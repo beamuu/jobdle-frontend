@@ -54,7 +54,7 @@ function SignUp() {
               className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
               type="text"
               value=""
-              placeholder="Your email"
+              placeholder="Your username"
             />
           </div>
           <div className="mb-3">
@@ -79,7 +79,7 @@ function SignUp() {
               placeholder="Confirm Password"
             />
           </div>
-          <div className="grid mb-3">
+          <div className="grid">
             <button
               type="submit"
               className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 hover:bg-blue-400"

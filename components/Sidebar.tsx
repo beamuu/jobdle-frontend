@@ -1,16 +1,24 @@
 import type { NextPage } from "next";
+import { useState } from "react";
 
 const Sidebar: NextPage = () => {
+  const [open, setOpen] = useState(true);
   return (
-    <div className="w-2/12 bg-white p-3 shadow-lg">
-      <div className="flex flex-warp items-center space-x-3 p-2 mb-5">
+    <div
+      className={`${
+        open ? "w-60" : "w-16"
+      } duration-300 bg-white p-3 shadow-lg hover:w-60 h-full`}
+    >
+      <div className="flex flex-warp items-center space-x-3 p-2 mb-5 max-w">
         <img
           className="rounded-full w-1/5"
           src="http://www.gravatar.com/avatar/2acfb745ecf9d4dccb3364752d17f65f?s=260&d=mp"
           alt="James Bhatta"
         />
         <div className="w-3/5">
-          <p className="font-semibold text-sm text-ellipsis overflow-hidden hover:text-clip">Napasin Saengthongfdsafasdfaffasdf</p>
+          <p className="font-semibold text-sm text-ellipsis overflow-hidden hover:text-clip">
+            Napasin Saengthongfdsafasdfaffasdf
+          </p>
           {/* <span className="text-sm tracking-wide flex items-center space-x-1">
             <svg
               className="h-4 text-green-500"
@@ -30,7 +38,7 @@ const Sidebar: NextPage = () => {
           </span> */}
         </div>
         <div className="w-1/5">
-          <span>
+          <span onClick={() => setOpen(!open)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

@@ -55,14 +55,14 @@ function SignIn() {
             />
           </div>
           <div className="flex justify-end mb-3">
-            <p className="text-blue-500 hover:underline hover:pointer">
+            <p className="text-blue-500 hover:underline hover:cursor-pointer">
               Forgot Password?
             </p>
           </div>
           <div className="grid mb-3">
             <button
               type="submit"
-              className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 hover:bg-blue-400"
+              className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 active:bg-blue-400"
             >
               LOGIN
             </button>

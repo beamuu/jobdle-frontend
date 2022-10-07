@@ -1,16 +1,31 @@
 import type { NextPage } from "next";
+import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 
 const Home: NextPage = () => {
+  const JobDescription = [
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+    { emp_name: "Napasin Saengthong", title: "ซ่อมท่อ", category: "ซ่อม", date: "2/10/2022" },
+  ];
   return (
     <div className="flex flex-wrap bg-gray-100 w-full h-screen">
       <Sidebar />
-      <div className="w-10/12 flex-col">
+      <div className="flex-1 flex-col">
         <Navbar />
         <div className="p-5">
           <div className="text-sky-700 font-bold text-2xl pb-3">Dashboard</div>
-          <span className="bg-white rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
+          <span className="bg-white rounded-md px-2 py-1 bg-green-200">
+            2 ตุลาคม
+          </span>
           <hr className="my-3" />
           <div className="my-3">
             <div className="mb-3">
@@ -25,45 +40,30 @@ const Home: NextPage = () => {
               <table className="min-w-max w-full table-auto">
                 <thead>
                   <tr className="bg-sky-200">
-                    <th className="text-start text-sky-800 py-3 px-6">Employer's Name</th>
-                    <th className="text-start text-sky-800 py-3 px-6">Title</th>
-                    <th className="text-start text-sky-800 py-3 px-6">Category</th>
-                    <th className="text-start text-sky-800 py-3 px-6">Date</th>
+                    <th className="text-start text-sky-700 py-3 px-6">
+                      Employer's Name
+                    </th>
+                    <th className="text-start text-sky-700 py-3 px-6">Title</th>
+                    <th className="text-start text-sky-700 py-3 px-6">
+                      Category
+                    </th>
+                    <th className="text-start text-sky-700 py-3 px-6">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  <tr className="hover:bg-gray-200 cursor-pointer">
-                    <td className="py-3 px-6">NAPASIN SAENGTHONG</td>
-                    <td className="py-3 px-6">ซ่อมท่อ</td>
+                  {JobDescription.map((job,i)=>(
+                    <tr className="hover:bg-gray-200 cursor-pointer">
+                    <td className="py-3 px-6">{job.emp_name}</td>
+                    <td className="py-3 px-6">{job.title}</td>
                     <td className="py-3 px-6">
-                      <span className="bg-red-200 rounded-md p-1">ซ่อม</span>
+                      <span className="bg-red-200 rounded-md p-1">{job.category}</span>
                     </td>
-                    <td className="py-3 px-6">
-                      2 ตุลาคม 2565
-                    </td>
+                    <td className="py-3 px-6">{job.date}</td>
                   </tr>
-                  <tr className="hover:bg-gray-200 cursor-pointer">
-                    <td className="py-3 px-6">NARUKABET SAENGTHONG</td>
-                    <td className="py-3 px-6">ซ่อมท่อ</td>
-                    <td className="py-3 px-6">
-                      <span className="bg-red-200 rounded-md p-1">ซ่อม</span>
-                    </td>
-                    <td className="py-3 px-6">
-                      2 ตุลาคม 2565
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-gray-200 cursor-pointer">
-                    <td className="py-3 px-6">NUTCHANON CHANWANDIDI</td>
-                    <td className="py-3 px-6">ซ่อมท่อ</td>
-                    <td className="py-3 px-6">
-                      <span className="bg-red-200 rounded-md p-1">ซ่อม</span>
-                    </td>
-                    <td className="py-3 px-6">
-                      2 ตุลาคม 2565
-                    </td>
-                  </tr>
+                  ))}
                 </tbody>
               </table>
+              <div className="w-full h-10 bg-sky-200 "></div>
             </div>
           </div>
         </div>
