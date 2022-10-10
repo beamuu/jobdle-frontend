@@ -1,9 +1,18 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import axios from "axios";
+import { NextPage } from "next";
 
-function SignIn() {
+const SignIn: NextPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useState({
+    username: "",
+    password: "",
+  });
+
+  const handleChange = (e: any) => {
+    setUser((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSignin = async (e: FormEvent) => {
     e.preventDefault();
@@ -21,6 +30,8 @@ function SignIn() {
     );
     console.log(res.data);
   };
+
+  console.log(user)
   return (
     <div className="bg-blue-200 h-screen w-screen grid justify-items-center">
       <div className="bg-white sm:w-8/12 md:w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
@@ -33,11 +44,10 @@ function SignIn() {
             <input
               className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
               type="text"
-              value={username}
+              value={user.username}
               placeholder="Type your email"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setUsername(e.target.value)
-              }
+              name="username"
+              onChange={handleChange}
             />
           </div>
           <div className="mb-3">
@@ -46,12 +56,11 @@ function SignIn() {
             </label>
             <input
               className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-              type="text"
-              value={password}
+              type="password"
+              value={user.password}
               placeholder="Type your password"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setPassword(e.target.value)
-              }
+              name="password"
+              onChange={handleChange}
             />
           </div>
           <div className="flex justify-end mb-3">
@@ -71,6 +80,6 @@ function SignIn() {
       </div>
     </div>
   );
-}
+};
 
 export default SignIn;
