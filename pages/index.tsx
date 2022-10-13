@@ -3,6 +3,7 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Dashboard from "../components/Dashboard";
 
 const Home: NextPage = () => {
   const JobDescription = [
@@ -69,10 +70,7 @@ const Home: NextPage = () => {
   ];
   return (
     <>
-      <div className="block bg-gray-100 min-h-screen min-w-screen">
-        <Sidebar/>
-        
-      </div>
+      <Dashboard/>
     </>
   );
 };
