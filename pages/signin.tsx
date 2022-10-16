@@ -2,7 +2,11 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import axios from "axios";
 import { NextPage } from "next";
 
-const SignIn: NextPage = () => {
+type SignInPageWithNotLayout = NextPage & {
+  notLayout: boolean;
+};
+
+const SignInPage: SignInPageWithNotLayout = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState({
@@ -31,7 +35,7 @@ const SignIn: NextPage = () => {
     console.log(res.data);
   };
 
-  console.log(user)
+  console.log(user);
   return (
     <div className="bg-blue-200 h-screen w-screen grid justify-items-center">
       <div className="bg-white sm:w-8/12 md:w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
@@ -82,4 +86,6 @@ const SignIn: NextPage = () => {
   );
 };
 
-export default SignIn;
+SignInPage.notLayout = true;
+
+export default SignInPage;

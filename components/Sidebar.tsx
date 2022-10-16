@@ -9,13 +9,9 @@ import {
   UserIcon,
 } from "@heroicons/react/24/outline";
 import type { NextPage } from "next";
-import { ComponentType, useEffect, useState } from "react";
+import { useState } from "react";
 
-type Props = {
-  Dashboard: ComponentType;
-};
-
-const Sidebar: NextPage = (Dashboard: Props) => {
+const Sidebar: NextPage = () => {
   const menus = [
     {
       title: "Dashboard",
@@ -33,19 +29,14 @@ const Sidebar: NextPage = (Dashboard: Props) => {
       icon: <ChatBubbleBottomCenterTextIcon className="w-5 d-5" />,
     },
     {
-      title: "My Profile",
-      link: "/myprofile",
+      title: "Profile",
+      link: "/profile",
       icon: <UserIcon className="w-5 d-5" />,
     },
     {
       title: "Settings",
       link: "/settings",
       icon: <AdjustmentsVerticalIcon className="w-5 d-5" />,
-    },
-    {
-      title: "Change Password",
-      link: "/",
-      icon: <LockClosedIcon className="w-5 h-5" />,
     },
     {
       title: "Log out",
@@ -123,7 +114,7 @@ const Sidebar: NextPage = (Dashboard: Props) => {
             </div>
             <div className="col-span-1 flex justify-center">
               <Bars3Icon
-                onClick={() => setOpen<ISidebar>({ Sidebar: !open.Sidebar })}
+                onClick={() => setOpen({ Sidebar: !open.Sidebar })}
                 className="w-5 h-5 cursor-pointer"
               />
             </div>
@@ -150,7 +141,6 @@ const Sidebar: NextPage = (Dashboard: Props) => {
             ))}
           </ul>
         </div>
-        {/* <Dashboard /> */}
       </div>
     </>
   );

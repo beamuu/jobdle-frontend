@@ -66,7 +66,7 @@ const Dashboard = () => {
     },
   ];
   return (
-    <div className="flex-1 p-5">
+    <div>
       <div className="text-sky-700 font-bold text-2xl pb-3">Dashboard</div>
       <span className="bg-white rounded-md px-2 py-1 bg-green-200">
         2 ตุลาคม
@@ -85,24 +85,24 @@ const Dashboard = () => {
           <table className="min-w-max w-full table-auto">
             <thead>
               <tr className="border-b-2 border-sky-300 ">
-                <th className="text-start text-sky-700 py-3 px-2 sm:px-6">
+                <th className="text-start text-sky-700 py-3 pl-2 md:pl-4">
                   Employer's Name
                 </th>
-                <th className="text-start text-sky-700 py-3 px-2 sm:px-6">
+                <th className="text-start text-sky-700 py-3">
                   Title
                 </th>
-                <th className="text-start text-sky-700 py-3 px-2 sm:px-6">
+                <th className="text-start text-sky-700 py-3">
                   Category
                 </th>
-                <th className="text-start text-sky-700 py-3 px-3">Date</th>
+                <th className="text-start text-sky-700 py-3">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {JobDescription.map((job, i) => (
                 <tr className="hover:bg-gray-200 cursor-pointer">
-                  <td className="py-3 px-2 sm:px-6">{job.emp_name}</td>
-                  <td className="py-3 px-2 sm:px-6">{job.title}</td>
-                  <td className="py-3 px-2 sm:px-6">
+                  <td className="py-3 pl-2 md:pl-4">{job.emp_name}</td>
+                  <td className="py-3">{job.title}</td>
+                  <td className="py-3">
                     <span className="bg-red-200 rounded-md px-2 sm:px-6">
                       {job.category}
                     </span>

@@ -1,7 +1,17 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  ReactElement,
+  ReactNode,
+  useState,
+} from "react";
 import { NextPage } from "next";
 
-const SignUp: NextPage = () => {
+type SignUpPageWithNotLayout = NextPage & {
+  notLayout: boolean;
+};
+
+const SignUpPage: SignUpPageWithNotLayout = () => {
   const [user, setUser] = useState({
     fname: "",
     lname: "",
@@ -122,4 +132,6 @@ const SignUp: NextPage = () => {
   );
 };
 
-export default SignUp;
+SignUpPage.notLayout = true;
+
+export default SignUpPage;
