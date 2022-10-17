@@ -20,7 +20,7 @@ const SignInPage: SignInPageWithNotLayout = () => {
 
   const handleSignin = async (e: FormEvent) => {
     e.preventDefault();
-    const res = await axios.post(
+    const response = await axios.post(
       "https://www.melivecode.com/api/login",
       {
         username: username,
@@ -32,14 +32,15 @@ const SignInPage: SignInPageWithNotLayout = () => {
         },
       }
     );
-    console.log(res.data);
+    console.log(response.data);
   };
 
   console.log(user);
   return (
-    <div className="bg-blue-200 h-screen w-screen grid justify-items-center">
+    <div className="bg-blue-200 w-full h-screen grid justify-items-center">
       <div className="bg-white sm:w-8/12 md:w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
         <p className="font-bold text-3xl text-center my-5">Login</p>
+
         <form onSubmit={handleSignin}>
           <div className="mb-3">
             <label className="block font-medium text-gray-700 my-1">
@@ -81,6 +82,7 @@ const SignInPage: SignInPageWithNotLayout = () => {
             </button>
           </div>
         </form>
+
       </div>
     </div>
   );

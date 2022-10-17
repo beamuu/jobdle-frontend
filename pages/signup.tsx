@@ -32,8 +32,8 @@ const SignUpPage: SignUpPageWithNotLayout = () => {
 
   console.log(user);
   return (
-    <div className="bg-blue-200 h-screen w-screen grid justify-items-center">
-      <div className="bg-white w-9/12 my-20 p-10 rounded-xl border border-transparent">
+    <div className="bg-blue-200 h-full w-auto grid justify-items-center">
+      <div className="bg-white w-9/12 my-20 px-10 py-5 rounded-xl border border-transparent">
         <p className="font-bold text-3xl text-center my-5">Sign Up</p>
         <form>
           <div className="mb-3 lg:flex">

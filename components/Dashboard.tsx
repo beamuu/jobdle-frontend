@@ -1,6 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import React from "react";
-import Navbar from "./Navbar";
 
 const Dashboard = () => {
   const JobDescription = [
