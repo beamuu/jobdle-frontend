@@ -15,7 +15,7 @@ const Sidebar: NextPage = () => {
   const menus = [
     {
       title: "Dashboard",
-      link: "/",
+      link: "/dashboard",
       icon: <ComputerDesktopIcon className="w-5 d-5" />,
     },
     {
@@ -40,7 +40,7 @@ const Sidebar: NextPage = () => {
     },
     {
       title: "Log out",
-      link: "/",
+      link: "/signout",
       icon: <ArrowRightOnRectangleIcon className="w-5 h-5" />,
     },
   ];
@@ -61,7 +61,7 @@ const Sidebar: NextPage = () => {
         {/* <!-- mobile menu button --> */}
         <button
           className="p-4 focus:outline-none"
-          onClick={() => setOpen({ Navbar: !open.Navbar })}
+          onClick={() => setOpen({ ...open, Navbar: !open.Navbar })}
         >
           <Bars3Icon className="w-5 h-5" />
         </button>
@@ -114,7 +114,7 @@ const Sidebar: NextPage = () => {
             </div>
             <div className="col-span-1 flex justify-center">
               <Bars3Icon
-                onClick={() => setOpen({ Sidebar: !open.Sidebar })}
+                onClick={() => setOpen({ ...open, Sidebar: !open.Sidebar })}
                 className="w-5 h-5 cursor-pointer"
               />
             </div>
