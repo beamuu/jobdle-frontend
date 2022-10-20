@@ -68,9 +68,8 @@ const Sidebar: NextPage = () => {
       </div>
       {/* mobile list menu */}
       <div
-        className={`absolute bg-white shadow-lg min-w-screen ${
-          !open.Navbar && "-translate-y-full"
-        } duration-200 md:hidden inset-x-0 top-14`}
+        className={`absolute bg-white shadow-lg min-w-screen ${!open.Navbar && "-translate-y-full"
+          } duration-200 md:hidden inset-x-0 top-14`}
       >
         {menus.map((menu) => (
           <a
@@ -85,18 +84,19 @@ const Sidebar: NextPage = () => {
 
       {/* Sidebar menu*/}
       <div
-        className={`${
-          open.Sidebar ? "w-60" : "w-16"
-        } relative duration-200 min-h-screen md:flex hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0 p-2 justify-center`}
+        className={`${open.Sidebar ? "w-60" : "w-16"
+          } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0 p-2`}
       >
+        <div className="flex justify-center items-center py-5">
+          <a className={`${open.Sidebar ? "text-2xl" : "text-sm"} font-bold text-white`} href="/">Jobdle</a>
+        </div>
         <div>
           {/* Sidebar-header */}
           <div
-            className={`${
-              open.Sidebar
-                ? "grid grid-cols-9 p-2 items-center"
-                : "flex flex-col-reverse space-y-2 pb-2 px-1"
-            } bg-gray-100 rounded-md`}
+            className={`${open.Sidebar
+              ? "grid grid-cols-9 p-2 items-center"
+              : "flex flex-col-reverse space-y-2 pb-2 px-1"
+              } bg-gray-100 rounded-md`}
           >
             <div className="col-span-2 flex justify-center">
               <div className="h-10 w-10 bg-gray-200 rounded-full flex justify-center items-center">
@@ -105,9 +105,8 @@ const Sidebar: NextPage = () => {
             </div>
             <div className="col-span-6">
               <p
-                className={`${
-                  !open.Sidebar && "hidden"
-                } font-semibold text-sm text-ellipsis overflow-hidden pl-2 hover:text-clip`}
+                className={`${!open.Sidebar && "hidden"
+                  } font-semibold text-sm text-ellipsis overflow-hidden pl-2 hover:text-clip`}
               >
                 Napasin Saengthongfasdkjnfsalkdfknfldk
               </p>
@@ -126,11 +125,10 @@ const Sidebar: NextPage = () => {
                 <a
                   href={menu.link}
                   key={menu.title}
-                  className={`${
-                    open.Sidebar
-                      ? "flex items-center space-x-3"
-                      : "flex justify-center"
-                  } hover:border p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline`}
+                  className={`${open.Sidebar
+                    ? "flex items-center space-x-3"
+                    : "flex justify-center"
+                    } hover:border p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline`}
                 >
                   {menu.icon}
                   <span className={`${open.Sidebar ? "" : "hidden"}`}>

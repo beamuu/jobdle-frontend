@@ -51,8 +51,8 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
   };
 
   return (
-    <div className="bg-sky-200 h-screen w-screen grid justify-items-center lg:px-96 py-20">
-      <div className="bg-white container p-10 rounded-xl border border-transparent">
+    <div className="bg-blue-200 h-screen w-screen grid justify-items-center">
+      <div className="bg-white w-9/12 my-20 p-10 rounded-xl border border-transparent">
         <p className="font-bold text-3xl text-center my-5">Sign Up</p>
         <form onSubmit={handleSignUp}>
           <div className="mb-3 lg:flex">
