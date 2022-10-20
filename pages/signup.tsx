@@ -139,7 +139,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
           <div className="grid mt-5">
             <button
               type="submit"
-              className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 hover:bg-blue-400 mx-60"
+              className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 hover:bg-blue-400"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -153,6 +153,11 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
             </button>
           </div>
         </form>
+        <div className="flex justify-center my-5">
+          <a href="/signin" className="text-blue-600 visited:text-purple-600">
+            Sign In
+          </a>
+        </div>
       </div>
     </div>
   );
