@@ -39,7 +39,6 @@ const SignInPage: SignInPageWithNoLayout = () => {
         alert("Sign in fail!");
       } else {
         setCookie("token", res.data.accessToken, { path: "/" });
-        console.log("res.data", res.data);
         setIsLoading(false);
         router.push("/dashboard");
       }
@@ -50,7 +49,6 @@ const SignInPage: SignInPageWithNoLayout = () => {
     }
   };
 
-  console.log(userData);
   return (
     <div className="bg-sky-200 h-screen w-screen grid justify-items-center">
       <div className="bg-white sm:w-8/12 md:w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
@@ -64,7 +62,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
               className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
               type="text"
               value={userData.username}
-              placeholder="Type your email"
+              placeholder="Type your username"
               name="username"
               onChange={handleChange}
             />

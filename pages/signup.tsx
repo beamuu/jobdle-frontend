@@ -32,7 +32,6 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
   const handleSignUp = async (e: FormEvent) => {
     try {
       setIsLoading(true);
-      console.log("userData ", userData);
       e.preventDefault();
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signup`,
@@ -45,7 +44,6 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
       );
       setIsLoading(false);
       router.push("/signin")
-      console.log("res.data", res.data);
     } catch (error) {
       console.error(error);
       setIsLoading(false);
