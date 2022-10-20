@@ -7,6 +7,7 @@ import {
 } from "react";
 import { NextPage } from "next";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 type SignUpPageWithNoLayout = NextPage & {
   noLayout: boolean;
@@ -21,8 +22,8 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-
   const [cfmPw, setCfmPw] = useState(""); // Comfirm Password
+  const router = useRouter();
 
   const handleChange = (e: any) => {
     setUserData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -43,6 +44,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
         }
       );
       setIsLoading(false);
+      router.push("/signin")
       console.log("res.data", res.data);
     } catch (error) {
       console.error(error);
@@ -155,7 +157,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
         </form>
         <div className="flex justify-center my-5">
           <a href="/signin" className="text-blue-600 visited:text-purple-600">
-            Sign In
+            You have an account ? Sign In
           </a>
         </div>
       </div>
