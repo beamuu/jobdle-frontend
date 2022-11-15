@@ -44,7 +44,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
       }
     } catch (error) {
       console.error(error);
-      alert("Sign in fail!");
+      alert("Can't connect to server!");
       setIsLoading(false);
     }
   };
