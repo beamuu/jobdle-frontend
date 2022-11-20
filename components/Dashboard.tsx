@@ -1,9 +1,28 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import React from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import { UserProvider } from "../contexts/User";
-import Navbar from "./Navbar";
+
+type Job = {
+  category: string;
+  detail: string;
+  fullname: string;
+  location: string;
+  note: string;
+  title: string;
+  userId: string;
+  wage: string;
+  _id: string;
+  date: string;
+};
 
 const Dashboard = () => {
+  const [cookies, setCookie] = useCookies(["token"]);
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
+  const router = useRouter();
+  const query = router.query;
   const JobDescription = [
     {
       emp_name: "Napasin Saengthong",
@@ -66,6 +85,32 @@ const Dashboard = () => {
       date: "2/10/2022",
     },
   ];
+
+  const getAllJobs = async () => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/work${
+        query.status ? `?status=${query.status}` : ""
+      }`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies.token}`,
+        },
+      }
+    );
+    setAllJobs(res.data);
+  };
+
+  if (!allJobs) return null;
+
+  useEffect(() => {
+    try {
+      getAllJobs();
+    } catch (err) {
+      console.error(err);
+    }
+  }, [query.status]);
+
   return (
     <UserProvider>
       <div>
@@ -76,40 +121,76 @@ const Dashboard = () => {
         <hr className="my-3" />
         <div className="my-3">
           <div className="mb-3">
-            <button className="text-sky-700 font-semibold p-2 bg-white rounded-md">
+            <button
+              className="text-sky-700 font-semibold p-2 bg-white rounded-md"
+              onClick={() => router.push("/dashboard")}
+            >
               Current
             </button>
-            <button className="text-sky-700 font-semibold p-2 bg-white rounded-md ml-3">
+            <button
+              className="text-sky-700 font-semibold p-2 bg-white rounded-md ml-3"
+              onClick={() => router.push("?status=new")}
+            >
               New
             </button>
           </div>
-          <div className="bg-white shadow-md rounded overflow-hidden text-[8px] sm:text-base">
-            <table className="min-w-max w-full table-auto">
-              <thead>
-                <tr className="border-b-2 border-sky-300 ">
-                  <th className="text-start text-sky-700 py-3 pl-2 md:pl-4">
-                    Employer's Name
-                  </th>
-                  <th className="text-start text-sky-700 py-3">Title</th>
-                  <th className="text-start text-sky-700 py-3">Category</th>
-                  <th className="text-start text-sky-700 py-3">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {JobDescription.map((job, i) => (
-                  <tr className="hover:bg-gray-200 cursor-pointer">
-                    <td className="py-3 pl-2 md:pl-4">{job.emp_name}</td>
-                    <td className="py-3">{job.title}</td>
-                    <td className="py-3">
-                      <span className="bg-red-200 rounded-md px-2 sm:px-6">
-                        {job.category}
-                      </span>
-                    </td>
-                    <td className="py-3 px-2 sm:px-6">{job.date}</td>
+          <div className="bg-white shadow rounded-md overflow-hidden">
+            <div className="overflow-auto">
+              <table className="table-auto w-full">
+                <thead>
+                  <tr className="border-b-2 border-sky-300">
+                    <th className="text-start text-sky-700 py-3 pl-2 md:pl-4 min-w-[300px]">
+                      Employer's Name
+                    </th>
+                    <th className="text-start text-sky-700 py-3 min-w-[200px]">
+                      Title
+                    </th>
+                    <th className="text-start text-sky-700 py-3 min-w-[100px]">
+                      Category
+                    </th>
+                    <th className="text-start text-sky-700 py-3 min-w-[100px]">
+                      Date
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y">
+                  {allJobs.map((job) => (
+                    <tr
+                      className="hover:bg-gray-200 cursor-pointer"
+                      key={job._id}
+                      onClick={() => {
+                        router.push({
+                          pathname: "/jobdetails",
+                          query: { id: job._id, status: "new" },
+                        });
+                      }}
+                    >
+                      <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
+                      <td className="py-3">{job.title}</td>
+                      <td className="py-3">
+                        <span className="bg-red-200 rounded-md px-2">
+                          {job.category}
+                        </span>
+                      </td>
+                      <td className="py-3">{job.date}</td>
+                    </tr>
+                  ))}
+                  {/* For test  */}
+                  {/* {JobDescription.map((job) => (
+                    <tr className="hover:bg-gray-200 cursor-pointer">
+                      <td className="py-3 pl-2 md:pl-4">{job.emp_name}</td>
+                      <td className="py-3">{job.title}</td>
+                      <td className="py-3">
+                        <span className="bg-red-200 rounded-md px-2">
+                          {job.category}
+                        </span>
+                      </td>
+                      <td className="py-3">{job.date}</td>
+                    </tr>
+                  ))} */}
+                </tbody>
+              </table>
+            </div>
             <div className="w-full border-sky-300 border-t-2">
               <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
                 <div className="flex flex-1 justify-between sm:hidden">

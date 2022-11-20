@@ -21,7 +21,7 @@ function UserProvider({ children }: UserProviderProps) {
     }
   }, []);
 
-  if (isLoading) return null
+  if (isLoading) return null;
 
   return <UserContext.Provider value={{}}>{children}</UserContext.Provider>;
 }

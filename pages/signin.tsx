@@ -21,6 +21,19 @@ const SignInPage: SignInPageWithNoLayout = () => {
     setUserData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // const getUserData = async () => {
+  //   const res =  await axios.get(
+  //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+  //     {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${cookies.token}`,
+  //       },
+  //     }
+  //   );
+  //   return res.data
+  // };
+
   const handleSignIn = async (e: FormEvent) => {
     try {
       setIsLoading(true);
@@ -35,7 +48,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
         }
       );
 
-      if (!res.data.accessToken) {
+      if (!res.data.accessToken) { // กรณีไม่มี acessToken
         alert("Sign in fail!");
       } else {
         setCookie("token", res.data.accessToken, { path: "/" });
@@ -44,7 +57,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
       }
     } catch (error) {
       console.error(error);
-      alert("Can't connect to server!");
+      alert("Error bewteen client and server!");
       setIsLoading(false);
     }
   };

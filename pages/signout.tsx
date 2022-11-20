@@ -8,6 +8,7 @@ const SignoutPage = () => {
 
   useEffect(() => {
     removeCookie("token");
+    localStorage.clear();
     router.push("/signin");
   }, []);
   return null;
