@@ -1,30 +1,67 @@
+import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 
 const EmployerDashBoard: NextPage = () => {
+  const [cookies, setCookie] = useCookies(["token"]);
+  const [userJobs, setUserJobs] = useState([]);
+  const [data, setData] = useState()
+
+  const getUserData = async () => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies.token}`,
+        },
+      }
+    );
+    console.log(res.data)
+  };
+
+  const getUserJobs = async () => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies.token}`,
+        },
+      }
+    );
+    setUserJobs(res.data);
+    console.log('userjobs', res)
+  };
+
+  useEffect(() => {
+    getUserData();
+    getUserJobs();
+  }, [])
   const jobData = [
     {
-      title: "",
+      title: "ซ่อมท่อ",
       detail: "",
-      category: "",
-      wage: "",
+      category: "ซ่อม",
+      wage: "500",
       note: "",
       location: "",
     },
     {
-      title: "",
+      title: "ซ่อมอ่าง",
       detail: "",
-      category: "",
-      wage: "",
+      category: "ซ่อม",
+      wage: "600",
       note: "",
       location: "",
     },
     {
-      title: "",
+      title: "จับงู",
       detail: "",
-      category: "",
-      wage: "",
+      category: "อื่นๆ",
+      wage: "200",
       note: "",
       location: "",
     },
@@ -37,7 +74,7 @@ const EmployerDashBoard: NextPage = () => {
     router.push("/filldetailsjob");
   };
 
-  return count === 0 ? (
+  return count === 5 ? (
     <div>
       <div className="text-sky-700 font-bold text-2xl pb-3">งานที่จ้าง</div>
       <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
@@ -60,28 +97,33 @@ const EmployerDashBoard: NextPage = () => {
       <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
       <hr className="my-3" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {jobData.map((detail) => (
-          <></>
+        {userJobs.map((detail) => (
+          <div className="bg-white rounded-md px-3 py-2 shadow cursor-pointer space-y-1" onClick={() => {
+            router.push({
+              pathname: "/jobdetails",
+              query: { id: detail._id},
+            });
+          }}>
+            <p className="font-bold">{detail.title}</p>
+            <div className="block">
+              Category: <span className="rounded-md px-2 bg-green-200">{detail.category}</span>
+            </div>
+            <div className="">
+              Date <span className="rounded-md px-2 bg-gray-200">27/11/2011</span>
+            </div>
+            <div className="">
+              Wage <span className="rounded-md px-2 bg-gray-200">{detail.wage}</span>
+            </div>
+            <div className="">
+              Status{" "}
+              <span className="rounded-md px-2 bg-orange-200">Planing...</span>
+            </div>
+            <span className="flex justify-end text-gray-300">
+              Click for details
+            </span>
+          </div>
         ))}
-        <div className="bg-white rounded-md px-3 py-2 shadow cursor-pointer space-y-1">
-          <p className="font-bold">Title</p>
-          <div className="block">
-            Category: <span className="rounded-md px-2 bg-green-200">ซ่อม</span>
-          </div>
-          <div className="">
-            Date <span className="rounded-md px-2 bg-gray-200">27/11/2011</span>
-          </div>
-          <div className="">
-            Wage <span className="rounded-md px-2 bg-gray-200">500</span>
-          </div>
-          <div className="">
-            Status{" "}
-            <span className="rounded-md px-2 bg-orange-200">Planing...</span>
-          </div>
-          <span className="flex justify-end text-gray-300">
-            Click for details
-          </span>
-        </div>
+
       </div>
     </div>
   );
