@@ -4,9 +4,22 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
+type Job = {
+  category: string;
+  detail: string;
+  fullname: string;
+  location: string;
+  note: string;
+  title: string;
+  userId: string;
+  wage: string;
+  _id: string;
+  date: string;
+};
+
 const EmployerDashBoard: NextPage = () => {
   const [cookies, setCookie] = useCookies(["token"]);
-  const [userJobs, setUserJobs] = useState([]);
+  const [userJobs, setUserJobs] = useState<Job[]>([]);
   const [data, setData] = useState()
 
   const getUserData = async () => {
@@ -32,49 +45,26 @@ const EmployerDashBoard: NextPage = () => {
         },
       }
     );
-    setUserJobs(res.data);
+    setUserJobs(res.data.docs);
     console.log('userjobs', res)
   };
+
+  if (!userJobs) return null;
 
   useEffect(() => {
     getUserData();
     getUserJobs();
   }, [])
-  const jobData = [
-    {
-      title: "ซ่อมท่อ",
-      detail: "",
-      category: "ซ่อม",
-      wage: "500",
-      note: "",
-      location: "",
-    },
-    {
-      title: "ซ่อมอ่าง",
-      detail: "",
-      category: "ซ่อม",
-      wage: "600",
-      note: "",
-      location: "",
-    },
-    {
-      title: "จับงู",
-      detail: "",
-      category: "อื่นๆ",
-      wage: "200",
-      note: "",
-      location: "",
-    },
-  ];
 
-  const [count, setCount] = useState(0);
   const router = useRouter();
 
   const handleCreateJob = () => {
     router.push("/filldetailsjob");
   };
 
-  return count === 5 ? (
+  if (!userJobs) return null;
+
+  return userJobs.length === 0 ? (
     <div>
       <div className="text-sky-700 font-bold text-2xl pb-3">งานที่จ้าง</div>
       <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
@@ -105,8 +95,8 @@ const EmployerDashBoard: NextPage = () => {
             });
           }}>
             <p className="font-bold">{detail.title}</p>
-            <div className="block">
-              Category: <span className="rounded-md px-2 bg-green-200">{detail.category}</span>
+            <div className="grid-rows-1">
+              Category: <span className="rounded-md px-2 bg-green-200 col-span-6">{detail.category}</span>
             </div>
             <div className="">
               Date <span className="rounded-md px-2 bg-gray-200">27/11/2011</span>

@@ -5,92 +5,32 @@ import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { UserProvider } from "../contexts/User";
 
-type Job = {
-  category: string;
-  detail: string;
-  fullname: string;
-  location: string;
-  note: string;
-  title: string;
-  userId: string;
-  wage: string;
-  _id: string;
-  date: string;
-};
-
 const Dashboard = () => {
   const [cookies, setCookie] = useCookies(["token"]);
   const [allJobs, setAllJobs] = useState<Job[]>([]);
+  const [data, setData] = useState({
+    page: 1,
+    totalDocs: 0,
+    limit: 0,
+    totalPages: 0
+  })
   const router = useRouter();
   const query = router.query;
-  const JobDescription = [
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-    {
-      emp_name: "Napasin Saengthong",
-      title: "ซ่อมท่อ",
-      category: "ซ่อม",
-      date: "2/10/2022",
-    },
-  ];
+
+  const dateFormat = (today: Date) => {
+    let dd = today.getDate();
+    let mm = today.getMonth() + 1;
+    let yyyy = today.getFullYear();
+    let currentDate = `${dd}/${mm}/${yyyy}`;
+    return currentDate;
+  };
 
   const getAllJobs = async () => {
+    console.log('url', `${process.env.NEXT_PUBLIC_BACKEND_URL}/work${query.status ? `?status=${query.status}` : ""
+      }${query.page ? `?page=${query.page}` : ""}`)
     const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/work${
-        query.status ? `?status=${query.status}` : ""
-      }`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/work${query.status ? `?status=${query.status}` : ""
+      }${data.page > 0 ? `?page=${data.page}` : ""}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -98,8 +38,36 @@ const Dashboard = () => {
         },
       }
     );
-    setAllJobs(res.data);
+    console.log('res', res)
+    setAllJobs(res.data.docs);
+    setData({ ...data, totalDocs: res.data.totalDocs, limit: res.data.limit, totalPages: res.data.totalPages })
   };
+
+  const handlePreviousPage = (page: any) => {
+    if (page <= 1) return
+    setData({ ...data, page: page - 1 })
+  }
+
+  const handleNextPage = (page: any) => {
+    if (page >= data.totalPages) return
+    setData({ ...data, page: page + 1 })
+  }
+
+  const handleLastPage = () => {
+    if (data.totalDocs < data.limit * data.page)
+      return data.totalDocs
+    return data.limit * data.page
+  }
+
+  const createArrayPage = () => {
+    console.log(data)
+    const res = [];
+    for (let i = 1; i <= data.totalPages; i++) {
+      res.push(i)
+    }
+    console.log('createArray', res)
+    return res
+  }
 
   if (!allJobs) return null;
 
@@ -109,14 +77,13 @@ const Dashboard = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [query.status]);
+  }, [data.page]);
 
   return (
-    <UserProvider>
       <div>
         <div className="text-sky-700 font-bold text-2xl pb-3">Dashboard</div>
         <span className="bg-white rounded-md px-2 py-1 bg-green-200">
-          2 ตุลาคม
+          {dateFormat(new Date())}
         </span>
         <hr className="my-3" />
         <div className="my-3">
@@ -139,7 +106,7 @@ const Dashboard = () => {
               <table className="table-auto w-full">
                 <thead>
                   <tr className="border-b-2 border-sky-300">
-                    <th className="text-start text-sky-700 py-3 pl-2 md:pl-4 min-w-[300px]">
+                    <th className="text-start text-sky-700 py-3 pl-2 md:pl-4 min-w-[200px]">
                       Employer's Name
                     </th>
                     <th className="text-start text-sky-700 py-3 min-w-[200px]">
@@ -161,7 +128,7 @@ const Dashboard = () => {
                       onClick={() => {
                         router.push({
                           pathname: "/jobdetails",
-                          query: { id: job._id, status: "new" },
+                          query: { id: job._id},
                         });
                       }}
                     >
@@ -175,19 +142,6 @@ const Dashboard = () => {
                       <td className="py-3">{job.date}</td>
                     </tr>
                   ))}
-                  {/* For test  */}
-                  {/* {JobDescription.map((job) => (
-                    <tr className="hover:bg-gray-200 cursor-pointer">
-                      <td className="py-3 pl-2 md:pl-4">{job.emp_name}</td>
-                      <td className="py-3">{job.title}</td>
-                      <td className="py-3">
-                        <span className="bg-red-200 rounded-md px-2">
-                          {job.category}
-                        </span>
-                      </td>
-                      <td className="py-3">{job.date}</td>
-                    </tr>
-                  ))} */}
                 </tbody>
               </table>
             </div>
@@ -210,9 +164,9 @@ const Dashboard = () => {
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">1</span> to{" "}
-                      <span className="font-medium">10</span> of{" "}
-                      <span className="font-medium">97</span> results
+                      Showing <span className="font-medium">{data.limit * (data.page - 1) + 1}</span> to{" "}
+                      <span className="font-medium">{handleLastPage()}</span> of{" "}
+                      <span className="font-medium">{data.totalDocs}</span> results
                     </p>
                   </div>
                   <div>
@@ -220,32 +174,44 @@ const Dashboard = () => {
                       className="isolate inline-flex -space-x-px rounded-md shadow-sm"
                       aria-label="Pagination"
                     >
-                      <a
-                        href="#"
+                      <div
                         className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                        onClick={() => handlePreviousPage(data.page)}
                       >
                         <span className="sr-only">Previous</span>
                         <ChevronLeftIcon className="h-5 w-5" />
-                      </a>
-                      <a
-                        href="#"
+                      </div>
+
+                      {createArrayPage().map((number) => {
+                        console.log(data)
+                        return (
+                          <div
+                            aria-current="page"
+                            className={`relative inline-flex items-center border ${data.page === number ? "border-indigo-500 bg-indigo-50 z-10" : "border-gray-300 bg-white"} cursor-pointer px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20`}
+                            onClick={() => setData({ ...data, page: number })}
+                          >
+                            {number}
+                          </div>
+                        )
+                      })}
+                      {/* <div
                         aria-current="page"
                         className="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 focus:z-20"
+                        onClick={() => setData({ ...data, page: 1 })}
                       >
                         1
-                      </a>
-                      <a
-                        href="#"
+                      </div>
+                      <div
                         className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                        onClick={() => setData({ ...data, page: 2 })}
                       >
                         2
-                      </a>
-                      <a
-                        href="#"
+                      </div>
+                      <div
                         className="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 md:inline-flex"
                       >
                         3
-                      </a>
+                      </div>
                       <span className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
                         ...
                       </span>
@@ -266,14 +232,14 @@ const Dashboard = () => {
                         className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
                       >
                         10
-                      </a>
-                      <a
-                        href="#"
+                      </a> */}
+                      <div
                         className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                        onClick={() => handleNextPage(data.page)}
                       >
-                        <span className="sr-only">Next</span>
+                        <p className="sr-only">Next</p>
                         <ChevronRightIcon className="h-5 w-5" />
-                      </a>
+                      </div>
                     </nav>
                   </div>
                 </div>
@@ -282,7 +248,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </UserProvider>
   );
 };
 

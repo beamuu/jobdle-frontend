@@ -3,51 +3,81 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { useUser } from "../contexts/User";
 
-type JobDetail = {
-  category: string;
-  detail: string;
-  fullname: string;
-  location: string;
-  note: string;
-  title: string;
-  userId: string;
-  wage: string;
-  _id: string;
-};
+// type JobDetail = {
+//   category: string;
+//   detail: string;
+//   fullname: string;
+//   location: string;
+//   note: string;
+//   title: string;
+//   userId: string;
+//   wage: string;
+//   _id: string;
+// };
 
 const JobDetailsPage: NextPage = () => {
   const [cookies, setCookie] = useCookies(["token"]);
   const router = useRouter();
-  const [job, setJob] = useState<JobDetail>();
+  const [job, setJob] = useState<Job>();
   const { id } = router.query;
 
-  const getJob = async () => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.token}`,
-        },
-      }
-    );
+  const { userData } = useUser()
 
-    setJob(res.data);
+  const getJob = async (id: any) => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.token}`,
+          },
+        }
+      );
+      setJob(res.data);
+    } catch (err) {
+      console.log(err);
+      router.push('/dashboard')
+    }
   };
 
-  const deleteJob = () => {};
-  const editJob = () => {};
+  const deleteJob = async () => {
+    try {
+      const res = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.token}`,
+          },
+        }
+      )
+      router.push("/dashboard")
+    } catch (err) {
+      console.log(err)
+    }
+  };
+  const editJob = () => {
+    router.push(`/editjobdetails?id=${id}`)
+  };
+
+  const handleManageTheJob = () => {
+    
+  }
 
   useEffect(() => {
-    try {
-      getJob();
-    } catch (err) {
-      console.error(err);
+    console.log('router.query', router.query)
+    if (router.query.id) {
+      console.log('idef', router.query.id)
+      getJob(router.query.id);
     }
-  }, []);
+  }, [router])
 
   if (job === undefined) return null;
+
+  if (!userData) return null;
 
   const jobDetails = [
     {
@@ -80,11 +110,11 @@ const JobDetailsPage: NextPage = () => {
     },
     {
       title: "Date",
-      description: "27/11/2022",
+      description: job.deadline,
     },
     {
       title: "Status",
-      description: "Planing",
+      description: job.status,
     },
   ];
 
@@ -102,18 +132,25 @@ const JobDetailsPage: NextPage = () => {
         ))}
       </div>
       <div className="flex justify-between">
-        <button
-          className="bg-yellow-500 rounded-md p-2 text-white w-20 mt-2"
-          onClick={editJob}
-        >
-          Edit
-        </button>
-        <button
-          className="bg-red-500 rounded-md p-2 text-white w-20 mt-2"
-          onClick={deleteJob}
-        >
-          Delete
-        </button>
+        <div className="space-x-2">
+          <button
+            className="bg-yellow-500 rounded-md p-2 text-white w-20 mt-2"
+            onClick={editJob}
+          >
+            Edit
+          </button>
+          <button
+            className="bg-red-500 rounded-md p-2 text-white w-20 mt-2"
+            onClick={deleteJob}
+          >
+            Delete
+          </button>
+        </div>
+        {userData.role === "admin" ? (<div>
+          <button className="bg-sky-500 rounded-md p-2 text-white w-20 mt-2">
+            Manage
+          </button>
+        </div>) : null}
       </div>
     </div>
   );

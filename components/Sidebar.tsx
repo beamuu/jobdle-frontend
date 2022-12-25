@@ -8,27 +8,39 @@ import {
   LockClosedIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
-import axios from "axios";
 import type { NextPage } from "next";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { useUser } from "../contexts/User";
 
 type Data = {
   firstname: string;
   lastname: string;
+  menuState: string;
 };
 
 const Sidebar: NextPage = () => {
   const [data, setData] = useState<Data>({
     firstname: "",
     lastname: "",
+    menuState: ""
   });
   const [cookies, setCookie] = useCookies(["token"]);
+  const [open, setOpen] = useState({
+    Sidebar: true,
+    Navbar: false,
+  });
+  const router = useRouter();
+
+  const { userData } = useUser();
+  if (!userData) return null
+
 
   const menus = [
     {
       title: "Dashboard",
-      link: "/dashboard",
+      link:  (userData.role === "admin" ? "/dashboard" : "/employerdashboard") ,
       icon: <ComputerDesktopIcon className="w-5 d-5" />,
     },
     {
@@ -58,27 +70,23 @@ const Sidebar: NextPage = () => {
     },
   ];
 
-  const [open, setOpen] = useState({
-    Sidebar: true,
-    Navbar: false,
-  });
+  // const getUserData = async () => {
+  //   const res = await axios.get(
+  //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+  //     {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${cookies.token}`,
+  //       },
+  //     }
+  //   );
+  //   setData({ ...data, firstname: res.data.firstname, lastname: res.data.lastname });
+  // };
 
-  const getUserData = async () => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.token}`,
-        },
-      }
-    );
-    setData({ firstname: res.data.firstname, lastname: res.data.lastname });
-  };
-
-  useEffect(() => {
-    getUserData();
-  }, []);
+  const handleSelectMenu = (menu: any) => {
+    setData({ ...data, menuState: menu.title })
+    router.push(menu.link)
+  }
 
   return (
     <>
@@ -98,9 +106,8 @@ const Sidebar: NextPage = () => {
       </div>
       {/* mobile list menu */}
       <div
-        className={`absolute bg-white shadow-lg min-w-screen ${
-          !open.Navbar && "-translate-y-full"
-        } duration-200 md:hidden inset-x-0 top-14`}
+        className={`absolute bg-white shadow-lg min-w-screen ${!open.Navbar && "-translate-y-full"
+          } duration-200 md:hidden inset-x-0 top-14`}
       >
         {menus.map((menu) => (
           <a
@@ -115,15 +122,13 @@ const Sidebar: NextPage = () => {
 
       {/* Sidebar menu*/}
       <div
-        className={`${
-          open.Sidebar ? "w-60" : "w-16"
-        } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0 p-2`}
+        className={`${open.Sidebar ? "w-60" : "w-16"
+          } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0 p-2`}
       >
         <div className="flex justify-center items-center py-5">
           <a
-            className={`${
-              open.Sidebar ? "text-2xl" : "text-sm"
-            } font-bold text-white`}
+            className={`${open.Sidebar ? "text-2xl" : "text-sm"
+              } font-bold text-white`}
             href="/"
           >
             Jobdle
@@ -132,11 +137,10 @@ const Sidebar: NextPage = () => {
         <div>
           {/* Sidebar-header */}
           <div
-            className={`${
-              open.Sidebar
-                ? "grid grid-cols-9 p-2 items-center"
-                : "flex flex-col-reverse space-y-2 pb-2 px-1"
-            } bg-gray-100 rounded-md`}
+            className={`${open.Sidebar
+              ? "grid grid-cols-9 p-2 items-center"
+              : "flex flex-col-reverse space-y-2 pb-2 px-1"
+              } bg-gray-100 rounded-md`}
           >
             <div className="col-span-2 flex justify-center">
               <div className="h-10 w-10 bg-gray-200 rounded-full flex justify-center items-center">
@@ -145,11 +149,10 @@ const Sidebar: NextPage = () => {
             </div>
             <div className="col-span-6">
               <p
-                className={`${
-                  !open.Sidebar && "hidden"
-                } font-semibold text-sm text-ellipsis overflow-hidden pl-2 hover:text-clip`}
+                className={`${!open.Sidebar && "hidden"
+                  } font-semibold text-sm text-ellipsis overflow-hidden pl-2 hover:text-clip`}
               >
-                {data.firstname} {data.lastname}
+                {userData.firstname} {userData.lastname}
               </p>
             </div>
             <div className="col-span-1 flex justify-center">
@@ -163,20 +166,19 @@ const Sidebar: NextPage = () => {
           <ul className="space-y-2 text-sm text-white py-2">
             {menus.map((menu, i) => (
               <li title={menu.title} key={menu.title}>
-                <a
-                  href={menu.link}
+                <div
+                  onClick={() => handleSelectMenu(menu)}
                   key={menu.title}
-                  className={`${
-                    open.Sidebar
-                      ? "flex items-center space-x-3"
-                      : "flex justify-center"
-                  } hover:border p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline`}
+                  className={`${open.Sidebar
+                    ? "flex items-center space-x-3"
+                    : "flex justify-center"
+                    } ${data.menuState === menu.title ? "bg-blue-500" : ""} p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline cursor-pointer`}
                 >
                   {menu.icon}
                   <span className={`${open.Sidebar ? "" : "hidden"}`}>
                     {menu.title}
                   </span>
-                </a>
+                </div>
               </li>
             ))}
           </ul>

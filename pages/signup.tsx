@@ -42,6 +42,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
           },
         }
       );
+      console.log(res)
       setIsLoading(false);
       router.push("/signin")
     } catch (error) {
