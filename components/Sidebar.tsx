@@ -37,10 +37,10 @@ const Sidebar: NextPage = () => {
   if (!userData) return null
 
 
-  const menus = [
+  let menus = [
     {
       title: "Dashboard",
-      link:  (userData.role === "admin" ? "/dashboard" : "/employerdashboard") ,
+      link: (userData.role === "admin" ? "/dashboard" : "/employerdashboard"),
       icon: <ComputerDesktopIcon className="w-5 d-5" />,
     },
     {
@@ -51,6 +51,11 @@ const Sidebar: NextPage = () => {
     {
       title: "Chat",
       link: "/chat",
+      icon: <ChatBubbleBottomCenterTextIcon className="w-5 d-5" />,
+    },
+    {
+      title: "Employee",
+      link: "/employee",
       icon: <ChatBubbleBottomCenterTextIcon className="w-5 d-5" />,
     },
     {
@@ -164,23 +169,27 @@ const Sidebar: NextPage = () => {
           </div>
 
           <ul className="space-y-2 text-sm text-white py-2">
-            {menus.map((menu, i) => (
-              <li title={menu.title} key={menu.title}>
-                <div
-                  onClick={() => handleSelectMenu(menu)}
-                  key={menu.title}
-                  className={`${open.Sidebar
-                    ? "flex items-center space-x-3"
-                    : "flex justify-center"
-                    } ${data.menuState === menu.title ? "bg-blue-500" : ""} p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline cursor-pointer`}
-                >
-                  {menu.icon}
-                  <span className={`${open.Sidebar ? "" : "hidden"}`}>
-                    {menu.title}
-                  </span>
-                </div>
-              </li>
-            ))}
+            {menus.map((menu, i) => {
+              if (userData.role !== "admin" && menu.title === "Employee") return null;
+              return (
+                <li title={menu.title} key={menu.title}>
+                  <div
+                    onClick={() => handleSelectMenu(menu)}
+                    key={menu.title}
+                    className={`${open.Sidebar
+                      ? "flex items-center space-x-3"
+                      : "flex justify-center"
+                      } ${data.menuState === menu.title ? "bg-blue-500" : ""} p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline cursor-pointer`}
+                  >
+                    {menu.icon}
+                    <span className={`${open.Sidebar ? "" : "hidden"}`}>
+                      {menu.title}
+                    </span>
+                  </div>
+                </li>
+              )
+            }
+            )}
           </ul>
         </div>
       </div>

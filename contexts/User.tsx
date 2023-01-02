@@ -1,17 +1,17 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
 type UserProviderProps = {
-  children: any;
+  children: ReactNode;
 };
 
 type UserContextType = {
   userData: User | undefined
 }
 
-const UserContext = createContext<UserContextType>({userData:undefined});
+const UserContext = createContext<UserContextType>({ userData: undefined });
 
 function UserProvider({ children }: UserProviderProps) {
   const router = useRouter();
@@ -33,21 +33,24 @@ function UserProvider({ children }: UserProviderProps) {
   };
 
   useEffect(() => {
-    if (!cookies.token) {
+    try {
+      if (!cookies.token) {
+        router.push("/signin");
+      } else {
+        getUserData();
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error('err', err);
       router.push("/signin");
-    } else {
-      getUserData();
-      setIsLoading(false);
     }
   }, []);
 
   if (isLoading) return null;
 
-  return <UserContext.Provider value={{userData}}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ userData }}>{children}</UserContext.Provider>;
 }
 
-function useUser() {
-  return useContext(UserContext);
-}
+const useUser = () => useContext(UserContext);
 
 export { UserProvider, useUser };

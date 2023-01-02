@@ -20,6 +20,7 @@ type Job = {
 const EmployerDashBoard: NextPage = () => {
   const [cookies, setCookie] = useCookies(["token"]);
   const [userJobs, setUserJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState()
 
   const getUserData = async () => {
@@ -36,6 +37,7 @@ const EmployerDashBoard: NextPage = () => {
   };
 
   const getUserJobs = async () => {
+    setLoading(true);
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
       {
@@ -47,6 +49,7 @@ const EmployerDashBoard: NextPage = () => {
     );
     setUserJobs(res.data.docs);
     console.log('userjobs', res)
+    setLoading(false);
   };
 
   if (!userJobs) return null;
@@ -63,6 +66,8 @@ const EmployerDashBoard: NextPage = () => {
   };
 
   if (!userJobs) return null;
+
+  if (loading) return null;
 
   return userJobs.length === 0 ? (
     <div>
@@ -91,7 +96,7 @@ const EmployerDashBoard: NextPage = () => {
           <div className="bg-white rounded-md px-3 py-2 shadow cursor-pointer space-y-1" onClick={() => {
             router.push({
               pathname: "/jobdetails",
-              query: { id: detail._id},
+              query: { id: detail._id },
             });
           }}>
             <p className="font-bold">{detail.title}</p>

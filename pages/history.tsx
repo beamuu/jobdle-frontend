@@ -164,7 +164,7 @@ const HistoryPage: NextPage = () => {
                     aria-label="Pagination"
                   >
                     <div
-                      className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                      className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 cursor-pointer"
                       onClick={() => handlePreviousPage(data.page)}
                     >
                       <span className="sr-only">Previous</span>
@@ -176,54 +176,15 @@ const HistoryPage: NextPage = () => {
                       return (
                         <div
                           aria-current="page"
-                          className={`relative inline-flex items-center border ${data.page === number ? "border-indigo-500 bg-indigo-50 z-10" : "border-gray-300 bg-white"} cursor-pointer px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20`}
+                          className={`relative inline-flex items-center border ${data.page === number ? "border-indigo-500 bg-indigo-50 z-10" : "border-gray-300 bg-white cursor-pointer"} px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20`}
                           onClick={() => setData({ ...data, page: number })}
                         >
                           {number}
                         </div>
                       )
                     })}
-                    {/* <div
-                        aria-current="page"
-                        className="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 focus:z-20"
-                        onClick={() => setData({ ...data, page: 1 })}
-                      >
-                        1
-                      </div>
-                      <div
-                        className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                        onClick={() => setData({ ...data, page: 2 })}
-                      >
-                        2
-                      </div>
-                      <div
-                        className="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 md:inline-flex"
-                      >
-                        3
-                      </div>
-                      <span className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
-                        ...
-                      </span>
-                      <a
-                        href="#"
-                        className="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 md:inline-flex"
-                      >
-                        8
-                      </a>
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                      >
-                        9
-                      </a>
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                      >
-                        10
-                      </a> */}
                     <div
-                      className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                      className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 cursor-pointer"
                       onClick={() => handleNextPage(data.page)}
                     >
                       <p className="sr-only">Next</p>

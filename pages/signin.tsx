@@ -101,7 +101,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
           <div className="grid mb-3">
             <button
               type="submit"
-              className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 active:bg-blue-400"
+              className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 active:bg-blue-400 hover:bg-blue-400"
               disabled={isLoading}
             >
               LOG IN

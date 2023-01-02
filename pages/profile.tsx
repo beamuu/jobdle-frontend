@@ -1,21 +1,27 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { useUser } from "../contexts/User";
 
-type ProfileData = {
-  email: string;
-  firstname: string;
-  lastname: string;
-  username: string;
-};
+const defaultUser = {
+  firstname: '',
+  lastname: '',
+  username: '',
+  password: '',
+  email: '',
+  role: '',
+}
 
 const ProfilePage = () => {
-  const [profileData, setProfileData] = useState<ProfileData>();
+  const { userData } = useUser();
+  const [profileData, setProfileData] = useState<User>(defaultUser);
   const [cookies, setCookie] = useCookies(["token"]);
 
-  const getUserData = async () => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+
+  const handleEditUserData = async () => {
+    console.log('profileData', profileData)
+    const res = await axios.patch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`, profileData,
       {
         headers: {
           "Content-Type": "application/json",
@@ -23,15 +29,17 @@ const ProfilePage = () => {
         },
       }
     );
-    setProfileData(res.data);
+  };
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setProfileData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   useEffect(() => {
-    try {
-      getUserData();
-    } catch (err) {}
-  }, []);
+    setProfileData(userData || defaultUser)
+  }, [userData]);
+
+  if (!userData) return null;
 
   return (
     <div>
@@ -56,8 +64,9 @@ const ProfilePage = () => {
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     type="text"
                     placeholder=""
-                    name="fname"
-                    value={profileData?.firstname}
+                    name="firstname"
+                    value={profileData.firstname}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="lg:flex-1">
@@ -68,8 +77,9 @@ const ProfilePage = () => {
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     type="text"
                     placeholder=""
-                    name="lname"
-                    value={profileData?.lastname}
+                    name="lastname"
+                    value={profileData.lastname}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -82,7 +92,8 @@ const ProfilePage = () => {
                   type="text"
                   placeholder="Your email"
                   name="email"
-                  value={profileData?.email}
+                  value={profileData.email}
+                  onChange={handleChange}
                 />
               </div>
               <div className="mb-3">
@@ -94,7 +105,8 @@ const ProfilePage = () => {
                   type="text"
                   placeholder="Your username"
                   name="username"
-                  value={profileData?.username}
+                  value={profileData.username}
+                  onChange={handleChange}
                 />
               </div>
               <div className="mb-3">
@@ -105,12 +117,14 @@ const ProfilePage = () => {
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   type="text"
                   placeholder="phone number"
+                  onChange={handleChange}
                 />
               </div>
               <div>
                 <button
                   type="submit"
                   className="rounded-md border border-transparent bg-yellow-500 py-2 px-4 text-sm font-medium text-white shadow-md shadow-yellow-500/50 hover:bg-yellow-400"
+                  onClick={handleEditUserData}
                 >
                   Edit Profile
                 </button>

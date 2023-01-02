@@ -125,9 +125,9 @@ const JobDetailsPage: NextPage = () => {
       <hr className="my-3" />
       <div className="bg-white px-5 py-2 rounded-md divide-y">
         {jobDetails.map((detail) => (
-          <div className="items-center sm:grid sm:grid-cols-5">
+          <div className="items-center sm:grid sm:grid-cols-5 py-1">
             <p className="font-bold col-span-1">{detail.title} </p>
-            <p className="w-full p-1 sm:col-span-4">{detail.description}</p>
+            <p className="w-full sm:col-span-4">{detail.description}</p>
           </div>
         ))}
       </div>
