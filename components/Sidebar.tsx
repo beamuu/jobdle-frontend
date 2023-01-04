@@ -127,7 +127,7 @@ const Sidebar: NextPage = () => {
 
       {/* Sidebar menu*/}
       <div
-        className={`${open.Sidebar ? "w-60" : "w-16"
+        className={`${open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
           } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0 p-2`}
       >
         <div className="flex justify-center items-center py-5">

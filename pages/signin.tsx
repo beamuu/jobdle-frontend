@@ -48,7 +48,6 @@ const SignInPage: SignInPageWithNoLayout = () => {
           },
         }
       );
-      console.log(res.data);
 
       if (!res.data.accessToken) {
         // กรณีไม่มี acessToken
@@ -72,7 +71,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
   };
 
   return (
-    <div className="bg-sky-200 h-screen w-screen grid justify-items-center">
+    <div className="bg-sky-400 h-screen w-screen grid justify-items-center">
       <div className="bg-white sm:w-8/12 md:w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
         <p className="font-bold text-3xl text-center my-5">Login</p>
         <form onSubmit={handleSignIn}>

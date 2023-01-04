@@ -85,18 +85,13 @@ const EmployerDashBoardPage: NextPage = () => {
         {userJobs.map((detail) => (
           <div
             className="bg-white rounded-md px-3 py-2 shadow cursor-pointer space-y-1"
-            onClick={() => {
-              router.push({
-                pathname: "/jobdetails",
-                query: { id: detail._id },
-              });
-            }}
+            onClick={() => router.push(`jobdetails/${detail?._id}`)}
           >
-            <p className="font-bold">{detail.title}</p>
+            <p className="font-bold">{detail?.title}</p>
             <div className="grid-rows-1">
               Category:{" "}
               <span className="rounded-md px-2 bg-green-200 col-span-6">
-                {detail.category}
+                {detail?.category}
               </span>
             </div>
             <div className="">
@@ -105,7 +100,9 @@ const EmployerDashBoardPage: NextPage = () => {
             </div>
             <div className="">
               Wage{" "}
-              <span className="rounded-md px-2 bg-gray-200">{detail.wage}</span>
+              <span className="rounded-md px-2 bg-gray-200">
+                {detail?.wage}
+              </span>
             </div>
             <div className="">
               Status{" "}

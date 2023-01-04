@@ -1,8 +1,9 @@
 interface User {
-    firstname: string;
-    lastname: string;
-    username: string;
-    password: string;
-    email: string;
-    role: string;
-  }
+  firstname: string;
+  lastname: string;
+  username: string;
+  password: string;
+  email: string;
+  role: string;
+  _id: string;
+}

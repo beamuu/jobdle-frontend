@@ -17,19 +17,15 @@ const ChatPage: NextPage = () => {
     index: -1,
   });
   const [message, setMessage] = useState("");
-  const [list, setList] = useState([]);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messageList, setMessageList] = useState<any[]>([]);
-  const [roomId, setRoomId] = useState();
+  const [roomId, setRoomId] = useState(undefined);
   const [cookies, setCookie] = useCookies(["token"]);
+  const [chatRooms, setChatRooms] = useState<any[]>([]);
   const refMessages = useRef<any[]>([]);
-  const { userData } = useUser();
-
-  const handleSendedMsg = (e: FormEvent) => {
-    e.preventDefault();
-    // console.log('msg', message)
-    // socket.emit("post", { post: message })
-  };
+  const [userData, setUserData] = useState<User>();
+  const [senderId, setSenderId] = useState();
+  // const { userData } = useUser();
 
   const getRoom = async (token: string) => {
     const res = await axios.get(
@@ -41,29 +37,87 @@ const ChatPage: NextPage = () => {
         },
       }
     );
-    console.log("getRoom", res);
+    // console.log("getRoom", res);
     return res.data;
   };
 
-  useEffect(() => {
-    const init = async () => {
-      var chatRoomData = await getRoom(cookies.token);
-      // if (userData) return;
+  const getFullName = async (token: string, user_id: string) => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/fullname/${user_id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("getFullName", res.data);
+    return res.data;
+  };
 
-      if (chatRoomData) {
+  const getUserData = async () => {
+    try {
+      // console.log("fetch userData");
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.token}`,
+          },
+        }
+      );
+      console.log("getUserData", res.data);
+      return res.data;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const init = async () => {
+    var chatRoomData = await getRoom(cookies.token);
+    var user = await getUserData();
+    setUserData(user);
+    setSenderId(user._id);
+
+    if (user && chatRoomData) {
+      console.log("user role", user.role);
+      if (user.role === "user") {
+        console.log("User");
         console.log("chatRoomData", chatRoomData);
         setMessageList(chatRoomData.messages);
         setRoomId(chatRoomData._id);
         refMessages.current = messageList;
+      } else if (user.role === "admin") {
+        console.log("Admin");
+        console.log("chatRoomData", chatRoomData);
+        setChatRooms(chatRoomData);
+        console.log("FIRST ROOM ID", roomId);
+        if (roomId === undefined) {
+          console.log("NOT HAVE ROOM ID");
+          // setRoomId(chatRoomData[0]._id);
+          setMessageList(chatRoomData[0].messages);
+        } else {
+          console.log("HAVE ROOM ID");
+          let selected = chatRoomData.filter(
+            (room: any) => room._id === roomId
+          );
+          console.log("selected room", selected);
+          console.log("selected messages", selected[0].messages);
+          setMessageList(selected[0].messages);
+        }
       }
-      console.log("MessageList", messageList);
-    };
+    }
+  };
+  console.log("MessageList", messageList);
+
+  useEffect(() => {
     init();
   }, [roomId]);
 
   useEffect(() => {
     refMessages.current = messageList;
-    console.log("ref changed to", refMessages.current);
+    // console.log("ref changed to", refMessages.current);
     // setChkMessage(true)
   }, [messageList]);
 
@@ -92,17 +146,23 @@ const ChatPage: NextPage = () => {
         // setChkReRenderSidebar(true);
         // setChkMessage(true);
       });
+      // console.log("messageList", messageList);
     }
   }, [socket]);
 
-  console.log("messageList", messageList);
-
   useEffect(() => {
-    // console.log(roomId)
+    console.log("ROOMID:", roomId);
     if (roomId && socket !== null) {
       socket.emit("joinroom", roomId);
     }
   }, [roomId]);
+
+  useEffect(() => {
+    if (messageList) {
+      var msgContainer: any = document.getElementById("messages");
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+  }, [messageList]);
 
   const sendMessage = async (e: FormEvent) => {
     e.preventDefault();
@@ -113,7 +173,7 @@ const ChatPage: NextPage = () => {
         roomId: roomId,
         content: {
           // sender: userData.username,
-          senderID: userData._id,
+          senderId: senderId,
           content_type: "Text",
           content: message,
           timeStamp: new Date(),
@@ -128,7 +188,6 @@ const ChatPage: NextPage = () => {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // console.log(e.target.value);
     setMessage(e.target.value);
   };
 
@@ -164,33 +223,41 @@ const ChatPage: NextPage = () => {
       recentMsg: "Hello!",
     },
   ];
+
+  // if (!userData) return null;
+
   return (
     <div className="w-full h-[90vh] max-h-[90vh] md:h-full flex flex-col md:flex md:flex-row rounded overflow-hidden shadow">
       {/* Chat channel part  */}
-      <div className="flex flex-col w-full h-full md:w-4/12">
+      <div className="flex flex-col w-full h-full md:w-3/12">
         <div className="w-full h-14 p-5 border-b flex justify-center items-center bg-sky-500">
           <p className="font-bold flex justify-center text-white">Chat</p>
         </div>
 
         <div className="flex-1 relative">
           <div className="overflow-auto absolute top-0 bottom-0 left-0 right-0">
-            {chatJobData.map((chat, i) => (
-              <div
-                className={`${
-                  data.index === i ? "bg-white" : "bg-gray-100"
-                } p-5 hover:bg-white cursor-pointer`}
-                onClick={() => setData({ ...data, index: i })}
-              >
-                <p className="font-bold">{chat.title}</p>
-                <p className="text-gray-500 font-light">{chat.username}</p>
-                <p>{chat.recentMsg}</p>
-              </div>
-            ))}
+            {chatRooms.map((room, i) => {
+              return (
+                <div
+                  className={`${
+                    data.index === i ? "bg-white" : "bg-gray-100"
+                  } p-5 hover:bg-white cursor-pointer`}
+                  onClick={() => {
+                    setData({ ...data, index: i });
+                    setRoomId(room._id);
+                  }}
+                >
+                  <p className="font-bold">{room._id}</p>
+                  {/* <p className="text-gray-500 font-light">{chat.username}</p> */}
+                  {/* <p>{room.messages[0].content}</p> */}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
       {/* Chat Message Content  */}
-      <div className="w-8/12 md:flex flex-col justify-between bg-white border-l border-gray-200 hidden">
+      <div className="w-9/12 md:flex flex-col justify-between bg-white border-l border-gray-200 hidden">
         {/* Chat title */}
         <div className="w-full h-14 py-5 pl-5 pr-3 border-b flex justify-between items-center relative">
           <p>Title</p>
@@ -198,18 +265,43 @@ const ChatPage: NextPage = () => {
             detail
           </button>
         </div>
-        {/* Chat content */}
 
+        {/* Chat content */}
         <div
           id="messages"
-          className="space-y-2 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+          className="space-y-2 p-3 overflow-y-auto flex-1 scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+          style={{}}
         >
           {messageList.map((message) => {
+            // console.log(
+            //   "userData._id, senderId",
+            //   userData?._id,
+            //   message.senderId
+            // );
+            // console.log("result", userData?._id === message.senderId);
             return (
-              <div className="flex items-end justify-end">
-                <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                  <div>
-                    <span className="px-4 py-2 rounded-lg inline-block bg-sky-600 text-white">
+              <div className="chat-message">
+                <div
+                  className={`${
+                    userData?._id === message.senderId
+                      ? "items-end justify-end"
+                      : ""
+                  } flex`}
+                >
+                  <div
+                    className={`${
+                      userData?._id === message.senderId
+                        ? "items-end order-1"
+                        : "items-start order-2"
+                    } flex flex-col rounded-lg space-y-2 mx-2 overflow-x-hidden max-w-[80%]`}
+                  >
+                    <span
+                      className={`${
+                        userData?._id === message.senderId
+                          ? "bg-sky-500 text-white"
+                          : "bg-gray-300 text-gray-600"
+                      } px-4 py-2 rounded-lg inline-block`}
+                    >
                       {message.content}
                     </span>
                   </div>
@@ -217,148 +309,6 @@ const ChatPage: NextPage = () => {
               </div>
             );
           })}
-
-          {/* <div className="chat-message">
-            <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-              <div>
-                <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                  hi
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end justify-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-sky-600 text-white ">
-                    Your error message says permission denied, npm global
-                    installs must be given root privileges.
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                    Command was run with root privileges. I'm sure about that.
-                  </span>
-                </div>
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                    I've update the description so it's more obviously now
-                  </span>
-                </div>
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                    FYI https://askubuntu.com/a/700266/510172
-                  </span>
-                </div>
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                    Check the line above (it ends with a # so, I'm running it as
-                    root )<pre># npm install -g @vue/devtools</pre>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end justify-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
-                    Any updates on this issue? I'm getting the same error when
-                    trying to install devtools. Thanks
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                    Thanks for your message David. I thought I'm alone with this
-                    issue. Please, ? the issue to support it :)
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end justify-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white ">
-                    Are you using sudo?
-                  </span>
-                </div>
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
-                    Run this command sudo chown -R `whoami` /Users/.npm-global/
-                    then install the package globally without using sudo
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                    It seems like you are from Mac OS world. There is no /Users/
-                    folder on linux ?
-                  </span>
-                </div>
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                    I have no issue with any other packages installed with root
-                    permission globally.
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end justify-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
-                    yes, I have a mac. I never had issues with root permission
-                    as well, but this helped me to solve the problem
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="chat-message">
-            <div className="flex items-end">
-              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                    I get the same error on Arch Linux (also with sudo)
-                  </span>
-                </div>
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                    I also have this issue, Here is what I was doing until now:
-                    #1076
-                  </span>
-                </div>
-                <div>
-                  <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                    even i am facing
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </div>
         {/* Chat input message */}
         <div className="flex border-t">
