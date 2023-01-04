@@ -1,6 +1,12 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useCookies } from "react-cookie";
 
 type UserProviderProps = {
@@ -8,8 +14,8 @@ type UserProviderProps = {
 };
 
 type UserContextType = {
-  userData: User | undefined
-}
+  userData: User | undefined;
+};
 
 const UserContext = createContext<UserContextType>({ userData: undefined });
 
@@ -17,19 +23,24 @@ function UserProvider({ children }: UserProviderProps) {
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["token"]);
   const [isLoading, setIsLoading] = useState(true);
-  const [userData, setUserData] = useState<User>()
+  const [userData, setUserData] = useState<User>();
 
   const getUserData = async () => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.token}`,
-        },
-      }
-    );
-    setUserData(res.data);
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.token}`,
+          },
+        }
+      );
+      console.log("getUserData", res.data)
+      setUserData(res.data);
+    } catch (err) {
+      router.push("/signin");
+    }
   };
 
   useEffect(() => {
@@ -41,14 +52,16 @@ function UserProvider({ children }: UserProviderProps) {
         setIsLoading(false);
       }
     } catch (err) {
-      console.error('err', err);
+      console.error("err", err);
       router.push("/signin");
     }
   }, []);
 
   if (isLoading) return null;
 
-  return <UserContext.Provider value={{ userData }}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ userData }}>{children}</UserContext.Provider>
+  );
 }
 
 const useUser = () => useContext(UserContext);

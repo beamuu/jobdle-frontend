@@ -3,7 +3,8 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { useUser } from "../contexts/User";
+import { useUser } from "../../contexts/User";
+import { dateFormat, deleteJob, getJob } from "../../services/jobServices";
 
 // type JobDetail = {
 //   category: string;
@@ -23,59 +24,66 @@ const JobDetailsPage: NextPage = () => {
   const [job, setJob] = useState<Job>();
   const { id } = router.query;
 
-  const { userData } = useUser()
+  const { userData } = useUser();
 
-  const getJob = async (id: any) => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.token}`,
-          },
-        }
-      );
-      setJob(res.data);
-    } catch (err) {
-      console.log(err);
-      router.push('/dashboard')
-    }
-  };
+  // const getJob = async (id: any) => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${cookies.token}`,
+  //         },
+  //       }
+  //     );
+  //     setJob(res.data);
+  //   } catch (err) {
+  //     console.log(err);
+  //     router.push("/dashboard");
+  //   }
+  // };
 
-  const deleteJob = async () => {
-    try {
-      const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.token}`,
-          },
-        }
-      )
-      router.push("/dashboard")
-    } catch (err) {
-      console.log(err)
-    }
-  };
+  // const deleteJob = async () => {
+  //   try {
+  //     const res = await axios.delete(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${cookies.token}`,
+  //         },
+  //       }
+  //     );
+  //     router.push("/dashboard");
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
   const editJob = () => {
-    router.push(`/editjobdetails?id=${id}`)
+    router.push(`/editjobdetails/${id}`);
   };
 
-  const handleManageTheJob = () => {
-    
-  }
+  const handleManageTheJob = () => {};
 
   useEffect(() => {
-    console.log('router.query', router.query)
-    if (router.query.id) {
-      console.log('idef', router.query.id)
-      getJob(router.query.id);
+    if (id) {
+      getJob(id, cookies.token).then((res) => {
+        setJob(res.data);
+      });
     }
-  }, [router])
+  }, [router]);
 
-  if (job === undefined) return null;
+  const handleDelete = () => {
+    try {
+      deleteJob(id, cookies.token);
+      router.push("/dashboard")
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  if (!job) return null;
 
   if (!userData) return null;
 
@@ -121,7 +129,9 @@ const JobDetailsPage: NextPage = () => {
   return (
     <div>
       <div className="text-sky-700 font-bold text-2xl pb-3">Job details</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
+      <span className="rounded-md px-2 py-1 bg-green-200">
+        {dateFormat(new Date())}
+      </span>
       <hr className="my-3" />
       <div className="bg-white px-5 py-2 rounded-md divide-y">
         {jobDetails.map((detail) => (
@@ -141,16 +151,18 @@ const JobDetailsPage: NextPage = () => {
           </button>
           <button
             className="bg-red-500 rounded-md p-2 text-white w-20 mt-2"
-            onClick={deleteJob}
+            onClick={handleDelete}
           >
             Delete
           </button>
         </div>
-        {userData.role === "admin" ? (<div>
-          <button className="bg-sky-500 rounded-md p-2 text-white w-20 mt-2">
-            Manage
-          </button>
-        </div>) : null}
+        {userData.role === "admin" ? (
+          <div>
+            <button className="bg-sky-500 rounded-md p-2 text-white w-20 mt-2">
+              Manage
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

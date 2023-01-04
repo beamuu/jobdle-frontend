@@ -3,6 +3,7 @@ import axios from "axios";
 import { NextPage } from "next";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
+import { spawn } from "child_process";
 
 type SignInPageWithNoLayout = NextPage & {
   noLayout: boolean;
@@ -47,8 +48,10 @@ const SignInPage: SignInPageWithNoLayout = () => {
           },
         }
       );
+      console.log(res.data);
 
-      if (!res.data.accessToken) { // กรณีไม่มี acessToken
+      if (!res.data.accessToken) {
+        // กรณีไม่มี acessToken
         alert("Sign in fail!");
       } else {
         setCookie("token", res.data.accessToken, { path: "/" });
@@ -56,8 +59,14 @@ const SignInPage: SignInPageWithNoLayout = () => {
         router.push("/dashboard");
       }
     } catch (error) {
-      console.error(error);
-      alert("Error bewteen client and server!");
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          alert("Sign in fail!");
+        } else {
+          alert("Error bewteen client and server!");
+        }
+      }
+      // console.error(error);
       setIsLoading(false);
     }
   };
@@ -98,13 +107,19 @@ const SignInPage: SignInPageWithNoLayout = () => {
               Forgot Password?
             </p>
           </div>
-          <div className="grid mb-3">
+          <div className="flex justify-center mb-3 items-center">
             <button
               type="submit"
-              className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 active:bg-blue-400 hover:bg-blue-400"
+              className="transition rounded-md border border-transparent bg-blue-600 w-full py-2 px-4 text-sm font-medium text-white hover:bg-blue-500"
               disabled={isLoading}
             >
-              LOG IN
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <span className="h-5 w-5 block rounded-full border-4 border-blue-400 border-t-white animate-spin"></span>
+                </div>
+              ) : (
+                <span className="justify-center">Log in</span>
+              )}
             </button>
           </div>
         </form>

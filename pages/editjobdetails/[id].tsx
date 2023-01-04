@@ -3,91 +3,90 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { dateFormat, editJob, getJob } from "../../services/jobServices";
 
 const EditDescriptionJobPage: NextPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const router = useRouter();
+  const { id } = router.query;
 
-  const [jobData, setJobData] = useState({
+  const [jobData, setJobData] = useState<EditableJob>({
     title: "",
     detail: "",
     category: "",
     wage: "",
     note: "",
     location: "",
-    deadline: ""
+    deadline: "",
   });
 
-  const getJob = async (id: any) => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.token}`,
-          },
-        }
-      );
-      console.log(res.data)
-      setJobData(res.data);
-    } catch (err) {
-      console.log(err);
-      router.push('/dashboard')
-    }
-  };
-
-
-
-  const currentDate = () => {
-    let today = new Date();
-    let dd = today.getDate();
-    let mm = today.getMonth() + 1;
-    let yyyy = today.getFullYear();
-    let currentDate = `${dd}/${mm}/${yyyy}`;
-    return currentDate;
-  };
+  // const getJob = async (id: any) => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${cookies.token}`,
+  //         },
+  //       }
+  //     );
+  //     console.log(res.data)
+  //     setJobData(res.data);
+  //   } catch (err) {
+  //     console.log(err);
+  //     router.push('/dashboard')
+  //   }
+  // };
 
   const handleChange = (e: any) => {
     setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleEditJobData = async (e: FormEvent) => {
-    try {
-      e.preventDefault();
-      const res = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${router.query.id}`,
-        jobData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.token}`,
-          },
-        }
-      );
-      console.log('res', res)
-      router.push('/dashboard')
+  // const handleEditJobData = async (e: FormEvent) => {
+  //   try {
+  //     e.preventDefault();
+  //     const res = await axios.patch(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${router.query.id}`,
+  //       jobData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${cookies.token}`,
+  //         },
+  //       }
+  //     );
+  //     console.log("res", res);
+  //     router.push("/dashboard");
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
-    } catch (err) {
-      console.log(err);
-    }
+  const handleEdit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+    await editJob(id as string, jobData, cookies.token);
+    router.push(`/jobdetails/${id}`);
   };
 
   useEffect(() => {
-    console.log('router.query', router.query)
-    if (router.query.id) {
-      console.log('idef', router.query.id)
-      getJob(router.query.id);
+    if (id) {
+      getJob(id, cookies.token).then((res) => {
+        setJobData(res.data);
+      });
     }
-  }, [router])
+  }, [router]);
 
   return (
     <div>
       <div className="text-sky-700 font-bold text-2xl pb-3">Job details</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">{currentDate()}</span>
+      <span className="rounded-md px-2 py-1 bg-green-200">
+        {dateFormat(new Date())}
+      </span>
       <hr className="my-3" />
 
-      <form onSubmit={handleEditJobData}>
+      <form onSubmit={handleEdit}>
         <div className="bg-white p-4 rounded-md space-y-2">
           <div className="sm:grid sm:grid-cols-5">
             <p className="font-bold col-span-1">Title </p>
@@ -165,14 +164,14 @@ const EditDescriptionJobPage: NextPage = () => {
               value={jobData.deadline}
               name="deadline"
               onChange={handleChange}
-            //   required
+              //   required
             />
           </div>
         </div>
         <div className="flex justify-between mt-2">
           <button
             className="bg-red-500 rounded-md p-2 text-white"
-            onClick={()=>router.push(`/jobdetails?id=${router.query.id}`)} // Can't work
+            onClick={() => router.push(`/jobdetails/${id}`)} // Can't work
           >
             Cancel
           </button>

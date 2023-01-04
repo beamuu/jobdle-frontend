@@ -1,10 +1,13 @@
 import axios from "axios";
 import { NextPage } from "next";
+import Router, { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { useCookies } from "react-cookie";
+import { dateFormat, postJob } from "../services/jobServices";
 
 const FillDescriptionJobPage: NextPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const router = useRouter();
 
   const [jobData, setJobData] = useState({
     title: "",
@@ -13,49 +16,53 @@ const FillDescriptionJobPage: NextPage = () => {
     wage: "",
     note: "",
     location: "",
-    deadline: ""
+    deadline: "",
   });
-
-  const currentDate = (today: Date) => {
-    let dd = today.getDate();
-    let mm = today.getMonth() + 1;
-    let yyyy = today.getFullYear();
-    let currentDate = `${dd}/${mm}/${yyyy}`;
-    return currentDate;
-  };
 
   const handleChange = (e: any) => {
     setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleJobData = async (e: FormEvent) => {
-    try {
-      e.preventDefault();
-      console.log(jobData)
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
-        { ...jobData },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.token}`,
-          },
-        }
-      );
-      console.log('res',res)
+  // const handleJobData = async (e: FormEvent) => {
+  //   try {
+  //     e.preventDefault();
+  //     console.log(jobData)
+  //     const res = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
+  //       { ...jobData },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${cookies.token}`,
+  //         },
+  //       }
+  //     );
+  //     console.log('res',res)
 
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  const handlePost = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await postJob(jobData, cookies.token);
+      router.push(`jobdetails/${res.data._id}`);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
   return (
     <div>
       <div className="text-sky-700 font-bold text-2xl pb-3">Job details</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">{currentDate(new Date())}</span>
+      <span className="rounded-md px-2 py-1 bg-green-200">
+        {dateFormat(new Date())}
+      </span>
       <hr className="my-3" />
 
-      <form onSubmit={handleJobData}>
+      <form onSubmit={handlePost}>
         <div className="bg-white p-4 rounded-md space-y-2">
           <div className="sm:grid sm:grid-cols-5">
             <p className="font-bold col-span-1">Title </p>

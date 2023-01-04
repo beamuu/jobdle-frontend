@@ -1,14 +1,17 @@
-type Job = {
-    category: string;
-    detail: string;
-    fullname: string;
-    location: string;
-    note: string;
-    title: string;
-    userId: string;
-    wage: string;
-    _id: string;
-    date: string;
-    deadline: string;
-    status: string;
-  };
+interface Job extends EditableJob {
+  fullname: string;
+  userId: string;
+  _id: string;
+  date: string;
+  status: string;
+}
+
+interface EditableJob {
+  title: string;
+  detail: string;
+  category: string;
+  wage: string;
+  note: string;
+  location: string;
+  deadline: string;
+}

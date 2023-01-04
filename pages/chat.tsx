@@ -1,53 +1,134 @@
+import axios from "axios";
 import { NextPage } from "next";
-import React, { ChangeEvent, FormEvent, FormEventHandler, useEffect, useState } from "react";
-import io, { Socket } from 'socket.io-client';
-
-// const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!);
+import React, {
+  ChangeEvent,
+  FormEvent,
+  FormEventHandler,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useCookies } from "react-cookie";
+import io, { Socket } from "socket.io-client";
+import { useUser } from "../contexts/User";
 
 const ChatPage: NextPage = () => {
   const [data, setData] = useState({
-    index: -1
-  })
-  const [message, setMessage] = useState("")
+    index: -1,
+  });
+  const [message, setMessage] = useState("");
   const [list, setList] = useState([]);
-  const [socket, setSocket] = useState<Socket<
-    DefaultEventsMap,
-    DefaultEventsMap
-  > | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [messageList, setMessageList] = useState<any[]>([]);
+  const [roomId, setRoomId] = useState();
+  const [cookies, setCookie] = useCookies(["token"]);
+  const refMessages = useRef<any[]>([]);
+  const { userData } = useUser();
 
   const handleSendedMsg = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // console.log('msg', message)
     // socket.emit("post", { post: message })
-  }
-  // socket.on("kirim", (data) => { setList([...list, data]) })
+  };
+
+  const getRoom = async (token: string) => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/chatroom`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("getRoom", res);
+    return res.data;
+  };
+
   useEffect(() => {
-    // if (socket === null) {
-    //   setSocket(
-    //     io(`https://87bb-158-108-231-19.ap.ngrok.io`, {
-    //       secure: true,
-    //       transports: ["flashsocket", "polling", "websocket"],
-    //     })
-    //   );
-    // } else {
-    //   socket.on("connect", () => {
-    //     console.log("SOCKET is already connected");
-    //   });
-    //   socket.on("message", (data: any) => {
-        // console.log(data)
-        // let a = [...messageList]
-        // a.push(data.content)
-        // console.log(messageList);
+    const init = async () => {
+      var chatRoomData = await getRoom(cookies.token);
+      // if (userData) return;
+
+      if (chatRoomData) {
+        console.log("chatRoomData", chatRoomData);
+        setMessageList(chatRoomData.messages);
+        setRoomId(chatRoomData._id);
+        refMessages.current = messageList;
+      }
+      console.log("MessageList", messageList);
+    };
+    init();
+  }, [roomId]);
+
+  useEffect(() => {
+    refMessages.current = messageList;
+    console.log("ref changed to", refMessages.current);
+    // setChkMessage(true)
+  }, [messageList]);
+
+  useEffect(() => {
+    // getRoom(cookies.token);
+    if (socket === null) {
+      setSocket(
+        io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
+          secure: true,
+          transports: ["flashsocket", "polling", "websocket"],
+        })
+      );
+    } else {
+      socket.on("connect", () => {
+        console.log("SOCKET is already connected");
+      });
+
+      socket.on("message", (data: any) => {
+        console.log("socket.on - message", data);
+        let newMessageLists = [...refMessages.current, data.content];
+        setMessageList(newMessageLists);
+        // let currentMessageList = [...messageList];
+        // currentMessageList.push(data.content);
         // setMessageList([...refMessages.current, data.content]);
         // setChk(!chk);
         // setChkReRenderSidebar(true);
         // setChkMessage(true);
-    //   });
-    // }
-  }, []); // <= [socket]
+      });
+    }
+  }, [socket]);
+
+  console.log("messageList", messageList);
+
+  useEffect(() => {
+    // console.log(roomId)
+    if (roomId && socket !== null) {
+      socket.emit("joinroom", roomId);
+    }
+  }, [roomId]);
+
+  const sendMessage = async (e: FormEvent) => {
+    e.preventDefault();
+    console.log("sendMessage");
+    if (socket !== null && userData) {
+      if (message === "") return;
+      let messageContent = {
+        roomId: roomId,
+        content: {
+          // sender: userData.username,
+          senderID: userData._id,
+          content_type: "Text",
+          content: message,
+          timeStamp: new Date(),
+        },
+      };
+      // console.log(socket.connected)
+      socket.emit("message", messageContent);
+      // setChkMessage(true)
+      // setMessageList([...messageList, messageContent.content]);
+      setMessage("");
+    }
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
+    // console.log(e.target.value);
     setMessage(e.target.value);
   };
 
@@ -94,7 +175,10 @@ const ChatPage: NextPage = () => {
         <div className="flex-1 relative">
           <div className="overflow-auto absolute top-0 bottom-0 left-0 right-0">
             {chatJobData.map((chat, i) => (
-              <div className={`${data.index === i ? "bg-white" : "bg-gray-100"} p-5 hover:bg-white cursor-pointer`}
+              <div
+                className={`${
+                  data.index === i ? "bg-white" : "bg-gray-100"
+                } p-5 hover:bg-white cursor-pointer`}
                 onClick={() => setData({ ...data, index: i })}
               >
                 <p className="font-bold">{chat.title}</p>
@@ -116,30 +200,67 @@ const ChatPage: NextPage = () => {
         </div>
         {/* Chat content */}
 
+        <div
+          id="messages"
+          className="space-y-2 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+        >
+          {messageList.map((message) => {
+            return (
+              <div className="flex items-end justify-end">
+                <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
+                  <div>
+                    <span className="px-4 py-2 rounded-lg inline-block bg-sky-600 text-white">
+                      {message.content}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
 
-        <div id="messages" className="space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
-          <div className="chat-message">
+          {/* <div className="chat-message">
             <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-              <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">Can be verified on any platform using docker</span></div>
+              <div>
+                <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
+                  hi
+                </span>
+              </div>
             </div>
           </div>
           <div className="chat-message">
             <div className="flex items-end justify-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-sky-600 text-white ">Your error message says permission denied, npm global installs must be given root privileges.</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-sky-600 text-white ">
+                    Your error message says permission denied, npm global
+                    installs must be given root privileges.
+                  </span>
+                </div>
               </div>
             </div>
           </div>
           <div className="chat-message">
             <div className="flex items-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div><span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">Command was run with root privileges. I'm sure about that.</span></div>
-                <div><span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">I've update the description so it's more obviously now</span></div>
-                <div><span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">FYI https://askubuntu.com/a/700266/510172</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                    Command was run with root privileges. I'm sure about that.
+                  </span>
+                </div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                    I've update the description so it's more obviously now
+                  </span>
+                </div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                    FYI https://askubuntu.com/a/700266/510172
+                  </span>
+                </div>
                 <div>
                   <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                    Check the line above (it ends with a # so, I'm running it as root )
-                    <pre># npm install -g @vue/devtools</pre>
+                    Check the line above (it ends with a # so, I'm running it as
+                    root )<pre># npm install -g @vue/devtools</pre>
                   </span>
                 </div>
               </div>
@@ -148,53 +269,100 @@ const ChatPage: NextPage = () => {
           <div className="chat-message">
             <div className="flex items-end justify-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">Any updates on this issue? I'm getting the same error when trying to install devtools. Thanks</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
+                    Any updates on this issue? I'm getting the same error when
+                    trying to install devtools. Thanks
+                  </span>
+                </div>
               </div>
             </div>
           </div>
           <div className="chat-message">
             <div className="flex items-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">Thanks for your message David. I thought I'm alone with this issue. Please, ? the issue to support it :)</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
+                    Thanks for your message David. I thought I'm alone with this
+                    issue. Please, ? the issue to support it :)
+                  </span>
+                </div>
               </div>
             </div>
           </div>
           <div className="chat-message">
             <div className="flex items-end justify-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div><span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white ">Are you using sudo?</span></div>
-                <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">Run this command sudo chown -R `whoami` /Users/.npm-global/ then install the package globally without using sudo</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white ">
+                    Are you using sudo?
+                  </span>
+                </div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
+                    Run this command sudo chown -R `whoami` /Users/.npm-global/
+                    then install the package globally without using sudo
+                  </span>
+                </div>
               </div>
             </div>
           </div>
           <div className="chat-message">
             <div className="flex items-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div><span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">It seems like you are from Mac OS world. There is no /Users/ folder on linux ?</span></div>
-                <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">I have no issue with any other packages installed with root permission globally.</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                    It seems like you are from Mac OS world. There is no /Users/
+                    folder on linux ?
+                  </span>
+                </div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
+                    I have no issue with any other packages installed with root
+                    permission globally.
+                  </span>
+                </div>
               </div>
             </div>
           </div>
           <div className="chat-message">
             <div className="flex items-end justify-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-                <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">yes, I have a mac. I never had issues with root permission as well, but this helped me to solve the problem</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white ">
+                    yes, I have a mac. I never had issues with root permission
+                    as well, but this helped me to solve the problem
+                  </span>
+                </div>
               </div>
             </div>
           </div>
           <div className="chat-message">
             <div className="flex items-end">
               <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-                <div><span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">I get the same error on Arch Linux (also with sudo)</span></div>
-                <div><span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">I also have this issue, Here is what I was doing until now: #1076</span></div>
-                <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">even i am facing</span></div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                    I get the same error on Arch Linux (also with sudo)
+                  </span>
+                </div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                    I also have this issue, Here is what I was doing until now:
+                    #1076
+                  </span>
+                </div>
+                <div>
+                  <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
+                    even i am facing
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         {/* Chat input message */}
         <div className="flex border-t">
-          <form onSubmit={handleSendedMsg} className="flex w-full">
+          <form onSubmit={sendMessage} className="flex w-full">
             <input
               className="flex-1 focus:outline-none px-2"
               type="text"

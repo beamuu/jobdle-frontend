@@ -4,24 +4,24 @@ import { useCookies } from "react-cookie";
 import { useUser } from "../contexts/User";
 
 const defaultUser = {
-  firstname: '',
-  lastname: '',
-  username: '',
-  password: '',
-  email: '',
-  role: '',
-}
+  firstname: "",
+  lastname: "",
+  username: "",
+  password: "",
+  email: "",
+  role: "",
+};
 
 const ProfilePage = () => {
   const { userData } = useUser();
   const [profileData, setProfileData] = useState<User>(defaultUser);
   const [cookies, setCookie] = useCookies(["token"]);
 
-
   const handleEditUserData = async () => {
-    console.log('profileData', profileData)
+    console.log("profileData", profileData);
     const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`, profileData,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+      profileData,
       {
         headers: {
           "Content-Type": "application/json",
@@ -36,7 +36,7 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    setProfileData(userData || defaultUser)
+    setProfileData(userData || defaultUser);
   }, [userData]);
 
   if (!userData) return null;
