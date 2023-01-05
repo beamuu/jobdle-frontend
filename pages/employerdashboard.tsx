@@ -113,6 +113,12 @@ const EmployerDashBoardPage: NextPage = () => {
             </span>
           </div>
         ))}
+        <div
+          className="bg-gray-100 rounded-md px-3 py-2 shadow cursor-pointer space-y-1 flex justify-center items-center"
+          onClick={handleCreateJob}
+        >
+          <span className="text-gray-600 text-4xl">+</span>
+        </div>
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ const ChatPage: NextPage = () => {
   const refMessages = useRef<any[]>([]);
   const [userData, setUserData] = useState<User>();
   const [senderId, setSenderId] = useState();
+  const [roomName, setRoomName] = useState();
   // const { userData } = useUser();
 
   const getRoom = async (token: string) => {
@@ -245,9 +246,10 @@ const ChatPage: NextPage = () => {
                   onClick={() => {
                     setData({ ...data, index: i });
                     setRoomId(room._id);
+                    setRoomName(room.nameOfUser);
                   }}
                 >
-                  <p className="font-bold">{room._id}</p>
+                  <p className="font-bold">{room.nameOfUser}</p>
                   {/* <p className="text-gray-500 font-light">{chat.username}</p> */}
                   {/* <p>{room.messages[0].content}</p> */}
                 </div>
@@ -260,7 +262,7 @@ const ChatPage: NextPage = () => {
       <div className="w-9/12 md:flex flex-col justify-between bg-white border-l border-gray-200 hidden">
         {/* Chat title */}
         <div className="w-full h-14 py-5 pl-5 pr-3 border-b flex justify-between items-center relative">
-          <p>Title</p>
+          <p>{roomName}</p>
           <button className="bg-green-500 p-2 rounded-lg text-white">
             detail
           </button>
@@ -293,7 +295,7 @@ const ChatPage: NextPage = () => {
                       userData?._id === message.senderId
                         ? "items-end order-1"
                         : "items-start order-2"
-                    } flex flex-col rounded-lg space-y-2 mx-2 overflow-x-hidden max-w-[80%]`}
+                    } flex flex-col rounded-lg space-y-2 mx-2 overflow-x-hidden max-w-xs`}
                   >
                     <span
                       className={`${
