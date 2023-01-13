@@ -15,23 +15,24 @@ export const getAllJobs = async (
   token: string
 ) => {
   console.log(status, page, token);
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/work${
-      status ? `?status=${status}` : ""
-    }${page > 0 ? `?page=${page}` : ""}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
+    params: {
+      status: status,
+    },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   console.log("getAllJobs", res);
   return res;
 };
 
 export const getUserJobs = async (token: string) => {
   const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
+    params: {
+      status: "pending",
+    },
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -89,6 +90,24 @@ export const postJob = async (data: {}, token: string) => {
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
     data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  console.log("postJob", res);
+  return res;
+};
+
+export const manageJob = async (
+  id: string | string[] | undefined,
+  token: string
+) => {
+  const res = await axios.patch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+    { status: "pending" },
     {
       headers: {
         "Content-Type": "application/json",

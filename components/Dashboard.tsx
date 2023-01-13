@@ -18,7 +18,7 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { status } = router.query;
+  const { status = "new" } = router.query;
 
   // const getAllJobs = async () => {
   //   console.log('url', `${process.env.NEXT_PUBLIC_BACKEND_URL}/work${query.status ? `?status=${query.status}` : ""
@@ -85,7 +85,7 @@ const Dashboard = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [data.page]);
+  }, [data.page, status]);
 
   return (
     <div>
@@ -95,18 +95,26 @@ const Dashboard = () => {
       </span>
       <hr className="my-3" />
       <div className="my-3">
-        <div className="mb-3">
+        <div className="mb-3 space-x-2">
           <button
-            className="text-sky-700 font-semibold p-2 bg-white rounded-md"
-            onClick={() => router.push("/dashboard")}
-          >
-            Current
-          </button>
-          <button
-            className="text-sky-700 font-semibold p-2 bg-white rounded-md ml-3"
+            className={`${
+              status === "new"
+                ? "bg-sky-500 text-white"
+                : "bg-white text-sky-700"
+            } font-semibold p-2 rounded-md`}
             onClick={() => router.push("?status=new")}
           >
             New
+          </button>
+          <button
+            className={`${
+              status === "pending"
+                ? "bg-sky-500 text-white"
+                : "bg-white text-sky-700"
+            } font-semibold p-2 rounded-md`}
+            onClick={() => router.push("?status=pending")}
+          >
+            Pending
           </button>
         </div>
         <div className="bg-white shadow rounded-md overflow-hidden">

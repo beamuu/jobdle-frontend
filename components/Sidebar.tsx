@@ -24,7 +24,7 @@ const Sidebar: NextPage = () => {
   const [data, setData] = useState<Data>({
     firstname: "",
     lastname: "",
-    menuState: ""
+    menuState: "",
   });
   const [cookies, setCookie] = useCookies(["token"]);
   const [open, setOpen] = useState({
@@ -34,13 +34,12 @@ const Sidebar: NextPage = () => {
   const router = useRouter();
 
   const { userData } = useUser();
-  if (!userData) return null
-
+  if (!userData) return null;
 
   let menus = [
     {
       title: "Dashboard",
-      link: (userData.role === "admin" ? "/dashboard" : "/employerdashboard"),
+      link: userData.role === "admin" ? "/dashboard" : "/employerdashboard",
       icon: <ComputerDesktopIcon className="w-5 d-5" />,
     },
     {
@@ -56,13 +55,13 @@ const Sidebar: NextPage = () => {
     {
       title: "Employee",
       link: "/employee",
-      icon: <ChatBubbleBottomCenterTextIcon className="w-5 d-5" />,
-    },
-    {
-      title: "Profile",
-      link: "/profile",
       icon: <UserIcon className="w-5 d-5" />,
     },
+    // {
+    //   title: "Profile",
+    //   link: "/profile",
+    //   icon: <UserIcon className="w-5 d-5" />,
+    // },
     {
       title: "Settings",
       link: "/settings",
@@ -89,9 +88,9 @@ const Sidebar: NextPage = () => {
   // };
 
   const handleSelectMenu = (menu: any) => {
-    setData({ ...data, menuState: menu.title })
-    router.push(menu.link)
-  }
+    setData({ ...data, menuState: menu.title });
+    router.push(menu.link);
+  };
 
   return (
     <>
@@ -111,8 +110,9 @@ const Sidebar: NextPage = () => {
       </div>
       {/* mobile list menu */}
       <div
-        className={`absolute bg-white shadow-lg min-w-screen ${!open.Navbar && "-translate-y-full"
-          } duration-200 md:hidden inset-x-0 top-14`}
+        className={`absolute bg-white shadow-lg min-w-screen ${
+          !open.Navbar && "-translate-y-full"
+        } duration-200 md:hidden inset-x-0 top-14`}
       >
         {menus.map((menu) => (
           <a
@@ -127,13 +127,15 @@ const Sidebar: NextPage = () => {
 
       {/* Sidebar menu*/}
       <div
-        className={`${open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
-          } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0 p-2`}
+        className={`${
+          open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
+        } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0 p-2`}
       >
         <div className="flex justify-center items-center py-5">
           <a
-            className={`${open.Sidebar ? "text-2xl" : "text-sm"
-              } font-bold text-white`}
+            className={`${
+              open.Sidebar ? "text-2xl" : "text-sm"
+            } font-bold text-white`}
             href="/"
           >
             Jobdle
@@ -142,25 +144,30 @@ const Sidebar: NextPage = () => {
         <div>
           {/* Sidebar-header */}
           <div
-            className={`${open.Sidebar
-              ? "grid grid-cols-9 p-2 items-center"
-              : "flex flex-col-reverse space-y-2 pb-2 px-1"
-              } bg-gray-100 rounded-md`}
+            className={`${
+              open.Sidebar
+                ? "flex p-2 items-center"
+                : "flex flex-col-reverse space-y-2 pb-2"
+            } bg-gray-100 rounded`}
           >
-            <div className="col-span-2 flex justify-center">
+            <div className="flex justify-center">
               <div className="h-10 w-10 bg-gray-200 rounded-full flex justify-center items-center">
                 <p>hi</p>
               </div>
             </div>
-            <div className="col-span-6">
-              <p
-                className={`${!open.Sidebar && "hidden"
-                  } font-semibold text-sm text-ellipsis overflow-hidden pl-2 hover:text-clip`}
+            <div className="w-full px-2">
+              <span
+                className={`${
+                  !open.Sidebar && "hidden"
+                } font-semibold text-sm text-ellipsis hover:underline hover:cursor-pointer`}
+                onClick={() => {
+                  router.push("/profile");
+                }}
               >
                 {userData.firstname} {userData.lastname}
-              </p>
+              </span>
             </div>
-            <div className="col-span-1 flex justify-center">
+            <div className="flex justify-center">
               <Bars3Icon
                 onClick={() => setOpen({ ...open, Sidebar: !open.Sidebar })}
                 className="w-5 h-5 cursor-pointer"
@@ -170,16 +177,41 @@ const Sidebar: NextPage = () => {
 
           <ul className="space-y-2 text-sm text-white py-2">
             {menus.map((menu, i) => {
-              if (userData.role !== "admin" && menu.title === "Employee") return null;
+              if (userData.role !== "admin" && menu.title === "Employee")
+                return null;
+              if (userData.role !== "admin" && menu.title === "Settings")
+                return null;
+              if (menu.title === "Log out")
+                return (
+                  <li>
+                    <div
+                      onClick={() => handleSelectMenu(menu)}
+                      key={menu.title}
+                      className={`${
+                        open.Sidebar
+                          ? "flex items-center space-x-3"
+                          : "flex justify-center"
+                      } p-2 rounded-md font-medium bg-red-500 hover:bg-red-400 focus:shadow-outline cursor-pointer`}
+                    >
+                      {menu.icon}
+                      <span className={`${open.Sidebar ? "" : "hidden"}`}>
+                        {menu.title}
+                      </span>
+                    </div>
+                  </li>
+                );
               return (
                 <li title={menu.title} key={menu.title}>
                   <div
                     onClick={() => handleSelectMenu(menu)}
                     key={menu.title}
-                    className={`${open.Sidebar
-                      ? "flex items-center space-x-3"
-                      : "flex justify-center"
-                      } ${data.menuState === menu.title ? "bg-blue-500" : ""} p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline cursor-pointer`}
+                    className={`${
+                      open.Sidebar
+                        ? "flex items-center space-x-3"
+                        : "flex justify-center"
+                    } ${
+                      data.menuState === menu.title ? "bg-blue-500" : ""
+                    } p-2 rounded-md font-medium hover:bg-blue-500 focus:shadow-outline cursor-pointer`}
                   >
                     {menu.icon}
                     <span className={`${open.Sidebar ? "" : "hidden"}`}>
@@ -187,9 +219,8 @@ const Sidebar: NextPage = () => {
                     </span>
                   </div>
                 </li>
-              )
-            }
-            )}
+              );
+            })}
           </ul>
         </div>
       </div>

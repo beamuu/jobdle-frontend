@@ -4,7 +4,12 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useUser } from "../../contexts/User";
-import { dateFormat, deleteJob, getJob } from "../../services/jobServices";
+import {
+  dateFormat,
+  deleteJob,
+  getJob,
+  manageJob,
+} from "../../services/jobServices";
 
 // type JobDetail = {
 //   category: string;
@@ -60,11 +65,10 @@ const JobDetailsPage: NextPage = () => {
   //     console.log(err);
   //   }
   // };
+
   const editJob = () => {
     router.push(`/editjobdetails/${id}`);
   };
-
-  const handleManageTheJob = () => {};
 
   useEffect(() => {
     if (id) {
@@ -77,9 +81,18 @@ const JobDetailsPage: NextPage = () => {
   const handleDelete = () => {
     try {
       deleteJob(id, cookies.token);
-      router.push("/dashboard")
+      router.push("/dashboard");
     } catch (err) {
-      console.log(err);
+      console.error(err);
+    }
+  };
+
+  const handleManageJob = () => {
+    try {
+      manageJob(id, cookies.token);
+      router.push("/dashboard");
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -158,7 +171,10 @@ const JobDetailsPage: NextPage = () => {
         </div>
         {userData.role === "admin" ? (
           <div>
-            <button className="bg-sky-500 rounded-md p-2 text-white w-20 mt-2">
+            <button
+              className="bg-sky-500 rounded-md p-2 text-white w-20 mt-2"
+              onClick={handleManageJob}
+            >
               Manage
             </button>
           </div>
