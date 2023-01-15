@@ -1,20 +1,16 @@
 import { Router, useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import Header from "../components/Header";
+import Modal from "../components/Modal";
+import Example from "../components/SignOutModal";
 import { getAllEmployees } from "../services/EmployeeServices";
-
-const dateFormat = (today: Date) => {
-  let dd = today.getDate();
-  let mm = today.getMonth() + 1;
-  let yyyy = today.getFullYear();
-  let currentDate = `${dd}/${mm}/${yyyy}`;
-  return currentDate;
-};
 
 function EmployeePage() {
   const [cookies, setCookie] = useCookies(["token"]);
   const router = useRouter();
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     getAllEmployees(cookies.token).then((res) => {
@@ -24,11 +20,7 @@ function EmployeePage() {
 
   return (
     <div>
-      <div className="text-sky-700 font-bold text-2xl pb-3">Employee</div>
-      <span className="bg-white rounded-md px-2 py-1 bg-green-200">
-        {dateFormat(new Date())}
-      </span>
-      <hr className="my-3" />
+      <Header title="Employee" />
       <div className="block my-3">
         <button
           className="p-2 rounded-md bg-green-500 text-white"
@@ -42,6 +34,7 @@ function EmployeePage() {
           <div
             className="bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
             onClick={() => router.push(`/employeedetails/${employee._id}`)}
+            key={employee._id}
           >
             {/* <div className="bg-red-500 w-24 rounded-md w-32">Picture</div>
           <div className="pl-2">
@@ -52,10 +45,10 @@ function EmployeePage() {
               <div className="bg-sky-500 rounded-full w-32 h-32"></div>
             </div>
             <div id="details" className="flex flex-col items-center">
-              <span className="">
+              <span>
                 {employee.firstname} {employee.lastname}
               </span>
-              <span className="text-gray-400">Front-end Developer</span>
+              <span className="text-gray-400">Front Developer</span>
             </div>
           </div>
         ))}

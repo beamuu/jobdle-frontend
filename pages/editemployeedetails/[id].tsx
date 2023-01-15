@@ -1,36 +1,59 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import Header from "../components/Header";
-import { postEmployee } from "../services/EmployeeServices";
+import Header from "../../components/Header";
+import { useUser } from "../../contexts/User";
+import {
+  deleteEmployee,
+  editEmployee,
+  getEmployee,
+} from "../../services/EmployeeServices";
 
-function FillEmployeeDetailPage() {
-  const [cookies, setCookie] = useCookies(["token"]);
-  const [detailsObject, setDetailsObject] = useState({
+function EmployeedetailsPage() {
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const router = useRouter();
+  const { id } = router.query;
+  const [employeeDetail, setEmployeeDetail] = useState<EditableEmployee>({
     firstname: "",
     lastname: "",
     email: "",
     tel: "",
-    age: 0,
+    age: -1,
+    // detail: string;
     gender: "",
-    detail: "",
   });
-  const router = useRouter();
+  const { userData } = useUser();
 
   const handleChange = (e: any) => {
-    setDetailsObject((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setEmployeeDetail((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleAddEmployee = async () => {
-    await postEmployee(detailsObject, cookies.token);
-    console.log("detailsObject", detailsObject);
-    router.push("/employee");
+  const handleEditEmployee = async (e: FormEvent) => {
+    // console.log("handleEditEmployee");
+    e.preventDefault();
+    if (!id) return;
+    await editEmployee(id, employeeDetail, cookies.token);
+    router.push(`/employeedetails/${id}`);
   };
+
+  useEffect(() => {
+    if (id) {
+      getEmployee(id, cookies.token)
+        .then((res) => {
+          setEmployeeDetail(res.data);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [router]);
+
+  if (employeeDetail === undefined) return null;
+
+  if (userData === undefined) return null;
 
   return (
     <>
-      <Header title="Fill Employee Details" />
-      <form onSubmit={handleAddEmployee}>
+      <Header title="Edit Employee" />
+      <form onSubmit={handleEditEmployee}>
         <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
           <div className="flex justify-center px-5">
             <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">
@@ -51,7 +74,7 @@ function FillEmployeeDetailPage() {
                       placeholder=""
                       name="firstname"
                       onChange={handleChange}
-                      value={detailsObject.firstname}
+                      value={employeeDetail.firstname}
                       required
                     />
                   </div>
@@ -65,7 +88,7 @@ function FillEmployeeDetailPage() {
                       placeholder=""
                       name="lastname"
                       onChange={handleChange}
-                      value={detailsObject.lastname}
+                      value={employeeDetail.lastname}
                       required
                     />
                   </div>
@@ -80,7 +103,7 @@ function FillEmployeeDetailPage() {
                     placeholder="Your email"
                     name="email"
                     onChange={handleChange}
-                    value={detailsObject.email}
+                    value={employeeDetail.email}
                     required
                   />
                 </div>
@@ -94,7 +117,7 @@ function FillEmployeeDetailPage() {
                     placeholder=""
                     name="tel"
                     onChange={handleChange}
-                    value={detailsObject.tel}
+                    value={employeeDetail.tel}
                     required
                   />
                 </div>
@@ -109,7 +132,7 @@ function FillEmployeeDetailPage() {
                       placeholder=""
                       name="age"
                       onChange={handleChange}
-                      value={detailsObject.age}
+                      value={employeeDetail.age}
                       required
                     />
                   </div>
@@ -122,7 +145,7 @@ function FillEmployeeDetailPage() {
                       required
                       name="gender"
                       onChange={handleChange}
-                      value={detailsObject.gender}
+                      value={employeeDetail.gender}
                     >
                       <option value="">โปรดเลือก</option>
                       <option value="male">Male</option>
@@ -146,9 +169,9 @@ function FillEmployeeDetailPage() {
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="p-2 bg-sky-500 rounded-md text-white"
+            className="p-2 bg-yellow-500 rounded-md text-white"
           >
-            Add
+            Edit
           </button>
         </div>
       </form>
@@ -156,4 +179,4 @@ function FillEmployeeDetailPage() {
   );
 }
 
-export default FillEmployeeDetailPage;
+export default EmployeedetailsPage;

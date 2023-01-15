@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import Header from "../components/Header";
 import { useUser } from "../contexts/User";
 
 const defaultUser = {
@@ -42,10 +43,8 @@ const ProfilePage = () => {
   if (!userData) return null;
 
   return (
-    <div>
-      <div className="block font-bold text-2xl text-sky-700 pb-5">
-        Your Profile
-      </div>
+    <>
+      <Header title="Profile" />
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
         <div className="flex justify-center px-5">
           <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">
@@ -123,7 +122,7 @@ const ProfilePage = () => {
               <div>
                 <button
                   type="submit"
-                  className="rounded-md border border-transparent bg-yellow-500 py-2 px-4 text-sm font-medium text-white shadow-md shadow-yellow-500/50 hover:bg-yellow-400"
+                  className="rounded-md border border-transparent bg-yellow-500 py-2 px-4 text-sm font-medium text-white hover:bg-yellow-400"
                   onClick={handleEditUserData}
                 >
                   Edit Profile
@@ -153,7 +152,7 @@ const ProfilePage = () => {
               <div>
                 <button
                   type="submit"
-                  className="rounded-md border border-transparent bg-red-500 py-2 px-4 text-sm font-medium text-white shadow-md shadow-red-500/50 hover:bg-red-400"
+                  className="rounded-md border border-transparent bg-red-500 py-2 px-4 text-sm font-medium text-white shadow-md hover:bg-red-400"
                 >
                   Change Password
                 </button>
@@ -162,7 +161,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

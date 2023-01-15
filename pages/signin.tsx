@@ -36,6 +36,8 @@ const SignInPage: SignInPageWithNoLayout = () => {
   // };
 
   const handleSignIn = async (e: FormEvent) => {
+    userData.username = userData.username.trim();
+    console.log("userData.username", userData.username);
     try {
       setIsLoading(true);
       e.preventDefault();

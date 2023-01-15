@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import Header from "../../components/Header";
 import { useUser } from "../../contexts/User";
 import { deleteEmployee, getEmployee } from "../../services/EmployeeServices";
 
@@ -11,13 +12,13 @@ function EmployeedetailsPage() {
   const [employeeDetail, setEmployeeDetail] = useState<Employee>();
   const { userData } = useUser();
 
-  const handleDeleteEmployee = () => {
-    deleteEmployee(id, cookies.token);
+  const handleDeleteEmployee = async () => {
+    await deleteEmployee(id, cookies.token);
     // router.push("/employee");
   };
 
   const handleEditEmployee = () => {
-    router.push(`/employee/${id}`);
+    router.push(`/editemployeedetails/${id}`);
   };
 
   useEffect(() => {
@@ -36,9 +37,7 @@ function EmployeedetailsPage() {
 
   return (
     <div>
-      <div className="text-sky-700 font-bold text-2xl pb-3">Job details</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
-      <hr className="my-3" />
+      <Header title="Employee details" />
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md">
         <div className="flex justify-center px-5 pb-5" id="picture">
           <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">

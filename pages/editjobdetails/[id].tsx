@@ -20,48 +20,9 @@ const EditDescriptionJobPage: NextPage = () => {
     deadline: "",
   });
 
-  // const getJob = async (id: any) => {
-  //   try {
-  //     const res = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${cookies.token}`,
-  //         },
-  //       }
-  //     );
-  //     console.log(res.data)
-  //     setJobData(res.data);
-  //   } catch (err) {
-  //     console.log(err);
-  //     router.push('/dashboard')
-  //   }
-  // };
-
   const handleChange = (e: any) => {
     setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
-  // const handleEditJobData = async (e: FormEvent) => {
-  //   try {
-  //     e.preventDefault();
-  //     const res = await axios.patch(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${router.query.id}`,
-  //       jobData,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${cookies.token}`,
-  //         },
-  //       }
-  //     );
-  //     console.log("res", res);
-  //     router.push("/dashboard");
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   const handleEdit = async (e: FormEvent) => {
     e.preventDefault();

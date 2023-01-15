@@ -1,9 +1,11 @@
 import React from "react";
+import Header from "../components/Header";
 
 const SettingPage = () => {
   return (
     <div>
-      <div className="block font-bold text-2xl text-sky-700 pb-5">Settings</div>
+      <Header title="Settings" />
+
       <div className="flex flex-col bg-white p-5 rounded-md shadow">
         <div className="space-x-2">
           <span>Your categories: </span>

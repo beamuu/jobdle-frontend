@@ -3,6 +3,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import Header from "../components/Header";
 import { getUserJobs } from "../services/jobServices";
 import { dateFormat } from "../services/jobServices";
 
@@ -46,7 +47,8 @@ const EmployerDashBoardPage: NextPage = () => {
   if (loading) return null;
 
   return userJobs.length === 0 ? (
-    <div>
+    <>
+      <Header title="Employment" />
       <div className="text-sky-700 font-bold text-2xl pb-3">งานที่จ้าง</div>
       <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
       <hr className="my-3" />
@@ -61,44 +63,16 @@ const EmployerDashBoardPage: NextPage = () => {
           </button>
         </div>
       </div>
-    </div>
+    </>
   ) : (
-    <div>
-      <div className="text-sky-700 font-bold text-2xl pb-3">งานที่จ้าง</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">
-        {dateFormat(new Date())}
-      </span>
-      <hr className="my-3" />
+    <>
+      <Header title="Employment" />
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {userJobs.map((jobDetail) => (
           <div
             className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg"
             onClick={() => router.push(`jobdetails/${jobDetail?._id}`)}
           >
-            {/* <p className="font-bold">{detail?.title}</p>
-			<div className="grid-rows-1">
-			  Category:{" "}
-			  <span className="rounded-md px-2 bg-green-200 col-span-6">
-				{detail?.category}
-			  </span>
-			</div>
-			<div className="">
-			  Date{" "}
-			  <span className="rounded-md px-2 bg-gray-200">27/11/2011</span>
-			</div>
-			<div className="">
-			  Wage{" "}
-			  <span className="rounded-md px-2 bg-gray-200">
-				{detail?.wage}
-			  </span>
-			</div>
-			<div className="">
-			  Status{" "}
-			  <span className="rounded-md px-2 bg-orange-200">Planing...</span>
-			</div>
-			<span className="flex justify-end text-gray-300">
-			  Click for details
-			</span> */}
             <div id="job-header" className="">
               <span>{jobDetail.title}</span>
             </div>
@@ -138,7 +112,7 @@ const EmployerDashBoardPage: NextPage = () => {
           <span className="text-gray-600 text-4xl">+</span>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
