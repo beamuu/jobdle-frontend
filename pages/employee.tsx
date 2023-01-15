@@ -1,5 +1,7 @@
 import { Router, useRouter } from "next/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import { getAllEmployees } from "../services/EmployeeServices";
 
 const dateFormat = (today: Date) => {
   let dd = today.getDate();
@@ -10,7 +12,16 @@ const dateFormat = (today: Date) => {
 };
 
 function EmployeePage() {
+  const [cookies, setCookie] = useCookies(["token"]);
   const router = useRouter();
+  const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
+
+  useEffect(() => {
+    getAllEmployees(cookies.token).then((res) => {
+      setAllEmployees(res.data);
+    });
+  }, []);
+
   return (
     <div>
       <div className="text-sky-700 font-bold text-2xl pb-3">Employee</div>
@@ -27,33 +38,27 @@ function EmployeePage() {
         </button>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <div
-          className="bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
-          onClick={() => router.push("/employeedetails")}
-        >
-          {/* <div className="bg-red-500 w-24 rounded-md w-32">Picture</div>
+        {allEmployees.map((employee) => (
+          <div
+            className="bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
+            onClick={() => router.push(`/employeedetails/${employee._id}`)}
+          >
+            {/* <div className="bg-red-500 w-24 rounded-md w-32">Picture</div>
           <div className="pl-2">
             <p>นภสินธ์ แสงทอง</p>
             <p>ความถนัด</p>
           </div> */}
-          <div id="image" className="flex justify-center py-2">
-            <div className="bg-sky-500 rounded-full w-32 h-32"></div>
+            <div id="image" className="flex justify-center py-2">
+              <div className="bg-sky-500 rounded-full w-32 h-32"></div>
+            </div>
+            <div id="details" className="flex flex-col items-center">
+              <span className="">
+                {employee.firstname} {employee.lastname}
+              </span>
+              <span className="text-gray-400">Front-end Developer</span>
+            </div>
           </div>
-          <div id="details" className="flex flex-col items-center">
-            <span className="">Napasin Saengthong</span>
-            <span className="text-gray-400">Front-end Developer</span>
-          </div>
-        </div>
-        <div
-          className="bg-white flex rounded-md shadow cursor-pointer h-40 p-2"
-          onClick={() => router.push("/employeedetails")}
-        >
-          <div className="bg-red-500 w-24 rounded-md w-32">Picture</div>
-          <div className="pl-2">
-            <p>นภสินธ์ แสงทอง</p>
-            <p>ความถนัด</p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

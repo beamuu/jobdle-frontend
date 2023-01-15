@@ -28,7 +28,6 @@ const JobDetailsPage: NextPage = () => {
   const router = useRouter();
   const [job, setJob] = useState<Job>();
   const { id } = router.query;
-
   const { userData } = useUser();
 
   // const getJob = async (id: any) => {

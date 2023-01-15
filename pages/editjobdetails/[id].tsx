@@ -114,10 +114,10 @@ const EditDescriptionJobPage: NextPage = () => {
             <p className="font-bold col-span-1">Category </p>
             <select
               className="w-full bg-gray-200 rounded-md p-1 col-span-4 cursor-pointer"
-              required
               name="category"
               onChange={handleChange}
               value={jobData.category}
+              required
             >
               <option value="">โปรดเลือก</option>
               <option value="ซ่อม">ซ่อม</option>
