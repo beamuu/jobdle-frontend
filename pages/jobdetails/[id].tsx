@@ -11,59 +11,13 @@ import {
   manageJob,
 } from "../../services/jobServices";
 
-// type JobDetail = {
-//   category: string;
-//   detail: string;
-//   fullname: string;
-//   location: string;
-//   note: string;
-//   title: string;
-//   userId: string;
-//   wage: string;
-//   _id: string;
-// };
-
 const JobDetailsPage: NextPage = () => {
   const [cookies, setCookie] = useCookies(["token"]);
+  const [showManageModal, setShowManageModal] = useState(false);
   const router = useRouter();
   const [job, setJob] = useState<Job>();
   const { id } = router.query;
   const { userData } = useUser();
-
-  // const getJob = async (id: any) => {
-  //   try {
-  //     const res = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${cookies.token}`,
-  //         },
-  //       }
-  //     );
-  //     setJob(res.data);
-  //   } catch (err) {
-  //     console.log(err);
-  //     router.push("/dashboard");
-  //   }
-  // };
-
-  // const deleteJob = async () => {
-  //   try {
-  //     const res = await axios.delete(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${cookies.token}`,
-  //         },
-  //       }
-  //     );
-  //     router.push("/dashboard");
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   const editJob = () => {
     router.push(`/editjobdetails/${id}`);
@@ -88,8 +42,9 @@ const JobDetailsPage: NextPage = () => {
 
   const handleManageJob = () => {
     try {
-      manageJob(id, cookies.token);
-      router.push("/dashboard");
+      // manageJob(id, cookies.token);
+      // router.push("/dashboard");
+      setShowManageModal(true);
     } catch (err) {
       console.error(err);
     }
@@ -139,7 +94,7 @@ const JobDetailsPage: NextPage = () => {
   ];
 
   return (
-    <div>
+    <>
       <div className="text-sky-700 font-bold text-2xl pb-3">Job details</div>
       <span className="rounded-md px-2 py-1 bg-green-200">
         {dateFormat(new Date())}
@@ -179,7 +134,8 @@ const JobDetailsPage: NextPage = () => {
           </div>
         ) : null}
       </div>
-    </div>
+      {showManageModal ? "" : ""}
+    </>
   );
 };
 

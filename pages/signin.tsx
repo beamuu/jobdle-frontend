@@ -36,11 +36,11 @@ const SignInPage: SignInPageWithNoLayout = () => {
   // };
 
   const handleSignIn = async (e: FormEvent) => {
+    e.preventDefault();
     userData.username = userData.username.trim();
     console.log("userData.username", userData.username);
     try {
       setIsLoading(true);
-      e.preventDefault();
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signin`,
         userData,
@@ -56,7 +56,6 @@ const SignInPage: SignInPageWithNoLayout = () => {
         alert("Sign in fail!");
       } else {
         setCookie("token", res.data.accessToken, { path: "/" });
-        setIsLoading(false);
         router.push("/dashboard");
       }
     } catch (error) {

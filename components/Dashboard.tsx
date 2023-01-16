@@ -76,7 +76,7 @@ const Dashboard = () => {
             className={`${
               status === "new"
                 ? "bg-sky-500 text-white"
-                : "bg-white text-sky-700"
+                : "bg-white text-sky-700 hover:bg-sky-100"
             } font-semibold p-2 rounded-md`}
             onClick={() => router.push("?status=new")}
           >
@@ -86,7 +86,7 @@ const Dashboard = () => {
             className={`${
               status === "pending"
                 ? "bg-sky-500 text-white"
-                : "bg-white text-sky-700"
+                : "bg-white text-sky-700 hover:bg-sky-100"
             } font-semibold p-2 rounded-md`}
             onClick={() => router.push("?status=pending")}
           >

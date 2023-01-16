@@ -96,9 +96,8 @@ const Sidebar: NextPage = () => {
       </div>
       {/* mobile list menu */}
       <div
-        className={`absolute bg-white shadow-lg min-w-screen ${
-          !open.Navbar && "-translate-y-full"
-        } duration-200 md:hidden inset-x-0 top-14`}
+        className={`absolute bg-white shadow-lg min-w-screen ${!open.Navbar && "-translate-y-full"
+          } duration-200 md:hidden inset-x-0 top-14`}
       >
         {menus.map((menu) => (
           <a
@@ -113,15 +112,13 @@ const Sidebar: NextPage = () => {
 
       {/* Sidebar menu*/}
       <div
-        className={`${
-          open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
-        } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0`}
+        className={`${open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
+          } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0`}
       >
         <div className="flex justify-center items-center py-5">
           <div
-            className={`${
-              open.Sidebar ? "text-2xl" : "text-sm"
-            } font-bold text-white`}
+            className={`${open.Sidebar ? "text-2xl" : "text-sm"
+              } font-bold text-white`}
           >
             <span
               className="cursor-pointer"
@@ -137,11 +134,10 @@ const Sidebar: NextPage = () => {
         <div>
           {/* Sidebar-header */}
           <div
-            className={`${
-              open.Sidebar
+            className={`${open.Sidebar
                 ? "flex p-2 items-center"
                 : "flex flex-col-reverse space-y-2 pb-2"
-            } bg-gray-100 rounded m-2`}
+              } bg-gray-100 rounded m-2`}
           >
             <div
               className="flex justify-center hover:cursor-pointer"
@@ -155,9 +151,8 @@ const Sidebar: NextPage = () => {
             </div>
             <div className="w-full px-2">
               <span
-                className={`${
-                  !open.Sidebar && "hidden"
-                } font-semibold text-sm text-ellipsis hover:underline hover:cursor-pointer`}
+                className={`${!open.Sidebar && "hidden"
+                  } font-semibold text-sm text-ellipsis hover:underline hover:cursor-pointer`}
                 onClick={() => {
                   router.push("/profile");
                 }}
@@ -185,11 +180,10 @@ const Sidebar: NextPage = () => {
                     <div
                       onClick={() => setSignOutMoDal(true)}
                       key={id}
-                      className={`${
-                        open.Sidebar
+                      className={`${open.Sidebar
                           ? "flex items-center space-x-3"
                           : "flex justify-center"
-                      } p-2 mx-2 mt-5 rounded-md font-medium bg-red-500 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100`}
+                        } p-2 mx-2 mt-5 rounded-md font-medium bg-red-400 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100`}
                     >
                       {menu.icon}
                       <span className={`${open.Sidebar ? "" : "hidden"}`}>
@@ -203,15 +197,13 @@ const Sidebar: NextPage = () => {
                   <div
                     onClick={() => handleSelectMenu(menu)}
                     key={menu.title}
-                    className={`${
-                      open.Sidebar
+                    className={`${open.Sidebar
                         ? "flex items-center space-x-3"
                         : "flex justify-center"
-                    } ${
-                      data.menuState === menu.title
+                      } ${data.menuState === menu.title
                         ? "bg-gray-100 text-sky-600"
                         : ""
-                    } p-2 ml-2 rounded-md rounded-r-none font-medium hover:bg-gray-100 hover:text-sky-600 focus:shadow-outline cursor-pointer`}
+                      } p-2 ml-2 rounded-md rounded-r-none font-medium hover:bg-gray-100 hover:text-sky-600 focus:shadow-outline cursor-pointer`}
                   >
                     {menu.icon}
                     <span className={`${open.Sidebar ? "" : "hidden"}`}>
@@ -225,25 +217,6 @@ const Sidebar: NextPage = () => {
         </div>
       </div>
       {signOutMoDal && (
-        // <Modal onClose={setSignOutMoDal}>
-        //   <div className="text-center text-xl pb-5">
-        //     <h1>Are you sure you want to sign out?</h1>
-        //   </div>
-        //   <div className="flex justify-end space-x-4">
-        //     <button
-        //       className="p-2 bg-white border-2 rounded-md hover:bg-gray-200 duration-150"
-        //       onClick={() => setSignOutMoDal(false)}
-        //     >
-        //       Cancel
-        //     </button>
-        //     <button
-        //       className="p-2 bg-red-500 border rounded-md text-white hover:bg-red-300 duration-150"
-        //       onClick={() => router.push("/signout")}
-        //     >
-        //       Logout
-        //     </button>
-        //   </div>
-        // </Modal>
         <SignOutModal
           onClose={setSignOutMoDal}
           show={signOutMoDal}

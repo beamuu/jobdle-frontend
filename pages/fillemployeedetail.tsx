@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { useCookies } from "react-cookie";
 import Header from "../components/Header";
 import { postEmployee } from "../services/EmployeeServices";
@@ -21,7 +21,8 @@ function FillEmployeeDetailPage() {
     setDetailsObject((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleAddEmployee = async () => {
+  const handleAddEmployee = async (e: FormEvent) => {
+    e.preventDefault();
     await postEmployee(detailsObject, cookies.token);
     console.log("detailsObject", detailsObject);
     router.push("/employee");
