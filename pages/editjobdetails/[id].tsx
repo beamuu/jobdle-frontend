@@ -50,10 +50,10 @@ const EditDescriptionJobPage: NextPage = () => {
       <form onSubmit={handleEdit}>
         <div className="bg-white p-4 rounded-md space-y-2">
           <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Title </p>
+            <p className="font-bold col-span-1 self-center">Title </p>
             <input
               type="text"
-              className="w-full bg-gray-200 rounded-md p-1 sm:col-span-4 required:border-red-500"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.title}
               name="title"
               onChange={handleChange}
@@ -61,9 +61,9 @@ const EditDescriptionJobPage: NextPage = () => {
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Detail </p>
+            <p className="font-bold col-span-1 self-center">Detail </p>
             <textarea
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               rows={10}
               value={jobData.detail}
               name="detail"
@@ -72,9 +72,9 @@ const EditDescriptionJobPage: NextPage = () => {
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Category </p>
+            <p className="font-bold col-span-1 self-center">Category </p>
             <select
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4 cursor-pointer"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 cursor-pointer col-span-4"
               name="category"
               onChange={handleChange}
               value={jobData.category}
@@ -86,10 +86,10 @@ const EditDescriptionJobPage: NextPage = () => {
             </select>
           </div>
           <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Wage </p>
+            <p className="font-bold col-span-1 self-center">Wage </p>
             <input
               type="number"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.wage}
               name="wage"
               onChange={handleChange}
@@ -97,20 +97,20 @@ const EditDescriptionJobPage: NextPage = () => {
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Note </p>
+            <p className="font-bold col-span-1 self-center">Note </p>
             <input
               type="text"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.note}
               name="note"
               onChange={handleChange}
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Location </p>
+            <p className="font-bold col-span-1 self-center">Location </p>
             <input
               type="text"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.location}
               name="location"
               onChange={handleChange}
@@ -118,10 +118,10 @@ const EditDescriptionJobPage: NextPage = () => {
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Deadline </p>
+            <p className="font-bold col-span-1 self-center">Deadline </p>
             <input
               type="date"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.deadline}
               name="deadline"
               onChange={handleChange}

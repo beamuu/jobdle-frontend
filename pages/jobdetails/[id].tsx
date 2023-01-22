@@ -3,13 +3,9 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import ManageEmployeeModal from "../../components/ManageEmployeeModal";
 import { useUser } from "../../contexts/User";
-import {
-  dateFormat,
-  deleteJob,
-  getJob,
-  manageJob,
-} from "../../services/jobServices";
+import { dateFormat, deleteJob, getJob } from "../../services/jobServices";
 
 const JobDetailsPage: NextPage = () => {
   const [cookies, setCookie] = useCookies(["token"]);
@@ -29,6 +25,7 @@ const JobDetailsPage: NextPage = () => {
         setJob(res.data);
       });
     }
+    console.log("jobDetails", jobDetails);
   }, [router]);
 
   const handleDelete = () => {
@@ -42,8 +39,6 @@ const JobDetailsPage: NextPage = () => {
 
   const handleManageJob = () => {
     try {
-      // manageJob(id, cookies.token);
-      // router.push("/dashboard");
       setShowManageModal(true);
     } catch (err) {
       console.error(err);
@@ -107,6 +102,14 @@ const JobDetailsPage: NextPage = () => {
             <p className="w-full sm:col-span-4">{detail.description}</p>
           </div>
         ))}
+        {job.status === "pending" ? (
+          <div className="items-center sm:grid sm:grid-cols-5 py-1">
+            <p className="font-bold col-span-1">Employee </p>
+            <p className="w-full sm:col-span-4">{job.employeeId}</p>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className="flex justify-between">
         <div className="space-x-2">
@@ -123,7 +126,7 @@ const JobDetailsPage: NextPage = () => {
             Delete
           </button>
         </div>
-        {userData.role === "admin" ? (
+        {userData.role === "admin" && job.status === "new" ? (
           <div>
             <button
               className="bg-sky-500 rounded-md p-2 text-white w-20 mt-2"
@@ -134,7 +137,15 @@ const JobDetailsPage: NextPage = () => {
           </div>
         ) : null}
       </div>
-      {showManageModal ? "" : ""}
+
+      <ManageEmployeeModal
+        onClose={setShowManageModal}
+        show={showManageModal}
+        cancel={() => setShowManageModal(false)}
+        confirm={() => router.push("/signout")}
+        id={id}
+        token={cookies.token}
+      />
     </>
   );
 };

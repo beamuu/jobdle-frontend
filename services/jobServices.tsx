@@ -1,5 +1,11 @@
 import axios from "axios";
-import { FormEvent } from "react";
+
+const headersParams = (token: string) => {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+};
 
 export const dateFormat = (today: Date) => {
   let dd = today.getDate();
@@ -19,10 +25,7 @@ export const getAllJobs = async (
     params: {
       status: status,
     },
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: headersParams(token),
   });
   console.log("getAllJobs", res);
   return res;
@@ -33,10 +36,7 @@ export const getUserJobs = async (token: string) => {
     params: {
       status: "pending",
     },
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: headersParams(token),
   });
   console.log("getUserJobs", res);
   return res;
@@ -46,32 +46,27 @@ export const getJob = async (id: any, token: string) => {
   const res = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
   console.log("getJob", res);
   return res;
 };
 
-export const editJob = async (id: string, data: EditableJob, token: string) => {
-  try {
-    const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log("res", res);
-  } catch (err) {
-    console.log(err);
-  }
+export const editJob = async (
+  id: string | string[] | undefined,
+  data: EditableJob,
+  token: string
+) => {
+  const res = await axios.patch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+    data,
+    {
+      headers: headersParams(token),
+    }
+  );
+  console.log("editJob", res);
+  return res;
 };
 
 export const deleteJob = async (
@@ -79,10 +74,7 @@ export const deleteJob = async (
   token: string
 ) => {
   await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: headersParams(token),
   });
 };
 
@@ -91,10 +83,7 @@ export const postJob = async (data: {}, token: string) => {
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
     data,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
   console.log("postJob", res);
@@ -103,16 +92,14 @@ export const postJob = async (data: {}, token: string) => {
 
 export const manageJob = async (
   id: string | string[] | undefined,
+  data: ManagedJob,
   token: string
 ) => {
   const res = await axios.patch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
-    { status: "pending" },
+    data,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
   console.log("postJob", res);

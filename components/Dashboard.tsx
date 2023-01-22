@@ -49,7 +49,7 @@ const Dashboard = () => {
   if (!allJobs) return null;
 
   useEffect(() => {
-    // if (!status) return;
+    if (!status) return;
     getAllJobs(status, data.page, cookies.token)
       .then((res) => {
         setIsLoading(true);
@@ -77,7 +77,7 @@ const Dashboard = () => {
               status === "new"
                 ? "bg-sky-500 text-white"
                 : "bg-white text-sky-700 hover:bg-sky-100"
-            } font-semibold p-2 rounded-md`}
+            } duration-200 font-semibold p-2 rounded-md`}
             onClick={() => router.push("?status=new")}
           >
             New
@@ -87,7 +87,7 @@ const Dashboard = () => {
               status === "pending"
                 ? "bg-sky-500 text-white"
                 : "bg-white text-sky-700 hover:bg-sky-100"
-            } font-semibold p-2 rounded-md`}
+            } duration-200 font-semibold p-2 rounded-md`}
             onClick={() => router.push("?status=pending")}
           >
             Pending
@@ -121,7 +121,7 @@ const Dashboard = () => {
                   {allJobs.map((job) => {
                     return (
                       <tr
-                        className="hover:bg-gray-200 cursor-pointer"
+                        className="hover:bg-gray-200 duration-100 cursor-pointer"
                         key={job._id}
                         onClick={() => {
                           router.push(`/jobdetails/${job._id}`);

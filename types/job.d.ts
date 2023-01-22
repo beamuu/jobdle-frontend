@@ -1,8 +1,9 @@
-interface Job extends EditableJob {
+interface Job extends EditableJob, JobManaged {
   fullname: string;
   userId: string;
   _id: string;
   date: string;
+  employeeId: array[];
   status: string;
 }
 
@@ -14,4 +15,9 @@ interface EditableJob {
   note: string;
   location: string;
   deadline: string;
+}
+
+interface ManagedJob {
+  employeeId: array[];
+  status: string;
 }
