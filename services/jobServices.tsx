@@ -24,10 +24,26 @@ export const getAllJobs = async (
   const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
     params: {
       status: status,
+      page: page,
     },
     headers: headersParams(token),
   });
   console.log("getAllJobs", res);
+  return res;
+};
+
+export const getAllAccomplishedJobs = async (
+  page: number = 0,
+  token: string
+) => {
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
+    params: {
+      status: "cancel",
+      page: page,
+    },
+    headers: headersParams(token),
+  });
+  console.log("getAllCompletedJobs", res);
   return res;
 };
 
@@ -92,7 +108,7 @@ export const postJob = async (data: {}, token: string) => {
 
 export const manageJob = async (
   id: string | string[] | undefined,
-  data: ManagedJob,
+  data: EditableJob,
   token: string
 ) => {
   const res = await axios.patch(

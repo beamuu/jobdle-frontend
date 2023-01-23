@@ -107,7 +107,7 @@ const Sidebar: NextPage = () => {
       <div
         className={`${
           open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
-        } duration-200 min-h-screen h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0`}
+        } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 z-10`}
       >
         <div className="flex justify-center items-center py-5">
           <div
@@ -127,7 +127,7 @@ const Sidebar: NextPage = () => {
           </div>
         </div>
 
-        <div>
+        <div className="flex-1 flex flex-col">
           {/* Sidebar-header */}
           <div
             className={`${
@@ -165,6 +165,7 @@ const Sidebar: NextPage = () => {
               />
             </div>
           </div>
+          {/* menu list */}
           <div className="flex-1">
             <ul className="space-y-1 text-sm text-white py-2">
               {menus.map((menu, id) => {
@@ -197,14 +198,14 @@ const Sidebar: NextPage = () => {
               })}
             </ul>
           </div>
-
+          {/* Log out button */}
           <div
             onClick={() => setSignOutMoDal(true)}
             className={`${
               open.Sidebar
                 ? "flex items-center space-x-3"
                 : "flex justify-center"
-            } p-2 mx-2 mt-5 rounded-md font-medium bg-red-400 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100 text-white inset-x-0 bottom-0`}
+            } p-1 mx-2 mb-2 rounded-md font-medium bg-red-400 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100 text-white bottom-0`}
           >
             <ArrowRightOnRectangleIcon className="w-5 h-5" />
             <span className={`${open.Sidebar ? "" : "hidden"}`}>

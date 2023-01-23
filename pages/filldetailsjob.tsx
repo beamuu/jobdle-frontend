@@ -23,27 +23,6 @@ const FillDescriptionJobPage: NextPage = () => {
     setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // const handleJobData = async (e: FormEvent) => {
-  //   try {
-  //     e.preventDefault();
-  //     console.log(jobData)
-  //     const res = await axios.post(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
-  //       { ...jobData },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${cookies.token}`,
-  //         },
-  //       }
-  //     );
-  //     console.log('res',res)
-
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
   const handlePost = async (e: FormEvent) => {
     e.preventDefault();
     try {
@@ -68,7 +47,7 @@ const FillDescriptionJobPage: NextPage = () => {
             <p className="font-bold col-span-1">Title </p>
             <input
               type="text"
-              className="w-full bg-gray-200 rounded-md p-1 sm:col-span-4 required:border-red-500"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.title}
               name="title"
               onChange={handleChange}
@@ -78,7 +57,7 @@ const FillDescriptionJobPage: NextPage = () => {
           <div className="sm:grid sm:grid-cols-5">
             <p className="font-bold col-span-1">Detail </p>
             <textarea
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               rows={10}
               value={jobData.detail}
               name="detail"
@@ -89,7 +68,7 @@ const FillDescriptionJobPage: NextPage = () => {
           <div className="sm:grid sm:grid-cols-5">
             <p className="font-bold col-span-1">Category </p>
             <select
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4 cursor-pointer"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 cursor-pointer col-span-4"
               required
               name="category"
               onChange={handleChange}
@@ -103,7 +82,7 @@ const FillDescriptionJobPage: NextPage = () => {
             <p className="font-bold col-span-1">Wage </p>
             <input
               type="number"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.wage}
               name="wage"
               onChange={handleChange}
@@ -114,7 +93,7 @@ const FillDescriptionJobPage: NextPage = () => {
             <p className="font-bold col-span-1">Note </p>
             <input
               type="text"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.note}
               name="note"
               onChange={handleChange}
@@ -124,7 +103,7 @@ const FillDescriptionJobPage: NextPage = () => {
             <p className="font-bold col-span-1">Location </p>
             <input
               type="text"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.location}
               name="location"
               onChange={handleChange}
@@ -135,7 +114,7 @@ const FillDescriptionJobPage: NextPage = () => {
             <p className="font-bold col-span-1">Deadline </p>
             <input
               type="date"
-              className="w-full bg-gray-200 rounded-md p-1 col-span-4"
+              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
               value={jobData.deadline}
               name="deadline"
               onChange={handleChange}
@@ -143,7 +122,7 @@ const FillDescriptionJobPage: NextPage = () => {
             />
           </div>
         </div>
-        <div className="flex justify-center mt-2">
+        <div className="flex justify-end mt-2">
           <button
             className="bg-sky-500 rounded-md p-2 text-white"
             type="submit"

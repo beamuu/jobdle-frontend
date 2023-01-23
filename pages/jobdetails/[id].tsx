@@ -3,21 +3,28 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import ComfirmModal from "../../components/ComfirmModal";
 import DeleteJobModal from "../../components/DeleteJobModal";
 import ManageEmployeeModal from "../../components/ManageEmployeeModal";
 import { useUser } from "../../contexts/User";
-import { dateFormat, deleteJob, getJob } from "../../services/jobServices";
+import {
+  dateFormat,
+  deleteJob,
+  editJob,
+  getJob,
+} from "../../services/jobServices";
 
 const JobDetailsPage: NextPage = () => {
   const [cookies, setCookie] = useCookies(["token"]);
   const [showManageModal, setShowManageModal] = useState(false);
   const [showDeleteJobModal, setShowDeleteJobModal] = useState(false);
+  const [showSuccessJobModal, setShowSuccessJobModal] = useState(false);
   const router = useRouter();
   const [job, setJob] = useState<Job>();
   const { id } = router.query;
   const { userData } = useUser();
 
-  const editJob = () => {
+  const editJobDetails = () => {
     router.push(`/editjobdetails/${id}`);
   };
 
@@ -42,6 +49,15 @@ const JobDetailsPage: NextPage = () => {
   const handleManageJob = () => {
     try {
       setShowManageModal(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSuccussJob = () => {
+    try {
+      editJob(id, { status: "done" }, cookies.token);
+      router.push("/dashboard");
     } catch (err) {
       console.error(err);
     }
@@ -117,13 +133,13 @@ const JobDetailsPage: NextPage = () => {
         <div className="space-x-2">
           <button
             className="bg-yellow-500 rounded-md p-2 text-white w-20 mt-2"
-            onClick={editJob}
+            onClick={editJobDetails}
           >
             Edit
           </button>
           <button
             className="bg-red-500 rounded-md p-2 text-white w-20 mt-2"
-            onClick={()=>setShowDeleteJobModal(true)}
+            onClick={() => setShowDeleteJobModal(true)}
           >
             Delete
           </button>
@@ -135,6 +151,16 @@ const JobDetailsPage: NextPage = () => {
               onClick={handleManageJob}
             >
               Manage
+            </button>
+          </div>
+        ) : null}
+        {userData.role === "admin" && job.status === "pending" ? (
+          <div>
+            <button
+              className="bg-green-500 rounded-md p-2 text-white w-20 mt-2"
+              onClick={() => setShowSuccessJobModal(true)}
+            >
+              Succuss
             </button>
           </div>
         ) : null}
@@ -153,6 +179,17 @@ const JobDetailsPage: NextPage = () => {
         show={showDeleteJobModal}
         cancel={() => setShowDeleteJobModal(false)}
         confirm={handleDelete}
+      />
+
+      <ComfirmModal
+        onClose={setShowSuccessJobModal}
+        show={showSuccessJobModal}
+        cancel={() => setShowSuccessJobModal(false)}
+        confirm={handleSuccussJob}
+        title="Are you sure you success this job ?"
+        cancelButtonValue="Cancel"
+        confirmButtonValue="Confirm"
+        confirmButtonColor="green"
       />
     </>
   );

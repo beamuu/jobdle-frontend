@@ -162,7 +162,9 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-700">
                       Showing{" "}
                       <span className="font-medium">
-                        {data.limit * (data.page - 1) + 1}
+                        {data.totalDocs === 0
+                          ? 0
+                          : data.limit * (data.page - 1) + 1}
                       </span>{" "}
                       to <span className="font-medium">{handleLastPage()}</span>{" "}
                       of <span className="font-medium">{data.totalDocs}</span>{" "}
