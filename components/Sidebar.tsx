@@ -63,11 +63,6 @@ const Sidebar: NextPage = () => {
       link: "/settings",
       icon: <AdjustmentsVerticalIcon className="w-5 d-5" />,
     },
-    {
-      title: "Log out",
-      link: "/signout",
-      icon: <ArrowRightOnRectangleIcon className="w-5 h-5" />,
-    },
   ];
 
   const handleSelectMenu = (menu: any) => {
@@ -108,11 +103,11 @@ const Sidebar: NextPage = () => {
         ))}
       </div>
 
-      {/* Sidebar menu*/}
+      {/* Sidebar */}
       <div
         className={`${
           open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
-        } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0`}
+        } duration-200 min-h-screen h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 md:translate-x-0`}
       >
         <div className="flex justify-center items-center py-5">
           <div
@@ -131,6 +126,7 @@ const Sidebar: NextPage = () => {
             </span>
           </div>
         </div>
+
         <div>
           {/* Sidebar-header */}
           <div
@@ -169,24 +165,27 @@ const Sidebar: NextPage = () => {
               />
             </div>
           </div>
-
-          <ul className="space-y-1 text-sm text-white py-2">
-            {menus.map((menu, id) => {
-              if (userData.role !== "admin" && menu.title === "Employee")
-                return null;
-              if (userData.role !== "admin" && menu.title === "Settings")
-                return null;
-              if (menu.title === "Log out")
+          <div className="flex-1">
+            <ul className="space-y-1 text-sm text-white py-2">
+              {menus.map((menu, id) => {
+                if (userData.role !== "admin" && menu.title === "Employee")
+                  return null;
+                if (userData.role !== "admin" && menu.title === "Settings")
+                  return null;
                 return (
-                  <li key={menu.title}>
+                  <li title={menu.title} key={menu.title}>
                     <div
-                      onClick={() => setSignOutMoDal(true)}
-                      key={id}
+                      onClick={() => handleSelectMenu(menu)}
+                      key={menu.title}
                       className={`${
                         open.Sidebar
                           ? "flex items-center space-x-3"
                           : "flex justify-center"
-                      } p-2 mx-2 mt-5 rounded-md font-medium bg-red-400 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100`}
+                      } ${
+                        data.menuState === menu.title
+                          ? "bg-gray-100 text-sky-600"
+                          : ""
+                      } p-2 ml-2 rounded-md rounded-r-none font-medium hover:bg-gray-100 hover:text-sky-600 focus:shadow-outline cursor-pointer duration-100`}
                     >
                       {menu.icon}
                       <span className={`${open.Sidebar ? "" : "hidden"}`}>
@@ -195,30 +194,23 @@ const Sidebar: NextPage = () => {
                     </div>
                   </li>
                 );
-              return (
-                <li title={menu.title} key={menu.title}>
-                  <div
-                    onClick={() => handleSelectMenu(menu)}
-                    key={menu.title}
-                    className={`${
-                      open.Sidebar
-                        ? "flex items-center space-x-3"
-                        : "flex justify-center"
-                    } ${
-                      data.menuState === menu.title
-                        ? "bg-gray-100 text-sky-600"
-                        : ""
-                    } p-2 ml-2 rounded-md rounded-r-none font-medium hover:bg-gray-100 hover:text-sky-600 focus:shadow-outline cursor-pointer duration-100`}
-                  >
-                    {menu.icon}
-                    <span className={`${open.Sidebar ? "" : "hidden"}`}>
-                      {menu.title}
-                    </span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+              })}
+            </ul>
+          </div>
+
+          <div
+            onClick={() => setSignOutMoDal(true)}
+            className={`${
+              open.Sidebar
+                ? "flex items-center space-x-3"
+                : "flex justify-center"
+            } p-2 mx-2 mt-5 rounded-md font-medium bg-red-400 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100 text-white inset-x-0 bottom-0`}
+          >
+            <ArrowRightOnRectangleIcon className="w-5 h-5" />
+            <span className={`${open.Sidebar ? "" : "hidden"}`}>
+              <p>Log out</p>
+            </span>
+          </div>
         </div>
       </div>
 

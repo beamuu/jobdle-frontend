@@ -10,7 +10,7 @@ interface Props {
   onClose: any;
   show: boolean;
   cancel: any;
-  confirm: any;
+  // confirm: any;
   id: string | string[] | undefined;
   token: string;
 }
@@ -19,7 +19,6 @@ export default function ManageEmployeeModal({
   onClose,
   show,
   cancel,
-  confirm,
   id,
   token,
 }: Props) {

@@ -3,6 +3,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import DeleteJobModal from "../../components/DeleteJobModal";
 import ManageEmployeeModal from "../../components/ManageEmployeeModal";
 import { useUser } from "../../contexts/User";
 import { dateFormat, deleteJob, getJob } from "../../services/jobServices";
@@ -10,6 +11,7 @@ import { dateFormat, deleteJob, getJob } from "../../services/jobServices";
 const JobDetailsPage: NextPage = () => {
   const [cookies, setCookie] = useCookies(["token"]);
   const [showManageModal, setShowManageModal] = useState(false);
+  const [showDeleteJobModal, setShowDeleteJobModal] = useState(false);
   const router = useRouter();
   const [job, setJob] = useState<Job>();
   const { id } = router.query;
@@ -121,7 +123,7 @@ const JobDetailsPage: NextPage = () => {
           </button>
           <button
             className="bg-red-500 rounded-md p-2 text-white w-20 mt-2"
-            onClick={handleDelete}
+            onClick={()=>setShowDeleteJobModal(true)}
           >
             Delete
           </button>
@@ -142,9 +144,15 @@ const JobDetailsPage: NextPage = () => {
         onClose={setShowManageModal}
         show={showManageModal}
         cancel={() => setShowManageModal(false)}
-        confirm={() => router.push("/signout")}
         id={id}
         token={cookies.token}
+      />
+
+      <DeleteJobModal
+        onClose={setShowDeleteJobModal}
+        show={showDeleteJobModal}
+        cancel={() => setShowDeleteJobModal(false)}
+        confirm={handleDelete}
       />
     </>
   );
