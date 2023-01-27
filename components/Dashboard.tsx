@@ -37,12 +37,10 @@ const Dashboard = () => {
   };
 
   const createArrayPage = () => {
-    console.log(data);
     const res = [];
     for (let i = 1; i <= data.totalPages; i++) {
       res.push(i);
     }
-    console.log("createArray", res);
     return res;
   };
 

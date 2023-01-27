@@ -36,7 +36,6 @@ function UserProvider({ children }: UserProviderProps) {
           },
         }
       );
-      // console.log("getUserData", res.data)
       setUserData(res.data);
     } catch (err) {
       router.push("/signin");

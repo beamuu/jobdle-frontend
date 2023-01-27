@@ -20,10 +20,10 @@ export const getAllJobs = async (
   page: number = 0,
   token: string
 ) => {
-  console.log(status, page, token);
+  console.log("status", status);
   const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
     params: {
-      status: status,
+      status: [status],
       page: page,
     },
     headers: headersParams(token),
@@ -38,7 +38,7 @@ export const getAllAccomplishedJobs = async (
 ) => {
   const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
     params: {
-      status: "cancel",
+      status: ["cancel", "done"],
       page: page,
     },
     headers: headersParams(token),
@@ -50,7 +50,7 @@ export const getAllAccomplishedJobs = async (
 export const getUserJobs = async (token: string) => {
   const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
     params: {
-      status: "pending",
+      status: ["new", "pending"],
     },
     headers: headersParams(token),
   });
