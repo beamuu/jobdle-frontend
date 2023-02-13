@@ -1,72 +1,66 @@
 import axios from "axios";
-
-const headersParams = (token: string) => {
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-};
-
-export const dateFormat = (today: Date) => {
-  let dd = today.getDate();
-  let mm = today.getMonth() + 1;
-  let yyyy = today.getFullYear();
-  let currentDate = `${dd}/${mm}/${yyyy}`;
-  return currentDate;
-};
+import { headersParams } from "./UtilsServies";
 
 export const getAllJobs = async (
   status: string | string[] | undefined,
   page: number = 0,
   token: string
 ) => {
-  console.log("status", status);
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
-    params: {
-      status: [status],
-      page: page,
-    },
-    headers: headersParams(token),
-  });
-  console.log("getAllJobs", res);
-  return res;
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
+    {
+      params: {
+        status: [status],
+        page: page,
+      },
+      headers: headersParams(token),
+    }
+  );
+  console.log("getAllJobs", response);
+  return response;
 };
 
 export const getAllAccomplishedJobs = async (
   page: number = 0,
   token: string
 ) => {
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
-    params: {
-      status: ["cancel", "done"],
-      page: page,
-    },
-    headers: headersParams(token),
-  });
-  console.log("getAllCompletedJobs", res);
-  return res;
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
+    {
+      params: {
+        status: ["cancel", "done"],
+        page: page,
+      },
+      headers: headersParams(token),
+    }
+  );
+  console.log("getAllCompletedJobs", response);
+  return response;
 };
 
 export const getUserJobs = async (token: string) => {
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work`, {
-    params: {
-      status: ["new", "pending"],
-    },
-    headers: headersParams(token),
-  });
-  console.log("getUserJobs", res);
-  return res;
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
+    {
+      params: {
+        status: ["new", "pending"],
+      },
+      headers: headersParams(token),
+    }
+  );
+  console.log("getUserJobs", response);
+  return response;
 };
 
 export const getJob = async (id: any, token: string) => {
-  const res = await axios.get(
+  const response = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
     {
       headers: headersParams(token),
     }
   );
-  console.log("getJob", res);
-  return res;
+  console.log("getJob", response);
+  return response;
 };
 
 export const editJob = async (
@@ -74,36 +68,41 @@ export const editJob = async (
   data: EditableJob,
   token: string
 ) => {
-  const res = await axios.patch(
+  const response = await axios.patch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
     data,
     {
       headers: headersParams(token),
     }
   );
-  console.log("editJob", res);
-  return res;
+  console.log("editJob", response);
+  return response;
 };
 
 export const deleteJob = async (
   id: string | string[] | undefined,
   token: string
 ) => {
-  await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`, {
-    headers: headersParams(token),
-  });
+  const response = await axios.delete(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
+    {
+      headers: headersParams(token),
+    }
+  );
+  console.log("deleteJob", response);
+  return response;
 };
 
 export const postJob = async (data: {}, token: string) => {
-  const res = await axios.post(
+  const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
     data,
     {
       headers: headersParams(token),
     }
   );
-  console.log("postJob", res);
-  return res;
+  console.log("postJob", response);
+  return response;
 };
 
 export const manageJob = async (
@@ -111,13 +110,13 @@ export const manageJob = async (
   data: EditableJob,
   token: string
 ) => {
-  const res = await axios.patch(
+  const response = await axios.patch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work/${id}`,
     data,
     {
       headers: headersParams(token),
     }
   );
-  console.log("postJob", res);
-  return res;
+  console.log("postJob", response);
+  return response;
 };

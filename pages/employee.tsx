@@ -1,21 +1,30 @@
-import { Router, useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
+
 import Header from "../components/Header";
-import Modal from "../components/Modal";
-import Example from "../components/SignOutModal";
 import { getAllEmployees } from "../services/EmployeeServices";
 
 function EmployeePage() {
-  const [cookies, setCookie] = useCookies(["token"]);
+  const [cookies] = useCookies(["token"]);
   const router = useRouter();
+
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
-  const [openModal, setOpenModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await getAllEmployees(cookies.token);
+      setAllEmployees(data);
+    } catch (error) {
+      console.error(error);
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    getAllEmployees(cookies.token).then((res) => {
-      setAllEmployees(res.data);
-    });
+    fetchData();
   }, []);
 
   return (
@@ -36,11 +45,6 @@ function EmployeePage() {
             onClick={() => router.push(`/employeedetails/${employee._id}`)}
             key={employee._id}
           >
-            {/* <div className="bg-red-500 w-24 rounded-md w-32">Picture</div>
-          <div className="pl-2">
-            <p>นภสินธ์ แสงทอง</p>
-            <p>ความถนัด</p>
-          </div> */}
             <div id="image" className="flex justify-center py-2">
               <div className="bg-sky-500 rounded-full w-32 h-32"></div>
             </div>

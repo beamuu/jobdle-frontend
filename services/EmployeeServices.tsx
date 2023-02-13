@@ -1,67 +1,55 @@
 import axios from "axios";
-import React from "react";
+import { headersParams } from "./UtilsServies";
 
 export const getAllEmployees = async (token: string) => {
-  const res = await axios.get(
+  const response = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/employee`,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
-  console.log("getAllEmployees", res);
-  return res;
+  console.log("getAllEmployees", response);
+  return response;
 };
 
 export const getEmployee = async (
   id: string | string[] | undefined,
   token: string
 ) => {
-  const res = await axios.get(
+  const response = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/employee/${id}`,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
-  console.log("getEmployee", res);
-  return res;
+  console.log("getEmployee", response);
+  return response;
 };
 
 export const deleteEmployee = async (
   id: string | string[] | undefined,
   token: string
 ) => {
-  const res = await axios.delete(
+  const response = await axios.delete(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/employee/${id}`,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
-  console.log("deleteEmployee", res);
-  return res;
+  console.log("deleteEmployee", response);
+  return response;
 };
 
 export const postEmployee = async (data: {}, token: string) => {
-  const res = await axios.post(
+  const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/employee`,
     data,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
-  console.log("postEmployee", res);
-  return res;
+  console.log("postEmployee", response);
+  return response;
 };
 
 export const editEmployee = async (
@@ -69,16 +57,13 @@ export const editEmployee = async (
   data: object,
   token: string
 ) => {
-  const res = await axios.patch(
+  const response = await axios.patch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/employee/${id}`,
     data,
     {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headersParams(token),
     }
   );
-  console.log("postEmployee", res);
-  return res;
+  console.log("postEmployee", response);
+  return response;
 };

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
-import type { NextPage } from "next";
-import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
+import { useCookies } from "react-cookie";
 
-import { useUser } from "../contexts/User";
-import { getAllAccomplishedJobs } from "../services/jobServices";
-import Header from "../components/Header";
+import { getAllJobs } from "../services/jobServices";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
-const HistoryPage: NextPage = () => {
+const AdminTable = () => {
   const [cookies] = useCookies(["token"]);
-  const { userData } = useUser();
+  const router = useRouter();
+  const { status = "new" } = router.query;
 
   const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +19,13 @@ const HistoryPage: NextPage = () => {
     limit: 0,
     totalPages: 0,
   });
+
+  const ButtonStyles = (statusNow: string) =>
+    `${
+      status === statusNow
+        ? "bg-sky-500 text-white"
+        : "bg-white text-sky-700 hover:bg-sky-100"
+    } duration-200 font-semibold p-2 rounded-md`;
 
   const handleFirstPage = (page: number) => {
     if (page <= 1) return;
@@ -50,10 +55,24 @@ const HistoryPage: NextPage = () => {
     return paginationArray;
   };
 
+  const pushStatusNew = () => {
+    router.push("?status=new");
+  };
+
+  const pushStatusPending = () => {
+    router.push("?status=pending");
+  };
+
+  const pushGoToEachJob = (id: string) => {
+    router.push(`/jobdetails/${id}`);
+  };
+
+  if (!allJobs) return null;
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const { data } = await getAllAccomplishedJobs(state.page, cookies.token);
+      const { data } = await getAllJobs(status, state.page, cookies.token);
       setAllJobs(data.docs);
       setState({
         ...state,
@@ -62,25 +81,17 @@ const HistoryPage: NextPage = () => {
         totalPages: data.totalPages,
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
+    if (!status) return;
     fetchData();
-  }, [state.page]);
+  }, [state.page, status]);
 
-  if (!allJobs) return null;
-  if (!userData) return null;
-
-  const isAdminHeaderStyles = `${
-    userData.role === "admin" ? "" : "pl-2 md:pl-4"
-  } text-start text-sky-700 py-3 min-w-[100px]`;
-
-  const isAdminDetailsStyles = userData.role === "admin" ? "" : "pl-2 md:pl-4";
-
-  const HeaderTableStyles = "text-start text-sky-700 py-3 min-w-[100px]";
+  const HeaderTableStyles = "text-start text-sky-700 py-3 min-w-[200px]";
 
   const LoadingComponent = (
     <div className="flex justify-center items-center w-full h-40 bg-white rounded-md">
@@ -90,47 +101,39 @@ const HistoryPage: NextPage = () => {
 
   const ShowingComponent = (
     // Header table area
-    <div className="bg-white shadow rounded-md overflow-hidden">
+    <div className="bg-white rounded-md overflow-hidden">
       <div className="overflow-auto">
-        <table className="min-w-max w-full table-auto">
+        <table className="table-auto w-full">
           <thead>
             <tr className="border-b-2 border-sky-300">
-              {userData.role === "admin" ? (
-                <th className="text-start text-sky-700 py-3 pl-2 md:pl-4 min-w-[200px]">
-                  Employer's Name
-                </th>
-              ) : (
-                ""
-              )}
-              <th className={isAdminHeaderStyles}>Title</th>
+              <th className={`${HeaderTableStyles} pl-2 md:pl-4`}>
+                Employer's Name
+              </th>
+              <th className={HeaderTableStyles}>Title</th>
               <th className={HeaderTableStyles}>Category</th>
               <th className={HeaderTableStyles}>Date</th>
-              <th className={HeaderTableStyles}>Status</th>
             </tr>
           </thead>
+          {/* Showing jobs area */}
           <tbody className="divide-y">
-            {allJobs.map((job) => (
-              <tr className="hover:bg-gray-200 cursor-pointer">
-                {userData.role === "admin" ? (
+            {allJobs.map((job) => {
+              return (
+                <tr
+                  className="hover:bg-gray-200 duration-100 cursor-pointer"
+                  key={job._id}
+                  onClick={() => pushGoToEachJob(job._id)}
+                >
                   <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
-                ) : (
-                  ""
-                )}
-                <td className={`${isAdminDetailsStyles} py-3`}>{job.title}</td>
-                <td className="py-3">{job.category.name}</td>
-                <td className="py-3">{job.date}</td>
-                <td className="py-3">
-                  {job.status !== "cancel" ? (
-                    <p className="font-bold text-green-500">Completed</p>
-                  ) : (
-                    <p className="font-bold text-red-500">Fail</p>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  <td className="py-3">{job.title}</td>
+                  <td className="py-3">{job.category.name}</td>
+                  <td className="py-3">{job.date}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+      {/* Footer area */}
       <div className="w-full border-sky-300 border-t-2">
         <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
           <div className="flex flex-1 justify-between sm:hidden">
@@ -173,6 +176,7 @@ const HistoryPage: NextPage = () => {
                           : "border-gray-300 bg-white cursor-pointer"
                       } px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20`}
                       onClick={() => setState({ ...state, page: number })}
+                      key={number}
                     >
                       {number}
                     </div>
@@ -195,12 +199,22 @@ const HistoryPage: NextPage = () => {
 
   return (
     <>
-      <Header title="History" />
       <div className="my-3">
+        <div className="mb-3 space-x-2">
+          <button className={ButtonStyles("new")} onClick={pushStatusNew}>
+            New
+          </button>
+          <button
+            className={ButtonStyles("pending")}
+            onClick={pushStatusPending}
+          >
+            Pending
+          </button>
+        </div>
         {isLoading ? LoadingComponent : ShowingComponent}
       </div>
     </>
   );
 };
 
-export default HistoryPage;
+export default AdminTable;

@@ -1,62 +1,41 @@
-import { FormEvent, useState } from "react";
 import axios from "axios";
+import { FormEvent, useState } from "react";
 import { NextPage } from "next";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
-import { spawn } from "child_process";
+import { postAccountUser } from "../services/AccountServices";
 
 type SignInPageWithNoLayout = NextPage & {
   noLayout: boolean;
 };
 
 const SignInPage: SignInPageWithNoLayout = () => {
+  const [, setCookie] = useCookies(["token"]);
+  const router = useRouter();
+
   const [userData, setUserData] = useState({
     username: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(["token"]);
-  const router = useRouter();
 
   const handleChange = (e: any) => {
     setUserData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // const getUserData = async () => {
-  //   const res =  await axios.get(
-  //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
-  //     {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${cookies.token}`,
-  //       },
-  //     }
-  //   );
-  //   return res.data
-  // };
-
   const handleSignIn = async (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     userData.username = userData.username.trim();
-    console.log("userData.username", userData.username);
     try {
-      setIsLoading(true);
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signin`,
-        userData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const { data } = await postAccountUser(userData);
 
-      if (!res.data.accessToken) {
+      if (!data.accessToken) {
         // กรณีไม่มี acessToken
         alert("Sign in fail!");
       } else {
-        setCookie("token", res.data.accessToken, { path: "/" });
-        router.push("/dashboard");
+        setCookie("token", data.accessToken, { path: "/" });
+        router.push("/");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -66,7 +45,6 @@ const SignInPage: SignInPageWithNoLayout = () => {
           alert("Error bewteen client and server!");
         }
       }
-      // console.error(error);
       setIsLoading(false);
     }
   };

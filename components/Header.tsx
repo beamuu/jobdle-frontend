@@ -1,5 +1,5 @@
-import { dateFormat } from "../services/jobServices";
 import { FC } from "react";
+import { dateFormat } from "../services/UtilsServies";
 
 interface Props {
   title: string;

@@ -1,23 +1,30 @@
 import axios from "axios";
 import { NextPage } from "next";
 import Router, { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { getAllCategories } from "../services/CategoryServices";
 import { dateFormat, postJob } from "../services/jobServices";
 
 const FillDescriptionJobPage: NextPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [categories, setCategories] = useState([]);
   const router = useRouter();
 
   const [jobData, setJobData] = useState({
     title: "",
     detail: "",
-    category: "",
+    category: {},
     wage: "",
     note: "",
     location: "",
     deadline: "",
   });
+
+  const fetchAllCategories = async () => {
+    const res = await getAllCategories(cookies.token);
+    setCategories(res.data);
+  };
 
   const handleChange = (e: any) => {
     setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -25,13 +32,21 @@ const FillDescriptionJobPage: NextPage = () => {
 
   const handlePost = async (e: FormEvent) => {
     e.preventDefault();
+    const jobRequestObject = {
+      ...jobData,
+      category: JSON.parse(jobData.category),
+    };
     try {
-      const res = await postJob(jobData, cookies.token);
+      const res = await postJob(jobRequestObject, cookies.token);
       router.push(`jobdetails/${res.data._id}`);
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    fetchAllCategories();
+  }, []);
 
   return (
     <div>
@@ -51,7 +66,7 @@ const FillDescriptionJobPage: NextPage = () => {
               value={jobData.title}
               name="title"
               onChange={handleChange}
-              required
+              // required
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
@@ -62,20 +77,25 @@ const FillDescriptionJobPage: NextPage = () => {
               value={jobData.detail}
               name="detail"
               onChange={handleChange}
-              required
+              // required
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
             <p className="font-bold col-span-1">Category </p>
             <select
               className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 cursor-pointer col-span-4"
-              required
               name="category"
               onChange={handleChange}
+              // required
             >
               <option value="">โปรดเลือก</option>
-              <option value="ซ่อม">ซ่อม</option>
-              <option value="บำรุง">บำรุง</option>
+              {categories.map((category) => {
+                return (
+                  <option value={JSON.stringify(category)}>
+                    {category.name}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <div className="sm:grid sm:grid-cols-5">
@@ -86,7 +106,7 @@ const FillDescriptionJobPage: NextPage = () => {
               value={jobData.wage}
               name="wage"
               onChange={handleChange}
-              required
+              // required
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
@@ -107,7 +127,7 @@ const FillDescriptionJobPage: NextPage = () => {
               value={jobData.location}
               name="location"
               onChange={handleChange}
-              required
+              // required
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
@@ -118,7 +138,7 @@ const FillDescriptionJobPage: NextPage = () => {
               value={jobData.deadline}
               name="deadline"
               onChange={handleChange}
-              required
+              // required
             />
           </div>
         </div>

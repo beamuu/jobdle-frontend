@@ -1,3 +1,9 @@
+import { useState } from "react";
+import type { NextPage } from "next";
+import { useRouter } from "next/router";
+
+import { useUser } from "../contexts/User";
+import SignOutModal from "./SignOutModal";
 import {
   AdjustmentsVerticalIcon,
   ArrowRightOnRectangleIcon,
@@ -7,22 +13,18 @@ import {
   ComputerDesktopIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
-import type { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
-import { useUser } from "../contexts/User";
-import SignOutModal from "./SignOutModal";
-import Modal from "./Modal";
 
-type Data = {
+type State = {
   firstname: string;
   lastname: string;
   menuState: string;
 };
 
 const Sidebar: NextPage = () => {
-  const [data, setData] = useState<Data>({
+  const router = useRouter();
+  const { userData } = useUser();
+
+  const [state, setState] = useState<State>({
     firstname: "",
     lastname: "",
     menuState: "",
@@ -31,16 +33,14 @@ const Sidebar: NextPage = () => {
     Sidebar: true,
     Navbar: false,
   });
-  const [signOutMoDal, setSignOutMoDal] = useState(false);
-  const router = useRouter();
+  const [showSignOutMoDal, setShowSignOutMoDal] = useState(false);
 
-  const { userData } = useUser();
   if (!userData) return null;
 
-  let menus = [
+  const menuLists = [
     {
       title: "Dashboard",
-      link: userData.role === "admin" ? "/dashboard" : "/employerdashboard",
+      link: "/",
       icon: <ComputerDesktopIcon className="w-5 d-5" />,
     },
     {
@@ -65,9 +65,22 @@ const Sidebar: NextPage = () => {
     },
   ];
 
-  const handleSelectMenu = (menu: any) => {
-    setData({ ...data, menuState: menu.title });
+  const handleSelectedMenu = (menu: { title: string; link: string }) => {
+    setState({ ...state, menuState: menu.title });
     router.push(menu.link);
+  };
+
+  const isSidebarExtend = open.Sidebar
+    ? "min-w-60 max-w-60 w-60"
+    : "min-w-16 max-w-16 w-16";
+
+  const clickOnLogo = () => {
+    router.push("/");
+    setState({ ...state, menuState: "" });
+  };
+
+  const clickOnHeader = () => {
+    router.push("/profile");
   };
 
   return (
@@ -76,7 +89,7 @@ const Sidebar: NextPage = () => {
       <div className="relative inset-x-0 bg-gradient-to-r from-cyan-500 to-blue-500 flex justify-between md:hidden text-white z-10">
         {/* <!-- logo --> */}
         <a href="#" className="p-4 font-bold">
-          Napasin Saengthong
+          {userData.firstname} {userData.lastname}
         </a>
         {/* <!-- mobile menu button --> */}
         <button
@@ -92,7 +105,7 @@ const Sidebar: NextPage = () => {
           !open.Navbar && "-translate-y-full"
         } duration-200 md:hidden inset-x-0 top-14`}
       >
-        {menus.map((menu) => (
+        {menuLists.map((menu) => (
           <a
             href={menu.link}
             className="block px-4 py-2 flex justify-center"
@@ -105,9 +118,7 @@ const Sidebar: NextPage = () => {
 
       {/* Sidebar */}
       <div
-        className={`${
-          open.Sidebar ? "min-w-60 max-w-60 w-60" : "min-w-16 max-w-16 w-16"
-        } relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 z-10`}
+        className={`${isSidebarExtend} relative duration-200 min-h-screen md:flex md:flex-col hidden bg-gradient-to-t from-cyan-500 to-blue-500 z-10`}
       >
         <div className="flex justify-center items-center py-5">
           <div
@@ -115,13 +126,7 @@ const Sidebar: NextPage = () => {
               open.Sidebar ? "text-2xl" : "text-sm"
             } font-bold text-white`}
           >
-            <span
-              className="cursor-pointer"
-              onClick={() => {
-                router.push("/dashboard");
-                setData({ ...data, menuState: "Dashboard" });
-              }}
-            >
+            <span className="cursor-pointer" onClick={clickOnLogo}>
               Jobdle
             </span>
           </div>
@@ -138,12 +143,10 @@ const Sidebar: NextPage = () => {
           >
             <div
               className="flex justify-center hover:cursor-pointer"
-              onClick={() => {
-                router.push("/profile");
-              }}
+              onClick={clickOnHeader}
             >
               <div className="h-10 w-10 bg-gray-200 rounded-full flex justify-center items-center">
-                <p>hi</p>
+                <p>pic</p>
               </div>
             </div>
             <div className="w-full px-2">
@@ -151,9 +154,7 @@ const Sidebar: NextPage = () => {
                 className={`${
                   !open.Sidebar && "hidden"
                 } font-semibold text-sm text-ellipsis hover:underline hover:cursor-pointer`}
-                onClick={() => {
-                  router.push("/profile");
-                }}
+                onClick={clickOnHeader}
               >
                 {userData.firstname} {userData.lastname}
               </span>
@@ -168,7 +169,7 @@ const Sidebar: NextPage = () => {
           {/* menu list */}
           <div className="flex-1">
             <ul className="space-y-1 text-sm text-white py-2">
-              {menus.map((menu, id) => {
+              {menuLists.map((menu, id) => {
                 if (userData.role !== "admin" && menu.title === "Employee")
                   return null;
                 if (userData.role !== "admin" && menu.title === "Settings")
@@ -176,14 +177,14 @@ const Sidebar: NextPage = () => {
                 return (
                   <li title={menu.title} key={menu.title}>
                     <div
-                      onClick={() => handleSelectMenu(menu)}
+                      onClick={() => handleSelectedMenu(menu)}
                       key={menu.title}
                       className={`${
                         open.Sidebar
                           ? "flex items-center space-x-3"
                           : "flex justify-center"
                       } ${
-                        data.menuState === menu.title
+                        state.menuState === menu.title
                           ? "bg-gray-100 text-sky-600"
                           : ""
                       } p-2 ml-2 rounded-md rounded-r-none font-medium hover:bg-gray-100 hover:text-sky-600 focus:shadow-outline cursor-pointer duration-100`}
@@ -200,7 +201,7 @@ const Sidebar: NextPage = () => {
           </div>
           {/* Log out button */}
           <div
-            onClick={() => setSignOutMoDal(true)}
+            onClick={() => setShowSignOutMoDal(true)}
             className={`${
               open.Sidebar
                 ? "flex items-center space-x-3"
@@ -216,9 +217,9 @@ const Sidebar: NextPage = () => {
       </div>
 
       <SignOutModal
-        onClose={setSignOutMoDal}
-        show={signOutMoDal}
-        cancel={() => setSignOutMoDal(false)}
+        onClose={setShowSignOutMoDal}
+        show={showSignOutMoDal}
+        cancel={() => setShowSignOutMoDal(false)}
         confirm={() => router.push("/signout")}
       />
     </>

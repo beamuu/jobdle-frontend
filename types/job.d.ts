@@ -10,8 +10,8 @@ interface Job extends EditableJob, JobManaged {
 interface EditableJob {
   title?: string;
   detail?: string;
-  category?: string;
-  wage?: string;
+  category?: object;
+  // wage?: string;
   note?: string;
   location?: string;
   deadline?: string;

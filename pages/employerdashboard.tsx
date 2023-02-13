@@ -80,7 +80,7 @@ const EmployerDashBoardPage: NextPage = () => {
             <div id="p-5" className="px-5 py-3">
               <div>
                 <span className="text-gray-400">Category: </span>
-                <span>{jobDetail.category}</span>
+                <span>{jobDetail.category.name}</span>
               </div>
               <div>
                 <span className="text-gray-400">Wage: </span>

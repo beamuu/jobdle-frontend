@@ -82,7 +82,7 @@ const JobDetailsPage: NextPage = () => {
     },
     {
       title: "Category",
-      description: job.category,
+      description: job.category.name,
     },
     {
       title: "Wage",

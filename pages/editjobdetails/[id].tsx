@@ -3,22 +3,29 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { getAllCategories } from "../../services/CategoryServices";
 import { dateFormat, editJob, getJob } from "../../services/jobServices";
 
 const EditDescriptionJobPage: NextPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const router = useRouter();
+  const [categories, setCategories] = useState([]);
   const { id } = router.query;
 
   const [jobData, setJobData] = useState<EditableJob>({
     title: "",
     detail: "",
-    category: "",
+    category: {},
     wage: "",
     note: "",
     location: "",
     deadline: "",
   });
+
+  const fetchAllCategories = async () => {
+    const res = await getAllCategories(cookies.token);
+    setCategories(res.data);
+  };
 
   const handleChange = (e: any) => {
     setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -26,15 +33,22 @@ const EditDescriptionJobPage: NextPage = () => {
 
   const handleEdit = async (e: FormEvent) => {
     e.preventDefault();
+    const jobRequestObject = {
+      ...jobData,
+      category: JSON.parse(jobData.category),
+    };
     if (!id) return;
-    await editJob(id as string, jobData, cookies.token);
+    await editJob(id as string, jobRequestObject, cookies.token);
     router.push(`/jobdetails/${id}`);
   };
 
   useEffect(() => {
+    fetchAllCategories();
     if (id) {
       getJob(id, cookies.token).then((res) => {
         setJobData(res.data);
+        // setJobData({ ...jobData, category: JSON.parse(jobData.category) });
+        console.log("typeof res.data.category", typeof res.data.category)
       });
     }
   }, [router]);
@@ -81,8 +95,13 @@ const EditDescriptionJobPage: NextPage = () => {
               required
             >
               <option value="">โปรดเลือก</option>
-              <option value="ซ่อม">ซ่อม</option>
-              <option value="บำรุง">บำรุง</option>
+              {categories.map((category) => {
+                return (
+                  <option value={JSON.stringify(category)}>
+                    {category.name}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <div className="sm:grid sm:grid-cols-5">
@@ -93,7 +112,7 @@ const EditDescriptionJobPage: NextPage = () => {
               value={jobData.wage}
               name="wage"
               onChange={handleChange}
-              required
+              // required
             />
           </div>
           <div className="sm:grid sm:grid-cols-5">
