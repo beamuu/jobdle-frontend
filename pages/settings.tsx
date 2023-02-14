@@ -56,9 +56,9 @@ const SettingPage = () => {
     <div>
       <Header title="Settings" />
       <div className="flex flex-col bg-white p-5 rounded-md shadow space-y-2">
-        <div className="flex">
-          <span className="self-center">Your categories: </span>
-          <div className="flex-1 bg-gray-100 p-2 rounded space-y-1">
+        <div className="grid grid-cols-5">
+          <span className="self-center col-span-1">Your categories: </span>
+          <div className="flex-1 bg-gray-100 p-2 rounded space-y-1 col-span-4">
             <div className="flex grid grid-cols-2">
               <div className="col-span-1 font-bold">Name</div>
               <div className="col-span-1 font-bold">Min Wage</div>
@@ -84,36 +84,40 @@ const SettingPage = () => {
                 )}
           </div>
         </div>
-        <div className="">
-          <form onSubmit={AddCategory}>
-            <div>
-              <span className="">Type categories: </span>
+
+        <form onSubmit={AddCategory}>
+          <div className="space-y-1">
+            <div className="grid grid-cols-5">
+              <span className="col-span-2">Type categories: </span>
               <input
                 type="text"
                 onChange={(e) => setInputName(e.target.value)}
                 value={inputName}
-                className="border-2 px-2 rounded-md h-full focus:outline-none"
+                className="border-2 px-2 rounded-md h-full focus:outline-none col-span-3"
                 required
               />
-              <br />
-              <span className="">Type min wage: </span>
+            </div>
+            <div className="grid grid-cols-5">
+              <span className="col-span-2">Type min wage: </span>
               <input
                 type="number"
                 pattern="[0-9]*"
                 onChange={(e) => setInputMinWage(e.target.value)}
                 value={inputMinWage}
-                className="border-2 px-2 rounded-md h-full focus:outline-none"
+                className="border-2 px-2 rounded-md h-full focus:outline-none col-span-3"
                 required
               />
             </div>
+          </div>
+          <div className="flex justify-end">
             <button
-              className="px-2 bg-green-500 rounded-md text-white h-full"
+              className="px-2 bg-green-500 rounded-md text-white h-full mt-3"
               type="submit"
             >
               Add
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );

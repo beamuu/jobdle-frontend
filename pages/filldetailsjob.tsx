@@ -1,44 +1,58 @@
 import axios from "axios";
 import { NextPage } from "next";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+
+import Header from "../components/Header";
 import { getAllCategories } from "../services/CategoryServices";
-import { dateFormat, postJob } from "../services/jobServices";
+import { postJob } from "../services/jobServices";
+import { splitTFromISO } from "../services/UtilsServies";
+
+const defaultValue = {
+  title: "",
+  detail: "",
+  category: {},
+  wage: "",
+  note: "",
+  location: "",
+  deadline: 0,
+};
 
 const FillDescriptionJobPage: NextPage = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
-  const [categories, setCategories] = useState([]);
+  const [cookies] = useCookies(["token"]);
   const router = useRouter();
 
-  const [jobData, setJobData] = useState({
-    title: "",
-    detail: "",
-    category: {},
-    wage: "",
-    note: "",
-    location: "",
-    deadline: "",
-  });
+  const [categoryObjects, setCategoryObjects] = useState([]);
+  const [jobDetailsObject, setJobDetailsObject] = useState(defaultValue);
 
   const fetchAllCategories = async () => {
-    const res = await getAllCategories(cookies.token);
-    setCategories(res.data);
+    const { data } = await getAllCategories(cookies.token);
+    setCategoryObjects(data);
   };
 
   const handleChange = (e: any) => {
-    setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setJobDetailsObject((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSelectChange = (myStringifyObject: string) => {
+    const prasedObject = JSON.parse(myStringifyObject);
+    setJobDetailsObject({ ...jobDetailsObject, category: prasedObject });
+  };
+
+  const handleDateChage = (date: any) => {
+    setJobDetailsObject({ ...jobDetailsObject, deadline: date });
   };
 
   const handlePost = async (e: FormEvent) => {
     e.preventDefault();
-    const jobRequestObject = {
-      ...jobData,
-      category: JSON.parse(jobData.category),
-    };
     try {
-      const res = await postJob(jobRequestObject, cookies.token);
-      router.push(`jobdetails/${res.data._id}`);
+      console.log(jobDetailsObject);
+      const { data } = await postJob(jobDetailsObject, cookies.token);
+      router.push(`jobdetails/${data._id}`);
     } catch (err) {
       console.error(err);
     }
@@ -48,96 +62,86 @@ const FillDescriptionJobPage: NextPage = () => {
     fetchAllCategories();
   }, []);
 
+  const BlockFieldStyles = "sm:grid sm:grid-cols-5 items-center";
+  const LabelStyles = "font-bold col-span-1";
+  const InputFieldStyles =
+    "border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4";
+
   return (
     <div>
-      <div className="text-sky-700 font-bold text-2xl pb-3">Job details</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">
-        {dateFormat(new Date())}
-      </span>
-      <hr className="my-3" />
+      <Header title="Fill job details" />
 
       <form onSubmit={handlePost}>
         <div className="bg-white p-4 rounded-md space-y-2">
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Title </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Title </p>
             <input
               type="text"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.title}
+              className={InputFieldStyles}
+              value={jobDetailsObject.title}
               name="title"
               onChange={handleChange}
               // required
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Detail </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Detail </p>
             <textarea
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
+              className={InputFieldStyles}
               rows={10}
-              value={jobData.detail}
+              value={jobDetailsObject.detail}
               name="detail"
               onChange={handleChange}
               // required
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Category </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Category </p>
             <select
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 cursor-pointer col-span-4"
+              className={`${InputFieldStyles} cursor-pointer`}
               name="category"
-              onChange={handleChange}
+              onChange={(e) => handleSelectChange(e.target.value)}
               // required
             >
               <option value="">โปรดเลือก</option>
-              {categories.map((category) => {
+              {categoryObjects.map((category) => {
                 return (
                   <option value={JSON.stringify(category)}>
-                    {category.name}
+                    {category.name} | minWage: {category.minWage}
                   </option>
                 );
               })}
             </select>
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Wage </p>
-            <input
-              type="number"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.wage}
-              name="wage"
-              onChange={handleChange}
-              // required
-            />
-          </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Note </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Note </p>
             <input
               type="text"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.note}
+              className={InputFieldStyles}
+              value={jobDetailsObject.note}
               name="note"
               onChange={handleChange}
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Location </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Location </p>
             <input
               type="text"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.location}
+              className={InputFieldStyles}
+              value={jobDetailsObject.location}
               name="location"
               onChange={handleChange}
               // required
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1">Deadline </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Deadline </p>
             <input
               type="date"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.deadline}
+              className={InputFieldStyles}
               name="deadline"
-              onChange={handleChange}
+              onChange={(e) => handleDateChage(e.target.value)}
+              min={splitTFromISO(new Date().toISOString())}
               // required
             />
           </div>

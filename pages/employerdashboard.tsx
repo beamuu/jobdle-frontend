@@ -1,39 +1,29 @@
-import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import Header from "../components/Header";
+
 import { getUserJobs } from "../services/jobServices";
-import { dateFormat } from "../services/jobServices";
+import { dateFormat } from "../services/UtilsServies";
 
 const EmployerDashBoardPage: NextPage = () => {
-  const [cookies, setCookie] = useCookies(["token"]);
+  const [cookies] = useCookies(["token"]);
   const [userJobs, setUserJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // const getUserJobs = async () => {
-  //   setLoading(true);
-  //   const res = await axios.get(
-  //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
-  //     {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${cookies.token}`,
-  //       },
-  //     }
-  //   );
-  //   setUserJobs(res.data.docs);
-  //   console.log('userjobs', res)
-  //   setLoading(false);
-  // };
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const { data } = await getUserJobs(cookies.token);
+      setUserJobs(data.docs);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    getUserJobs(cookies.token).then((res) => {
-      setLoading(true);
-      setUserJobs(res.data.docs);
-      setLoading(false);
-    });
+    fetchData();
   }, []);
 
   const router = useRouter();
@@ -48,7 +38,6 @@ const EmployerDashBoardPage: NextPage = () => {
 
   return userJobs.length === 0 ? (
     <>
-      <Header title="Employment" />
       <div className="text-sky-700 font-bold text-2xl pb-3">งานที่จ้าง</div>
       <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
       <hr className="my-3" />
@@ -66,25 +55,24 @@ const EmployerDashBoardPage: NextPage = () => {
     </>
   ) : (
     <>
-      <Header title="Employment" />
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {userJobs.map((jobDetail) => (
+        {userJobs.map((jobDetailsObject) => (
           <div
             className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg"
-            onClick={() => router.push(`jobdetails/${jobDetail?._id}`)}
+            onClick={() => router.push(`jobdetails/${jobDetailsObject?._id}`)}
           >
-            <div id="job-header" className="">
-              <span>{jobDetail.title}</span>
+            <div id="job-header" className="text-lg">
+              <span>{jobDetailsObject.title}</span>
             </div>
             <hr />
             <div id="p-5" className="px-5 py-3">
               <div>
                 <span className="text-gray-400">Category: </span>
-                <span>{jobDetail.category.name}</span>
+                <span>{jobDetailsObject.category.name}</span>
               </div>
               <div>
-                <span className="text-gray-400">Wage: </span>
-                <span>{jobDetail?.wage}</span>
+                <span className="text-gray-400">min-Wage: </span>
+                <span>{jobDetailsObject?.category.minWage}</span>
               </div>
             </div>
             <div
@@ -93,14 +81,16 @@ const EmployerDashBoardPage: NextPage = () => {
             >
               <div className="text-sm">
                 <span className="text-gray-400">Deadline: </span>
-                <span>{jobDetail.deadline}</span>
+                <span>{dateFormat(new Date(jobDetailsObject.deadline))}</span>
               </div>
               <span
                 className={`${
-                  jobDetail.status === "new" ? "bg-green-500" : "bg-yellow-500"
+                  jobDetailsObject.status === "new"
+                    ? "bg-green-500"
+                    : "bg-yellow-500"
                 } px-5 rounded-full text-white`}
               >
-                <span className="uppercase">{jobDetail.status}</span>
+                <span className="uppercase">{jobDetailsObject.status}</span>
               </span>
             </div>
           </div>

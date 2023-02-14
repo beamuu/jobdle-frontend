@@ -1,149 +1,154 @@
-import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+
+import Header from "../../components/Header";
 import { getAllCategories } from "../../services/CategoryServices";
-import { dateFormat, editJob, getJob } from "../../services/jobServices";
+import { editJob, getJob } from "../../services/jobServices";
+import { splitTFromISO } from "../../services/UtilsServies";
 
 const EditDescriptionJobPage: NextPage = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [cookies] = useCookies(["token"]);
   const router = useRouter();
-  const [categories, setCategories] = useState([]);
   const { id } = router.query;
 
-  const [jobData, setJobData] = useState<EditableJob>({
+  const [categories, setCategories] = useState([]);
+  const [jobDetailsObject, setJobDetailsObject] = useState<EditableJob>({
     title: "",
     detail: "",
     category: {},
-    wage: "",
     note: "",
     location: "",
     deadline: "",
   });
 
-  const fetchAllCategories = async () => {
-    const res = await getAllCategories(cookies.token);
-    setCategories(res.data);
+  const handleChange = (e: any) => {
+    setJobDetailsObject((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleChange = (e: any) => {
-    setJobData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleSelectChange = (myStringifyObject: string) => {
+    const prasedObject = JSON.parse(myStringifyObject);
+    setJobDetailsObject({ ...jobDetailsObject, category: prasedObject });
+  };
+
+  const handleDateChage = (date: any) => {
+    setJobDetailsObject({ ...jobDetailsObject, deadline: date });
   };
 
   const handleEdit = async (e: FormEvent) => {
     e.preventDefault();
-    const jobRequestObject = {
-      ...jobData,
-      category: JSON.parse(jobData.category),
-    };
     if (!id) return;
-    await editJob(id as string, jobRequestObject, cookies.token);
+    await editJob(id, jobDetailsObject, cookies.token);
     router.push(`/jobdetails/${id}`);
+  };
+
+  const fetchAllCategories = async () => {
+    const { data } = await getAllCategories(cookies.token);
+    setCategories(data);
+  };
+
+  const fetchData = async () => {
+    try {
+      if (id) {
+        const { data } = await getJob(id, cookies.token);
+        setJobDetailsObject(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
     fetchAllCategories();
-    if (id) {
-      getJob(id, cookies.token).then((res) => {
-        setJobData(res.data);
-        // setJobData({ ...jobData, category: JSON.parse(jobData.category) });
-        console.log("typeof res.data.category", typeof res.data.category)
-      });
-    }
+    fetchData();
   }, [router]);
+
+  if (!jobDetailsObject) return null;
+
+  const BlockFieldStyles = "sm:grid sm:grid-cols-5 items-center";
+  const LabelStyles = "font-bold col-span-1 self-center";
+  const InputFieldStyles =
+    "border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4";
 
   return (
     <div>
-      <div className="text-sky-700 font-bold text-2xl pb-3">Job details</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">
-        {dateFormat(new Date())}
-      </span>
-      <hr className="my-3" />
+      <Header title="Edit job details" />
 
       <form onSubmit={handleEdit}>
         <div className="bg-white p-4 rounded-md space-y-2">
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1 self-center">Title </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Title </p>
             <input
               type="text"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.title}
+              className={InputFieldStyles}
+              value={jobDetailsObject.title}
               name="title"
               onChange={handleChange}
               required
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1 self-center">Detail </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Detail </p>
             <textarea
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
+              className={InputFieldStyles}
               rows={10}
-              value={jobData.detail}
+              value={jobDetailsObject.detail}
               name="detail"
               onChange={handleChange}
               required
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1 self-center">Category </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Category </p>
             <select
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 cursor-pointer col-span-4"
+              className={InputFieldStyles}
               name="category"
-              onChange={handleChange}
-              value={jobData.category}
+              onChange={(e) => handleSelectChange(e.target.value)}
+              defaultValue={jobDetailsObject.category.name}
               required
             >
-              <option value="">โปรดเลือก</option>
               {categories.map((category) => {
                 return (
                   <option value={JSON.stringify(category)}>
-                    {category.name}
+                    {category.name} | minWage: {category.minWage}
                   </option>
                 );
               })}
             </select>
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1 self-center">Wage </p>
-            <input
-              type="number"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.wage}
-              name="wage"
-              onChange={handleChange}
-              // required
-            />
-          </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1 self-center">Note </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Note </p>
             <input
               type="text"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.note}
+              className={InputFieldStyles}
+              value={jobDetailsObject.note}
               name="note"
               onChange={handleChange}
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1 self-center">Location </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Location </p>
             <input
               type="text"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.location}
+              className={InputFieldStyles}
+              value={jobDetailsObject.location}
               name="location"
               onChange={handleChange}
               required
             />
           </div>
-          <div className="sm:grid sm:grid-cols-5">
-            <p className="font-bold col-span-1 self-center">Deadline </p>
+          <div className={BlockFieldStyles}>
+            <p className={LabelStyles}>Deadline </p>
             <input
               type="date"
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4"
-              value={jobData.deadline}
+              className={InputFieldStyles}
+              value={splitTFromISO(jobDetailsObject.deadline)}
               name="deadline"
-              onChange={handleChange}
+              onChange={(e) => handleDateChage(e.target.value)}
               //   required
             />
           </div>
@@ -151,7 +156,7 @@ const EditDescriptionJobPage: NextPage = () => {
         <div className="flex justify-between mt-2">
           <button
             className="bg-red-500 rounded-md p-2 text-white"
-            onClick={() => router.push(`/jobdetails/${id}`)} // Can't work
+            onClick={() => router.push(`/jobdetails/${id}`)}
           >
             Cancel
           </button>

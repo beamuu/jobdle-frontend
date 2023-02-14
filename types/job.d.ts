@@ -14,7 +14,7 @@ interface EditableJob {
   // wage?: string;
   note?: string;
   location?: string;
-  deadline?: string;
+  deadline?: string | undefined;
   status?: string;
   employeeId?: array[];
 }

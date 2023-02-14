@@ -12,3 +12,10 @@ export const dateFormat = (today: Date) => {
   let currentDate = `${dd}/${mm}/${yyyy}`;
   return currentDate;
 };
+
+export const splitTFromISO = (dateString: string) => {
+  console.log("dateString", dateString);
+  const dateSplitT = dateString.split("T")[0];
+  console.log("dateSplitT", dateSplitT);
+  return dateSplitT;
+};
