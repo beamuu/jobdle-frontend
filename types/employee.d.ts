@@ -1,14 +1,13 @@
-interface Employee extends EditableEmployee {
-  status: string;
-  works: [];
-  _id: string;
-}
-interface EditableEmployee {
-  firstname: string;
-  lastname: string;
-  email: string;
-  tel: string;
+interface Employee {
   age: number;
-  // detail: string;
+  email: string;
+  firstname: string;
   gender: string;
+  lastname: string;
+  status: string;
+  tel: string;
+  updatedAt: string;
+  works: array;
+  __v: number;
+  _id: string;
 }

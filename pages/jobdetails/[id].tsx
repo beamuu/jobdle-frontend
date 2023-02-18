@@ -8,12 +8,31 @@ import DeleteJobModal from "../../components/DeleteJobModal";
 import Header from "../../components/Header";
 import ManageEmployeeModal from "../../components/ManageEmployeeModal";
 import { useUser } from "../../contexts/User";
-import { deleteJob, editJob, getJob } from "../../services/jobServices";
-import { dateFormat, formatDate } from "../../services/UtilsServies";
+import { deleteJob, editJob, getJob } from "../../services/JobServices";
+import { dateFormat } from "../../services/UtilsServies";
 
-// type Job = {
-
-// }
+type Job = {
+  category: {
+    name: string;
+    minWage: number;
+    _id: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  createdAt: string;
+  deadline: string;
+  detail: string;
+  employee: [Employee];
+  employeeId: [];
+  fullname: string;
+  location: string;
+  status: string;
+  title: string;
+  updatedAt: string;
+  userId: string;
+  __v: 0;
+  _id: string;
+};
 
 const JobDetailsPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
@@ -112,10 +131,6 @@ const JobDetailsPage: NextPage = () => {
           <p className={DetailStyles}>{jobDetailsObject.category.minWage} </p>
         </div>
         <div className={BlockFieldStyles}>
-          <p className={LabelStyles}>Note </p>
-          <p className={DetailStyles}>{jobDetailsObject.note}</p>
-        </div>
-        <div className={BlockFieldStyles}>
           <p className={LabelStyles}>Location </p>
           <p className={DetailStyles}>{jobDetailsObject.location}</p>
         </div>
@@ -130,9 +145,28 @@ const JobDetailsPage: NextPage = () => {
           <p className={DetailStyles}>{jobDetailsObject.status}</p>
         </div>
         {jobDetailsObject.status === "pending" ? (
-          <div className={BlockFieldStyles}>
+          <div className={`${BlockFieldStyles}`}>
             <p className={LabelStyles}>Employee </p>
-            <p className={DetailStyles}>{jobDetailsObject.employeeId}</p>
+            <div className={DetailStyles}>
+              <div className="grid grid-cols-3 gap-2">
+                {jobDetailsObject.employee.map((employee) => (
+                  <div
+                    className="bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
+                    key={employee._id}
+                  >
+                    <div id="image" className="flex justify-center py-2">
+                      <div className="bg-sky-500 rounded-full w-32 h-32"></div>
+                    </div>
+                    <div id="details" className="flex flex-col items-center">
+                      <span>
+                        {employee.firstname} {employee.lastname}
+                      </span>
+                      <span className="text-gray-400">Front Developer</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : null}
       </div>

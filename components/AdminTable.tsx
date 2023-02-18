@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
 
-import { getAllJobs } from "../services/jobServices";
-
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { getAllJobs } from "../services/JobServices";
 
 const AdminTable = () => {
   const [cookies] = useCookies(["token"]);
@@ -19,6 +18,8 @@ const AdminTable = () => {
     limit: 0,
     totalPages: 0,
   });
+  const [sortList, setSortList] = useState([]);
+  const [query, setQuery] = useState({});
 
   const ButtonStyles = (statusNow: string) =>
     `${
@@ -72,7 +73,13 @@ const AdminTable = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const { data } = await getAllJobs(status, state.page, cookies.token);
+      const { data, request } = await getAllJobs(
+        status,
+        state.page,
+        cookies.token,
+        query
+      );
+      console.log("req", request);
       setAllJobs(data.docs);
       setState({
         ...state,
@@ -80,6 +87,7 @@ const AdminTable = () => {
         limit: data.limit,
         totalPages: data.totalPages,
       });
+      setSortList(Object.keys(data.docs[0]));
     } catch (error) {
       console.error(error);
     }
@@ -89,7 +97,8 @@ const AdminTable = () => {
   useEffect(() => {
     if (!status) return;
     fetchData();
-  }, [state.page, status]);
+    console.log("query", query);
+  }, [state.page, status, query]);
 
   const HeaderTableStyles = "text-start text-sky-700 py-3 min-w-[200px]";
 
@@ -200,16 +209,43 @@ const AdminTable = () => {
   return (
     <>
       <div className="my-3">
-        <div className="mb-3 space-x-2">
-          <button className={ButtonStyles("new")} onClick={pushStatusNew}>
-            New
-          </button>
-          <button
-            className={ButtonStyles("pending")}
-            onClick={pushStatusPending}
-          >
-            Pending
-          </button>
+        <div className="flex mb-3 justify-between">
+          <div className="space-x-2">
+            <button className={ButtonStyles("new")} onClick={pushStatusNew}>
+              New
+            </button>
+            <button
+              className={ButtonStyles("pending")}
+              onClick={pushStatusPending}
+            >
+              Pending
+            </button>
+          </div>
+          <div className="flex">
+            <div>
+              <span>Sort: </span>
+              <select
+                name=""
+                id=""
+                onChange={(e) => setQuery({ ...query, sort: e.target.value })}
+              >
+                {sortList.map((item) => (
+                  <option value={item}>{item}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <span>Order</span>
+              <select
+                name=""
+                id=""
+                onChange={(e) => setQuery({ ...query, order: e.target.value })}
+              >
+                <option value="asc">asc</option>
+                <option value="desc">desc</option>
+              </select>
+            </div>
+          </div>
         </div>
         {isLoading ? LoadingComponent : ShowingComponent}
       </div>

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-import { getUserJobs } from "../services/jobServices";
+import { getUserJobs } from "../services/JobServices";
 import { dateFormat } from "../services/UtilsServies";
 
 const EmployerDashBoardPage: NextPage = () => {

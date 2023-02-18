@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 
 import Header from "../../components/Header";
 import { getAllCategories } from "../../services/CategoryServices";
-import { editJob, getJob } from "../../services/jobServices";
+import { editJob, getJob } from "../../services/JobServices";
 import { splitTFromISO } from "../../services/UtilsServies";
 
 const EditDescriptionJobPage: NextPage = () => {
@@ -104,7 +104,8 @@ const EditDescriptionJobPage: NextPage = () => {
           </div>
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Category </p>
-            <select
+            <p>{jobDetailsObject.category.name}</p>
+            {/* <select
               className={InputFieldStyles}
               name="category"
               onChange={(e) => handleSelectChange(e.target.value)}
@@ -118,7 +119,7 @@ const EditDescriptionJobPage: NextPage = () => {
                   </option>
                 );
               })}
-            </select>
+            </select> */}
           </div>
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Note </p>

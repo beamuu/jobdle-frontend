@@ -3,7 +3,7 @@ import { useCookies } from "react-cookie";
 import { getAllEmployees } from "../services/EmployeeServices";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import { editJob, manageJob } from "../services/jobServices";
+import { editJob, manageJob } from "../services/JobServices";
 import Router, { useRouter } from "next/router";
 
 interface Props {
@@ -39,15 +39,19 @@ export default function ManageEmployeeModal({
     setAllEmployees(allEmployees.data);
   };
 
-  const handleManageEmployees = () => {
+  const handleManageEmployees = async () => {
     selectedEmployeeArray.sort();
-    const selectedEmployees:Employee[] = selectedEmployeeArray.map(
+    const selectedEmployees: Employee[] = selectedEmployeeArray.map(
       (index) => allEmployees[index]
     );
     console.log("SelectedEmployees", selectedEmployees);
     console.log("id", id);
-    manageJob(id, { employeeId: selectedEmployees, status: "pending" }, token);
-    router.push("/dashboard")
+    await manageJob(
+      id,
+      { employee: selectedEmployees, status: "pending" },
+      token
+    );
+    router.push("/");
   };
 
   return (

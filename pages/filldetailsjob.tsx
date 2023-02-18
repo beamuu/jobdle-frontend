@@ -6,7 +6,7 @@ import { useCookies } from "react-cookie";
 
 import Header from "../components/Header";
 import { getAllCategories } from "../services/CategoryServices";
-import { postJob } from "../services/jobServices";
+import { postJob } from "../services/JobServices";
 import { splitTFromISO } from "../services/UtilsServies";
 
 const defaultValue = {

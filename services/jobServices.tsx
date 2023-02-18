@@ -4,7 +4,8 @@ import { headersParams } from "./UtilsServies";
 export const getAllJobs = async (
   status: string | string[] | undefined,
   page: number = 0,
-  token: string
+  token: string,
+  query: object | undefined
 ) => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
@@ -12,11 +13,12 @@ export const getAllJobs = async (
       params: {
         status: [status],
         page: page,
+        ...query,
       },
       headers: headersParams(token),
     }
   );
-  console.log("getAllJobs", response);
+  console.log("getAllJob", response);
   return response;
 };
 
@@ -107,7 +109,7 @@ export const postJob = async (data: {}, token: string) => {
 
 export const manageJob = async (
   id: string | string[] | undefined,
-  data: EditableJob,
+  data: { employee: Employee[]; status: string },
   token: string
 ) => {
   const response = await axios.patch(

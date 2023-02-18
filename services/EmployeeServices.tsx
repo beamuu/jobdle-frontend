@@ -1,10 +1,14 @@
 import axios from "axios";
 import { headersParams } from "./UtilsServies";
 
-export const getAllEmployees = async (token: string) => {
+export const getAllEmployees = async (
+  token: string,
+  query: object | undefined
+) => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/employee`,
     {
+      params: query,
       headers: headersParams(token),
     }
   );

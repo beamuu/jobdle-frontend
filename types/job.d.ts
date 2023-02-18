@@ -3,7 +3,7 @@ interface Job extends EditableJob, JobManaged {
   userId: string;
   _id: string;
   date: string;
-  employeeId: array[];
+  employee: array[];
   status: string;
 }
 
