@@ -11,29 +11,6 @@ import { useUser } from "../../contexts/User";
 import { deleteJob, editJob, getJob } from "../../services/JobServices";
 import { dateFormat } from "../../services/UtilsServies";
 
-type Job = {
-  category: {
-    name: string;
-    minWage: number;
-    _id: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-  createdAt: string;
-  deadline: string;
-  detail: string;
-  employee: [Employee];
-  employeeId: [];
-  fullname: string;
-  location: string;
-  status: string;
-  title: string;
-  updatedAt: string;
-  userId: string;
-  __v: 0;
-  _id: string;
-};
-
 const JobDetailsPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
   const router = useRouter();
@@ -62,12 +39,6 @@ const JobDetailsPage: NextPage = () => {
   };
 
   useEffect(() => {
-    // if (id) {
-    //   getJob(id, cookies.token).then((res) => {
-    //     setJob(res.data);
-    //   });
-    // }
-    // console.log("jobDetails", jobDetails);
     fetchData();
   }, [router]);
 
@@ -91,7 +62,7 @@ const JobDetailsPage: NextPage = () => {
   const handleSuccussJob = async () => {
     try {
       await editJob(id, { status: "done" }, cookies.token);
-      router.push("/dashboard");
+      router.push("/");
     } catch (err) {
       console.error(err);
     }
@@ -124,7 +95,7 @@ const JobDetailsPage: NextPage = () => {
         </div>
         <div className={BlockFieldStyles}>
           <p className={LabelStyles}>Category </p>
-          <p className={DetailStyles}>{jobDetailsObject.category.name} </p>
+          <p className={DetailStyles}>{jobDetailsObject.category.name}</p>
         </div>
         <div className={BlockFieldStyles}>
           <p className={LabelStyles}>Min wage </p>
@@ -171,7 +142,11 @@ const JobDetailsPage: NextPage = () => {
         ) : null}
       </div>
 
-      <div className="flex justify-between">
+      <div
+        className={`${
+          jobDetailsObject.status === "done" ? "hidden" : ""
+        } flex justify-between`}
+      >
         <div className="space-x-2">
           <button
             className="bg-yellow-500 rounded-md p-2 text-white w-20 mt-2"

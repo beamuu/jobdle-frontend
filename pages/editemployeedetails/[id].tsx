@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React, { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+
 import Header from "../../components/Header";
 import { useUser } from "../../contexts/User";
 import {
@@ -9,11 +10,13 @@ import {
   getEmployee,
 } from "../../services/EmployeeServices";
 
-function EmployeedetailsPage() {
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+const EmployeedetailsPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const [employeeDetail, setEmployeeDetail] = useState<EditableEmployee>({
+  const { userData } = useUser();
+
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [employeeDetail, setEmployeeDetail] = useState({
     firstname: "",
     lastname: "",
     email: "",
@@ -22,7 +25,6 @@ function EmployeedetailsPage() {
     // detail: string;
     gender: "",
   });
-  const { userData } = useUser();
 
   const handleChange = (e: any) => {
     setEmployeeDetail((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -177,6 +179,6 @@ function EmployeedetailsPage() {
       </form>
     </>
   );
-}
+};
 
 export default EmployeedetailsPage;

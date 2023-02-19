@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getAllJobs } from "../services/JobServices";
+import { dateFormat } from "../services/UtilsServies";
 
 const AdminTable = () => {
   const [cookies] = useCookies(["token"]);
@@ -18,7 +19,12 @@ const AdminTable = () => {
     limit: 0,
     totalPages: 0,
   });
-  const [sortList, setSortList] = useState([]);
+  const [sortList, setSortList] = useState([
+    "deadline",
+    "employee",
+    "title",
+    "category",
+  ]);
   const [query, setQuery] = useState({});
 
   const ButtonStyles = (statusNow: string) =>
@@ -73,13 +79,12 @@ const AdminTable = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const { data, request } = await getAllJobs(
+      const { data } = await getAllJobs(
         status,
         state.page,
         cookies.token,
         query
       );
-      console.log("req", request);
       setAllJobs(data.docs);
       setState({
         ...state,
@@ -87,7 +92,8 @@ const AdminTable = () => {
         limit: data.limit,
         totalPages: data.totalPages,
       });
-      setSortList(Object.keys(data.docs[0]));
+      // setSortList(Object.keys(data.docs[0]));
+      console.log(sortList);
     } catch (error) {
       console.error(error);
     }
@@ -100,7 +106,7 @@ const AdminTable = () => {
     console.log("query", query);
   }, [state.page, status, query]);
 
-  const HeaderTableStyles = "text-start text-sky-700 py-3 min-w-[200px]";
+  const HeaderTableStyles = "text-start text-sky-700 py-3";
 
   const LoadingComponent = (
     <div className="flex justify-center items-center w-full h-40 bg-white rounded-md">
@@ -120,7 +126,7 @@ const AdminTable = () => {
               </th>
               <th className={HeaderTableStyles}>Title</th>
               <th className={HeaderTableStyles}>Category</th>
-              <th className={HeaderTableStyles}>Date</th>
+              <th className={HeaderTableStyles}>Dead line</th>
             </tr>
           </thead>
           {/* Showing jobs area */}
@@ -135,16 +141,19 @@ const AdminTable = () => {
                   <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
                   <td className="py-3">{job.title}</td>
                   <td className="py-3">{job.category.name}</td>
-                  <td className="py-3">{job.date}</td>
+                  <td className="py-3">
+                    {dateFormat(new Date(job.updatedAt))}
+                  </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
+
       {/* Footer area */}
       <div className="w-full border-sky-300 border-t-2">
-        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-2 py-3 sm:px-4">
           <div className="flex flex-1 justify-between sm:hidden">
             <div className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
               Previous
@@ -221,7 +230,7 @@ const AdminTable = () => {
               Pending
             </button>
           </div>
-          <div className="flex">
+          <div className="flex space-x-2">
             <div>
               <span>Sort: </span>
               <select

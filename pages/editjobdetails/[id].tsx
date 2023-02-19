@@ -8,20 +8,26 @@ import { getAllCategories } from "../../services/CategoryServices";
 import { editJob, getJob } from "../../services/JobServices";
 import { splitTFromISO } from "../../services/UtilsServies";
 
+const defaultValue = {
+  title: "",
+  detail: "",
+  category: {
+    name: "",
+    minWage: 0,
+  },
+  note: "",
+  location: "",
+  deadline: "",
+};
+
 const EditDescriptionJobPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
   const router = useRouter();
   const { id } = router.query;
 
   const [categories, setCategories] = useState([]);
-  const [jobDetailsObject, setJobDetailsObject] = useState<EditableJob>({
-    title: "",
-    detail: "",
-    category: {},
-    note: "",
-    location: "",
-    deadline: "",
-  });
+  const [jobDetailsObject, setJobDetailsObject] =
+    useState<JobEditable>(defaultValue);
 
   const handleChange = (e: any) => {
     setJobDetailsObject((prev) => ({
@@ -75,7 +81,7 @@ const EditDescriptionJobPage: NextPage = () => {
     "border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4";
 
   return (
-    <div>
+    <>
       <Header title="Edit job details" />
 
       <form onSubmit={handleEdit}>
@@ -122,16 +128,6 @@ const EditDescriptionJobPage: NextPage = () => {
             </select> */}
           </div>
           <div className={BlockFieldStyles}>
-            <p className={LabelStyles}>Note </p>
-            <input
-              type="text"
-              className={InputFieldStyles}
-              value={jobDetailsObject.note}
-              name="note"
-              onChange={handleChange}
-            />
-          </div>
-          <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Location </p>
             <input
               type="text"
@@ -169,7 +165,7 @@ const EditDescriptionJobPage: NextPage = () => {
           </button>
         </div>
       </form>
-    </div>
+    </>
   );
 };
 

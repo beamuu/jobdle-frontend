@@ -6,4 +6,6 @@ interface User {
   email: string;
   role: string;
   _id: string;
+  updatedAt: string;
+  verifyEmail: number;
 }

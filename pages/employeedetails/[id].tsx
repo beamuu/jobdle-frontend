@@ -1,20 +1,23 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import ComfirmModal from "../../components/ComfirmModal";
 import Header from "../../components/Header";
 import { useUser } from "../../contexts/User";
 import { deleteEmployee, getEmployee } from "../../services/EmployeeServices";
 
-function EmployeedetailsPage() {
+const EmployeedetailsPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const router = useRouter();
   const { id } = router.query;
-  const [employeeDetail, setEmployeeDetail] = useState<Employee>();
   const { userData } = useUser();
+
+  const [employeeDetail, setEmployeeDetail] = useState<Employee>();
+  const [showDeleteEmployeeModal, setShowDeleteEmployeeModal] = useState(false);
 
   const handleDeleteEmployee = async () => {
     await deleteEmployee(id, cookies.token);
-    // router.push("/employee");
+    router.push("/employee");
   };
 
   const handleEditEmployee = () => {
@@ -36,7 +39,7 @@ function EmployeedetailsPage() {
   if (userData === undefined) return null;
 
   return (
-    <div>
+    <>
       <Header title="Employee details" />
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md">
         <div className="flex justify-center px-5 pb-5" id="picture">
@@ -83,14 +86,25 @@ function EmployeedetailsPage() {
           </button>
           <button
             className="p-2 bg-red-500 rounded-md text-white"
-            onClick={handleDeleteEmployee}
+            onClick={() => setShowDeleteEmployeeModal(true)}
           >
             Delete
           </button>
         </div>
       ) : null}
-    </div>
+
+      <ComfirmModal
+        onClose={setShowDeleteEmployeeModal}
+        show={showDeleteEmployeeModal}
+        cancel={() => setShowDeleteEmployeeModal(false)}
+        confirm={handleDeleteEmployee}
+        title="Are you sure you delete this employee ?"
+        cancelButtonValue="Cancel"
+        confirmButtonValue="Confirm"
+        confirmButtonColor="red"
+      />
+    </>
   );
-}
+};
 
 export default EmployeedetailsPage;

@@ -12,14 +12,14 @@ function EmployeePage() {
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState({});
-  const [sortList, setSortList] = useState([]);
+  const [sortList, setSortList] = useState(["age","status","work"]);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
       const { data } = await getAllEmployees(cookies.token, query);
       setAllEmployees(data);
-      setSortList(Object.keys(data[0]));
+      // setSortList(Object.keys(data[0]));
     } catch (error) {
       console.error(error);
     }

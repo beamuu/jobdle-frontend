@@ -4,14 +4,16 @@ import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 
 import { useUser } from "../contexts/User";
-import { getAllAccomplishedJobs } from "../services/jobServices";
+import { getAllAccomplishedJobs } from "../services/JobServices";
 import Header from "../components/Header";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { dateFormat } from "../services/UtilsServies";
 
 const HistoryPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
   const { userData } = useUser();
+  const router = useRouter();
 
   const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,7 +98,7 @@ const HistoryPage: NextPage = () => {
           <thead>
             <tr className="border-b-2 border-sky-300">
               {userData.role === "admin" ? (
-                <th className="text-start text-sky-700 py-3 pl-2 md:pl-4 min-w-[200px]">
+                <th className="text-start text-sky-700 py-3 pl-2 md:pl-4">
                   Employer's Name
                 </th>
               ) : (
@@ -110,7 +112,10 @@ const HistoryPage: NextPage = () => {
           </thead>
           <tbody className="divide-y">
             {allJobs.map((job) => (
-              <tr className="hover:bg-gray-200 cursor-pointer">
+              <tr
+                className="hover:bg-gray-200 cursor-pointer"
+                onClick={() => router.push(`/jobdetails/${job._id}`)}
+              >
                 {userData.role === "admin" ? (
                   <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
                 ) : (
@@ -118,7 +123,7 @@ const HistoryPage: NextPage = () => {
                 )}
                 <td className={`${isAdminDetailsStyles} py-3`}>{job.title}</td>
                 <td className="py-3">{job.category.name}</td>
-                <td className="py-3">{job.date}</td>
+                <td className="py-3">{dateFormat(new Date(job.updatedAt))}</td>
                 <td className="py-3">
                   {job.status !== "cancel" ? (
                     <p className="font-bold text-green-500">Completed</p>

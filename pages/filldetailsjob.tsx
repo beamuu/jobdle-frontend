@@ -67,6 +67,8 @@ const FillDescriptionJobPage: NextPage = () => {
   const InputFieldStyles =
     "border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 col-span-4";
 
+  if (!categoryObjects) return null;
+
   return (
     <div>
       <Header title="Fill job details" />
@@ -104,7 +106,7 @@ const FillDescriptionJobPage: NextPage = () => {
               // required
             >
               <option value="">โปรดเลือก</option>
-              {categoryObjects.map((category) => {
+              {categoryObjects.map((category: any) => {
                 return (
                   <option value={JSON.stringify(category)}>
                     {category.name} | minWage: {category.minWage}

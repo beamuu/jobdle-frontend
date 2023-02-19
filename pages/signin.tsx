@@ -50,68 +50,76 @@ const SignInPage: SignInPageWithNoLayout = () => {
   };
 
   return (
-    <div className="bg-sky-400 h-screen w-screen grid justify-items-center">
-      <div className="bg-white sm:w-8/12 md:w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
-        <p className="font-bold text-3xl text-center my-5">Login</p>
-        <form onSubmit={handleSignIn}>
-          <div className="mb-3">
-            <label className="block font-medium text-gray-700 my-1">
-              Username
-            </label>
-            <input
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-              type="text"
-              value={userData.username}
-              placeholder="Type your username"
-              name="username"
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <label className="block font-medium text-gray-700 my-1">
-              Password
-            </label>
-            <input
-              className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-              type="password"
-              value={userData.password}
-              placeholder="Type your password"
-              name="password"
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex justify-end mb-3">
-            <p className="text-blue-500 hover:underline hover:cursor-pointer">
-              Forgot Password?
+    <>
+      <div className="bg-sky-400 min-h-screen min-w-screen grid justify-items-center">
+        <div className="bg-white sm:w-8/12 md:w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
+          <p className="font-bold text-3xl text-center my-5">Login</p>
+          <form onSubmit={handleSignIn}>
+            <div className="mb-3">
+              <label className="block font-medium text-gray-700 my-1">
+                Username
+              </label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="text"
+                value={userData.username}
+                placeholder="Type your username"
+                name="username"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="block font-medium text-gray-700 my-1">
+                Password
+              </label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="password"
+                value={userData.password}
+                placeholder="Type your password"
+                name="password"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex justify-end mb-3">
+              <p
+                className="text-blue-500 hover:underline hover:cursor-pointer"
+                onClick={() => router.push("/identify")}
+              >
+                Forgot Password?
+              </p>
+            </div>
+            <div className="flex justify-center mb-3 items-center">
+              <button
+                type="submit"
+                className="transition rounded-md border border-transparent bg-blue-600 w-full py-2 px-4 text-sm font-medium text-white hover:bg-blue-500"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex justify-center">
+                    <span className="h-5 w-5 block rounded-full border-4 border-blue-400 border-t-white animate-spin"></span>
+                  </div>
+                ) : (
+                  <span className="justify-center">Log in</span>
+                )}
+              </button>
+            </div>
+          </form>
+          <hr />
+          <div className="flex justify-center my-5">
+            <p>
+              Need An Account?{" "}
+              <a
+                href="/signup"
+                className="text-blue-600 visited:text-purple-600"
+              >
+                Create Now!
+              </a>
             </p>
           </div>
-          <div className="flex justify-center mb-3 items-center">
-            <button
-              type="submit"
-              className="transition rounded-md border border-transparent bg-blue-600 w-full py-2 px-4 text-sm font-medium text-white hover:bg-blue-500"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex justify-center">
-                  <span className="h-5 w-5 block rounded-full border-4 border-blue-400 border-t-white animate-spin"></span>
-                </div>
-              ) : (
-                <span className="justify-center">Log in</span>
-              )}
-            </button>
-          </div>
-        </form>
-        <hr />
-        <div className="flex justify-center my-5">
-          <p>
-            Need An Account?{" "}
-            <a href="/signup" className="text-blue-600 visited:text-purple-600">
-              Create Now!
-            </a>
-          </p>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

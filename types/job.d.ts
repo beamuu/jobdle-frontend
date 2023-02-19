@@ -1,20 +1,33 @@
-interface Job extends EditableJob, JobManaged {
+interface Job {
+  category: {
+    name: string;
+    minWage: number;
+    _id: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  createdAt: string;
+  deadline: string;
+  detail: string;
+  employee: [Employee];
+  employeeId: [];
   fullname: string;
-  userId: string;
-  _id: string;
-  date: string;
-  employee: array[];
+  location: string;
   status: string;
+  title: string;
+  updatedAt: string;
+  userId: string;
+  __v: 0;
+  _id: string;
 }
 
-interface EditableJob {
-  title?: string;
-  detail?: string;
-  category?: object;
-  // wage?: string;
-  note?: string;
-  location?: string;
-  deadline?: string | undefined;
-  status?: string;
-  employeeId?: array[];
+interface JobEditable {
+  title: string;
+  detail: string;
+  category: {
+    name: string;
+    minWage: number;
+  };
+  location: string;
+  deadline: string;
 }

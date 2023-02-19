@@ -3,7 +3,6 @@ import { NextPage } from "next";
 import React, {
   ChangeEvent,
   FormEvent,
-  FormEventHandler,
   useEffect,
   useRef,
   useState,
@@ -13,23 +12,24 @@ import io, { Socket } from "socket.io-client";
 import { useUser } from "../contexts/User";
 
 const ChatPage: NextPage = () => {
+  const [messageList, setMessageList] = useState<any[]>([]);
+  const [roomId, setRoomId] = useState(undefined);
+  const [cookies] = useCookies(["token"]);
+  const refMessages = useRef<any[]>([]);
+
+  const [chatRooms, setChatRooms] = useState<any[]>([]);
+  // const [userData, setUserData] = useState<User>();
+  const [senderId, setSenderId] = useState();
+  const [roomName, setRoomName] = useState();
   const [data, setData] = useState({
     index: -1,
   });
   const [message, setMessage] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [messageList, setMessageList] = useState<any[]>([]);
-  const [roomId, setRoomId] = useState(undefined);
-  const [cookies, setCookie] = useCookies(["token"]);
-  const [chatRooms, setChatRooms] = useState<any[]>([]);
-  const refMessages = useRef<any[]>([]);
-  const [userData, setUserData] = useState<User>();
-  const [senderId, setSenderId] = useState();
-  const [roomName, setRoomName] = useState();
-  // const { userData } = useUser();
+  const { userData } = useUser();
 
   const getRoom = async (token: string) => {
-    const res = await axios.get(
+    const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/chatroom`,
       {
         headers: {
@@ -38,22 +38,8 @@ const ChatPage: NextPage = () => {
         },
       }
     );
-    // console.log("getRoom", res);
-    return res.data;
-  };
-
-  const getFullName = async (token: string, user_id: string) => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/fullname/${user_id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log("getFullName", res.data);
-    return res.data;
+    console.log("getRoom", data);
+    return data;
   };
 
   const getUserData = async () => {
@@ -77,20 +63,22 @@ const ChatPage: NextPage = () => {
 
   const init = async () => {
     var chatRoomData = await getRoom(cookies.token);
-    var user = await getUserData();
-    setUserData(user);
-    setSenderId(user._id);
+    var userData = await getUserData();
+    // setUserData(user);
+    setSenderId(userData._id);
+    if (chatRoomData.length == 0) return;
 
-    if (user && chatRoomData) {
-      console.log("user role", user.role);
-      if (user.role === "user") {
-        console.log("User");
+    if (userData !== undefined && chatRoomData !== undefined) {
+      if (userData.role === "user") {
+        // USER CHAT
+        console.log("ROLE:User");
         console.log("chatRoomData", chatRoomData);
         setMessageList(chatRoomData.messages);
         setRoomId(chatRoomData._id);
         refMessages.current = messageList;
-      } else if (user.role === "admin") {
-        console.log("Admin");
+      } else if (userData.role === "admin") {
+        // ADMIN CHAT
+        console.log("ROLE:Admin");
         console.log("chatRoomData", chatRoomData);
         setChatRooms(chatRoomData);
         console.log("FIRST ROOM ID", roomId);
