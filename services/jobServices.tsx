@@ -67,7 +67,7 @@ export const getJob = async (id: any, token: string) => {
 
 export const editJob = async (
   id: string | string[] | undefined,
-  data: EditableJob,
+  data: JobEditable,
   token: string
 ) => {
   const response = await axios.patch(

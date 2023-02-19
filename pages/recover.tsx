@@ -18,7 +18,7 @@ const RecoverPasswordPage = () => {
   return (
     <>
       <div className="bg-sky-400 flex justify-center min-h-screen min-w-screen">
-        <div className="bg-white w-4/12  my-20 p-10 rounded-xl border border-transparent">
+        <div className="bg-white w-4/12 my-20 p-10 rounded-xl border border-transparent">
           <div>
             <p className="text-3xl">Recover</p>
           </div>

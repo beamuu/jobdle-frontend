@@ -55,6 +55,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
       console.error(error);
     }
     setIsLoading(false);
+    alert("Please go to your email for verify.");
   };
 
   return (

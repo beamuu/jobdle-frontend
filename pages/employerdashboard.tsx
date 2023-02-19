@@ -38,9 +38,6 @@ const EmployerDashBoardPage: NextPage = () => {
 
   return userJobs.length === 0 ? (
     <>
-      <div className="text-sky-700 font-bold text-2xl pb-3">งานที่จ้าง</div>
-      <span className="rounded-md px-2 py-1 bg-green-200">2 ตุลาคม</span>
-      <hr className="my-3" />
       <div className="w-full h-full flex justify-center">
         <div>
           <span>You do not have any employment </span>
