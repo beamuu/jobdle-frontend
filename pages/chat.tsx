@@ -11,7 +11,7 @@ import { useCookies } from "react-cookie";
 import io, { Socket } from "socket.io-client";
 import { useUser } from "../contexts/User";
 import { getUserJobs } from "../services/JobServices";
-import { dateFormat } from "../services/UtilsServies";
+import { dateFormat } from "../services/UtilsServices";
 
 const ChatPage: NextPage = () => {
   const [messageList, setMessageList] = useState<any[]>([]);

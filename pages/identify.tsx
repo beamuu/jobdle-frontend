@@ -1,16 +1,28 @@
+import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useCookies } from "react-cookie";
+import { headersParams } from "../services/UtilsServices";
 
 const IdentifyPage = () => {
   const router = useRouter();
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+
   const [userEmail, setUserEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-    } catch {}
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/password`,
+        { params: { email: userEmail } }
+      );
+      console.log("response", response);
+    } catch (error) {
+      console.error(error);
+    }
     console.log(userEmail);
     setIsLoading(false);
   };
@@ -52,7 +64,10 @@ const IdentifyPage = () => {
               </div>
             </form>
           </div>
-          <p className="text-blue-500 cursor-pointer" onClick={() => router.push("/signin")}>
+          <p
+            className="text-blue-500 cursor-pointer"
+            onClick={() => router.push("/signin")}
+          >
             Back to sign in
           </p>
         </div>

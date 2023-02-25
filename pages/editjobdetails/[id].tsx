@@ -6,7 +6,7 @@ import { useCookies } from "react-cookie";
 import Header from "../../components/Header";
 import { getAllCategories } from "../../services/CategoryServices";
 import { editJob, getJob } from "../../services/JobServices";
-import { splitTFromISO } from "../../services/UtilsServies";
+import { splitTFromISO } from "../../services/UtilsServices";
 
 const defaultValue = {
   title: "",

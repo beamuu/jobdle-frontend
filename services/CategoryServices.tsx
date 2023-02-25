@@ -1,5 +1,5 @@
 import axios from "axios";
-import { headersParams } from "./UtilsServies";
+import { headersParams } from "./UtilsServices";
 
 export const getAllCategories = async (token: string) => {
   const response = await axios.get(

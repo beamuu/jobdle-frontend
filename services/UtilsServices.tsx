@@ -1,4 +1,4 @@
-export const headersParams = (token: string) => {
+export const headersParams = (token: string | string[] | undefined) => {
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,

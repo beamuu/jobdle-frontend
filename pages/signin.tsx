@@ -9,14 +9,16 @@ type SignInPageWithNoLayout = NextPage & {
   noLayout: boolean;
 };
 
+const defaultValue = {
+  username: "",
+  password: "",
+};
+
 const SignInPage: SignInPageWithNoLayout = () => {
   const [, setCookie] = useCookies(["token"]);
   const router = useRouter();
 
-  const [userData, setUserData] = useState({
-    username: "",
-    password: "",
-  });
+  const [userData, setUserData] = useState(defaultValue);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: any) => {
@@ -32,7 +34,8 @@ const SignInPage: SignInPageWithNoLayout = () => {
 
       if (!data.accessToken) {
         // กรณีไม่มี acessToken
-        alert("Sign in fail!");
+        alert("No token!");
+        setUserData({ ...userData, password: "" });
       } else {
         setCookie("token", data.accessToken, { path: "/" });
         router.push("/");
@@ -41,6 +44,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
           alert("Sign in fail!");
+          setUserData({ ...userData, password: "" });
         } else {
           alert("Error bewteen client and server!");
         }
@@ -58,28 +62,28 @@ const SignInPage: SignInPageWithNoLayout = () => {
             <div className="mb-3">
               <label className="block font-medium text-gray-700 my-1">
                 Username
+                <input
+                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                  type="text"
+                  value={userData.username}
+                  placeholder="Type your username"
+                  name="username"
+                  onChange={handleChange}
+                />
               </label>
-              <input
-                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                type="text"
-                value={userData.username}
-                placeholder="Type your username"
-                name="username"
-                onChange={handleChange}
-              />
             </div>
             <div className="mb-3">
               <label className="block font-medium text-gray-700 my-1">
                 Password
+                <input
+                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                  type="password"
+                  value={userData.password}
+                  placeholder="Type your password"
+                  name="password"
+                  onChange={handleChange}
+                />
               </label>
-              <input
-                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                type="password"
-                value={userData.password}
-                placeholder="Type your password"
-                name="password"
-                onChange={handleChange}
-              />
             </div>
             <div className="flex justify-end mb-3">
               <p

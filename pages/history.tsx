@@ -8,7 +8,7 @@ import { getAllAccomplishedJobs } from "../services/JobServices";
 import Header from "../components/Header";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { dateFormat } from "../services/UtilsServies";
+import { dateFormat } from "../services/UtilsServices";
 
 const HistoryPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);

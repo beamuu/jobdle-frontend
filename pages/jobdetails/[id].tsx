@@ -9,7 +9,7 @@ import Header from "../../components/Header";
 import ManageEmployeeModal from "../../components/ManageEmployeeModal";
 import { useUser } from "../../contexts/User";
 import { deleteJob, editJob, getJob } from "../../services/JobServices";
-import { dateFormat } from "../../services/UtilsServies";
+import { dateFormat } from "../../services/UtilsServices";
 
 const JobDetailsPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);

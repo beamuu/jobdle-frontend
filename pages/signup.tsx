@@ -34,11 +34,11 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
 
   const handleSignUp = async (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     if (comfirmPassword !== userData.password) {
       alert("Those passwords didn’t match. Try again");
       return;
     }
-    setIsLoading(true);
     try {
       e.preventDefault();
       await axios.post(
@@ -54,8 +54,8 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
     } catch (error) {
       console.error(error);
     }
-    setIsLoading(false);
     alert("Please go to your email for verify.");
+    setIsLoading(false);
   };
 
   return (

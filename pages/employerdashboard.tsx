@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
 import { getUserJobs } from "../services/JobServices";
-import { dateFormat } from "../services/UtilsServies";
+import { dateFormat } from "../services/UtilsServices";
 
 const EmployerDashBoardPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);

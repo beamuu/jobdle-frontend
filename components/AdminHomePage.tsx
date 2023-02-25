@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getAllJobs } from "../services/JobServices";
-import { dateFormat } from "../services/UtilsServies";
+import { dateFormat } from "../services/UtilsServices";
 
 const AdminTable = () => {
   const [cookies] = useCookies(["token"]);
