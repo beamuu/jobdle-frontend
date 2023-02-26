@@ -1,4 +1,3 @@
-import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
@@ -150,7 +149,7 @@ const FillDescriptionJobPage: NextPage = () => {
         </div>
         <div className="flex justify-end mt-2">
           <button
-            className="bg-sky-500 rounded-md p-2 text-white"
+            className="bg-sky-600 hover:bg-sky-400 rounded-md p-2 text-white"
             type="submit"
           >
             Create

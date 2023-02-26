@@ -30,4 +30,5 @@ interface JobEditable {
   };
   location: string;
   deadline: string;
+  status: string;
 }

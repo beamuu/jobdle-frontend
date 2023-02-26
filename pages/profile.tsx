@@ -46,9 +46,12 @@ const ProfilePage = () => {
     <>
       <Header title="Profile" />
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
-        <div className="flex justify-center px-5">
+        <div className="flex flex-col items-center px-5 lg:w-1/3">
           <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">
             Picture
+          </div>
+          <div className="overflow-hidden w-full flex justify-center">
+            <input type="file" accept="image/*" className="text-xs"/>
           </div>
         </div>
         <div className="px-5 lg:w-2/3">

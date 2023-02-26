@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { getAllJobs } from "../services/JobServices";
 import { dateFormat } from "../services/UtilsServices";
+import { getAllJobs } from "../services/JobServices";
 
 const AdminTable = () => {
   const [cookies] = useCookies(["token"]);
@@ -92,8 +92,7 @@ const AdminTable = () => {
         limit: data.limit,
         totalPages: data.totalPages,
       });
-      // setSortList(Object.keys(data.docs[0]));
-      console.log(sortList);
+
     } catch (error) {
       console.error(error);
     }

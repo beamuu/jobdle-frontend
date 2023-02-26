@@ -14,8 +14,6 @@ const RecoverPasswordPage = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [inputFields, setInputFleids] = useState(defaultValue);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setconfirmNewPassword] = useState("");
 
   const handleChange = (e: any) => {
     setInputFleids((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,7 +28,7 @@ const RecoverPasswordPage = () => {
       inputFields.newPassword === "" ||
       inputFields.comfirmNewPassword === ""
     ) {
-      alert("Please type completely!")
+      alert("Please type completely!");
       setInputFleids(defaultValue);
     } else if (inputFields.newPassword === inputFields.comfirmNewPassword) {
       try {
@@ -39,7 +37,7 @@ const RecoverPasswordPage = () => {
           token
         );
         console.log(response);
-        alert("Change Password sucessfully!");
+        alert(response.data.message);
         router.push("/signin");
       } catch (error) {
         console.error(error);
@@ -51,9 +49,7 @@ const RecoverPasswordPage = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    console.log("token", token);
-  }, [token]);
+  useEffect(() => {}, [token]);
 
   return (
     <>

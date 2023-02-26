@@ -12,6 +12,7 @@ import {
   ClockIcon,
   ComputerDesktopIcon,
   UserIcon,
+  CalendarDaysIcon
 } from "@heroicons/react/24/outline";
 
 type State = {
@@ -57,6 +58,11 @@ const Sidebar: NextPage = () => {
       title: "Employee",
       link: "/employee",
       icon: <UserIcon className="w-5 d-5" />,
+    },
+    {
+      title: "Schedule",
+      link: "/schedule",
+      icon: <CalendarDaysIcon className="w-5 d-5" />,
     },
     {
       title: "Settings",
@@ -206,7 +212,7 @@ const Sidebar: NextPage = () => {
               open.Sidebar
                 ? "flex items-center space-x-3"
                 : "flex justify-center"
-            } p-1 mx-2 mb-2 rounded-md font-medium bg-red-400 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100 text-white bottom-0`}
+            } p-1 mx-2 mb-2 rounded-md font-medium bg-red-500 hover:bg-red-100 hover:text-red-500 cursor-pointer duration-100 text-white bottom-0`}
           >
             <ArrowRightOnRectangleIcon className="w-5 h-5" />
             <span className={`${open.Sidebar ? "" : "hidden"}`}>

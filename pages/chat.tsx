@@ -223,7 +223,7 @@ const ChatPage: NextPage = () => {
                     <div
                       className={`${
                         data.index === i ? "bg-white" : "bg-gray-100"
-                      } p-5 hover:bg-white cursor-pointer`}
+                      } p-5 hover:bg-white cursor-pointer border-b border-white`}
                       onClick={() => {
                         setData({ ...data, index: i });
                         setRoomId(room._id);

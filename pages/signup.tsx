@@ -1,12 +1,6 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  ReactElement,
-  ReactNode,
-  useState,
-} from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { NextPage } from "next";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
 
 type SignUpPageWithNoLayout = NextPage & {
@@ -32,15 +26,30 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
     setUserData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSignUp = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSignUp = async (event: FormEvent) => {
+    event.preventDefault();
     setIsLoading(true);
+
+    let errorArray = [];
+    let inputs = Object.entries(userData);
+
+    for (let i = 0; i < Object.keys(userData).length; i++) {
+      if (inputs[i][1].trim() === "") {
+        errorArray.push(inputs[i][0]);
+      }
+    }
+    if (errorArray.length > 0) {
+      setIsLoading(false);
+      alert(`Please enter ${errorArray}`);
+      return;
+    }
+
     if (comfirmPassword !== userData.password) {
       alert("Those passwords didn’t match. Try again");
       return;
     }
     try {
-      e.preventDefault();
+      event.preventDefault();
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signup`,
         userData,
@@ -50,23 +59,30 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
           },
         }
       );
+      alert("Please go to your email for verify.");
       router.push("/signin");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      alert(error.response.data.message);
     }
-    alert("Please go to your email for verify.");
     setIsLoading(false);
   };
 
   return (
     <>
       <div className="bg-sky-400 flex justify-center items-center min-h-screen min-w-screen">
+        <div
+          id="logo"
+          className="font-bold m-4 absolute inset-0 text-gray-100 h-5"
+        >
+          Jobdle
+        </div>
         <div className="bg-white w-9/12 h-5/6 p-10 rounded-xl border border-transparent">
           <p className="font-bold text-3xl text-center my-5">Sign Up</p>
           <form onSubmit={handleSignUp}>
             <div className="mb-3 lg:flex">
               <div className="lg:flex-1 lg:mr-3">
-                <label className="block font-medium text-gray-700 my-1">
+                <label className="block text-gray-700 my-1">
                   First Name
                   <input
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
@@ -80,7 +96,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
                 </label>
               </div>
               <div className="lg:flex-1">
-                <label className="block font-medium text-gray-700 my-1">
+                <label className="block text-gray-700 my-1">
                   Surname
                   <input
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
@@ -95,7 +111,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
               </div>
             </div>
             <div className="mb-3">
-              <label className="block font-medium text-gray-700 my-1">
+              <label className="block text-gray-700 my-1">
                 Email address
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
@@ -109,7 +125,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
               </label>
             </div>
             <div className="mb-3">
-              <label className="block font-medium text-gray-700 my-1">
+              <label className="block text-gray-700 my-1">
                 Username
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
@@ -123,7 +139,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
               </label>
             </div>
             <div className="mb-3">
-              <label className="block font-medium text-gray-700 my-1">
+              <label className="block text-gray-700 my-1">
                 Password
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
@@ -137,7 +153,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
               </label>
             </div>
             <div className="mb-3">
-              <label className="block font-medium text-gray-700 my-1">
+              <label className="block text-gray-700 my-1">
                 Confirm Password
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
@@ -153,7 +169,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
             <div className="grid mt-5">
               <button
                 type="submit"
-                className="transition rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-lg shadow-blue-500/50 hover:bg-blue-400"
+                className="border border-transparent rounded-full bg-blue-600 w-full py-2 px-4 text-sm font-medium text-white hover:bg-blue-400"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -161,7 +177,7 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
                     <svg className="h-5 w-5 block rounded-full border-4 border-blue-400 border-t-white animate-spin"></svg>
                   </div>
                 ) : (
-                  <span>SIGN UP</span>
+                  <span>Sign up</span>
                 )}
               </button>
             </div>

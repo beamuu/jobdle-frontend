@@ -45,7 +45,7 @@ const JobDetailsPage: NextPage = () => {
   const handleDelete = async () => {
     try {
       await deleteJob(id, cookies.token);
-      router.push("/dashboard");
+      router.push("/");
     } catch (err) {
       console.error(err);
     }
@@ -61,7 +61,8 @@ const JobDetailsPage: NextPage = () => {
 
   const handleSuccussJob = async () => {
     try {
-      await editJob(id, { status: "done" }, cookies.token);
+      const response = await editJob(id, { status: "done" }, cookies.token);
+      console.log(response);
       router.push("/");
     } catch (err) {
       console.error(err);
@@ -73,7 +74,7 @@ const JobDetailsPage: NextPage = () => {
   if (!userData) return null;
 
   const BlockFieldStyles = "items-center sm:grid sm:grid-cols-5 py-1";
-  const LabelStyles = "font-bold col-span-1";
+  const LabelStyles = "font-bold col-span-1 text-sky-700";
   const DetailStyles = "w-full sm:col-span-4";
 
   return (
@@ -119,10 +120,10 @@ const JobDetailsPage: NextPage = () => {
           <div className={`${BlockFieldStyles}`}>
             <p className={LabelStyles}>Employee </p>
             <div className={DetailStyles}>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 lg:grid-cols-4 gap-2">
                 {jobDetailsObject.employee.map((employee) => (
                   <div
-                    className="bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
+                    className="border bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
                     key={employee._id}
                   >
                     <div id="image" className="flex justify-center py-2">
@@ -144,18 +145,22 @@ const JobDetailsPage: NextPage = () => {
 
       <div
         className={`${
-          jobDetailsObject.status === "done" ? "hidden" : ""
+          jobDetailsObject.status === "done" || // job status => done
+          jobDetailsObject.status === "cancel" || // job status => cancel
+          (jobDetailsObject.status === "pending" && userData.role === "user") // job status => pending & role => user
+            ? "hidden"
+            : ""
         } flex justify-between`}
       >
         <div className="space-x-2">
           <button
-            className="bg-yellow-500 rounded-md p-2 text-white w-20 mt-2"
+            className="bg-yellow-500 hover:bg-yellow-400 rounded-md p-2 text-white w-20 mt-2"
             onClick={pushEditJobDetails}
           >
             Edit
           </button>
           <button
-            className="bg-red-500 rounded-md p-2 text-white w-20 mt-2"
+            className="bg-red-500 hover:bg-red-400 rounded-md p-2 text-white w-20 mt-2"
             onClick={() => setShowDeleteJobModal(true)}
           >
             Delete
@@ -164,7 +169,7 @@ const JobDetailsPage: NextPage = () => {
         {userData.role === "admin" && jobDetailsObject.status === "new" ? (
           <div>
             <button
-              className="bg-sky-500 rounded-md p-2 text-white w-20 mt-2"
+              className="bg-sky-500 hover:bg-sky-400 rounded-md p-2 text-white w-20 mt-2"
               onClick={handleManageJob}
             >
               Manage
@@ -174,7 +179,7 @@ const JobDetailsPage: NextPage = () => {
         {userData.role === "admin" && jobDetailsObject.status === "pending" ? (
           <div>
             <button
-              className="bg-green-500 rounded-md p-2 text-white w-20 mt-2"
+              className="bg-green-500 hover:bg-green-400 rounded-md p-2 text-white w-20 mt-2"
               onClick={() => setShowSuccessJobModal(true)}
             >
               Succuss
