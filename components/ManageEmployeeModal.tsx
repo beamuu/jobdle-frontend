@@ -34,7 +34,7 @@ export default function ManageEmployeeModal({
   }, [show]);
 
   const fetchData = async () => {
-    const allEmployees = await getAllEmployees(cookies.token);
+    const allEmployees = await getAllEmployees(cookies.token); // error must have query
     setAllEmployees(allEmployees.data);
   };
 
