@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useCookies } from "react-cookie";
 import io, { Socket } from "socket.io-client";
+
 import { useUser } from "../contexts/User";
 import { getUserJobs } from "../services/JobServices";
 import { dateFormat } from "../services/UtilsServices";
@@ -21,7 +22,6 @@ const ChatPage: NextPage = () => {
   const { userData } = useUser();
 
   const [chatRooms, setChatRooms] = useState<any[]>([]);
-  // const [userData, setUserData] = useState<User>();
   const [senderId, setSenderId] = useState();
   const [roomName, setRoomName] = useState();
   const [data, setData] = useState({
@@ -32,23 +32,27 @@ const ChatPage: NextPage = () => {
   const [userJobsArray, setUserJobsArray] = useState([]);
 
   const getRoom = async (token: string) => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/chatroom`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log("getRoom", res);
-    return res.data;
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/chatroom`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("getRoom", response);
+      return response.data;
+    } catch (error: any) {
+      console.error(error);
+      alert(error.response.data.message);
+    }
   };
 
   const getUserData = async () => {
     try {
-      // console.log("fetch userData");
-      const res = await axios.get(
+      const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
         {
           headers: {
@@ -57,45 +61,44 @@ const ChatPage: NextPage = () => {
           },
         }
       );
-      console.log("getUserData", res.data);
-      return res.data;
+      console.log("getUserData", response);
+      return response.data;
     } catch (err) {
       console.error(err);
     }
   };
 
   const init = async () => {
-    var chatRoomsObjectArray = await getRoom(cookies.token);
+    var chatRoomsObjectsArray = await getRoom(cookies.token);
     var userData = await getUserData();
-    // setUserData(user);
     setSenderId(userData._id);
 
     console.log(userData.role);
 
-    if (chatRoomsObjectArray.length == 0) return;
+    if (chatRoomsObjectsArray.length == 0) return;
 
-    if (userData !== undefined && chatRoomsObjectArray !== undefined) {
+    if (userData !== undefined && chatRoomsObjectsArray !== undefined) {
       if (userData.role === "user") {
         // USER CHAT
         console.log("ROLE:User");
-        console.log("chatRoomsObjectArray", chatRoomsObjectArray);
-        setMessageList(chatRoomsObjectArray.messages);
-        setRoomId(chatRoomsObjectArray._id);
+        console.log("chatRoomsObjectsArray", chatRoomsObjectsArray);
+        setMessageList(chatRoomsObjectsArray.messages);
+        setRoomId(chatRoomsObjectsArray._id);
         refMessages.current = messageList;
       } else if (userData.role === "admin") {
         // ADMIN CHAT
         console.log("ROLE:Admin");
-        console.log("chatRoomsObjectArray", chatRoomsObjectArray);
-        setChatRooms(chatRoomsObjectArray);
+        console.log("chatRoomsObjectsArray", chatRoomsObjectsArray);
+        setChatRooms(chatRoomsObjectsArray);
         console.log("FIRST ROOM ID", roomId);
         if (roomId === undefined) {
           console.log("NOT HAVE ROOM ID");
-          setRoomId(chatRoomsObjectArray[0]._id);
-          setMessageList(chatRoomsObjectArray[0].messages);
-          setRoomName(chatRoomsObjectArray[0].nameOfUser);
+          setRoomId(chatRoomsObjectsArray[0]._id);
+          setMessageList(chatRoomsObjectsArray[0].messages);
+          setRoomName(chatRoomsObjectsArray[0].nameOfUser);
         } else {
           console.log("HAVE ROOM ID");
-          let selected = chatRoomsObjectArray.filter(
+          let selected = chatRoomsObjectsArray.filter(
             (room: any) => room._id === roomId
           );
           console.log("selected room", selected);
@@ -116,11 +119,11 @@ const ChatPage: NextPage = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { // for getUserJobs
     fetchData();
   }, []);
 
-  useEffect(() => {
+  useEffect(() => { 
     init();
   }, [roomId]);
 
@@ -218,17 +221,18 @@ const ChatPage: NextPage = () => {
         <div className="flex-1 relative">
           <div className="overflow-auto absolute top-0 bottom-0 left-0 right-0">
             {userData.role === "admin"
-              ? chatRooms.map((room, i) => {
+              ? chatRooms.map((room, id) => {
                   return (
                     <div
                       className={`${
-                        data.index === i ? "bg-white" : "bg-gray-100"
+                        data.index === id ? "bg-white" : "bg-gray-100"
                       } p-5 hover:bg-white cursor-pointer border-b border-white`}
                       onClick={() => {
-                        setData({ ...data, index: i });
+                        setData({ ...data, index: id });
                         setRoomId(room._id);
                         setRoomName(room.nameOfUser);
                       }}
+                      key={id}
                     >
                       <p className="font-bold">{room.nameOfUser}</p>
                       {/* <p className="text-gray-500 font-light">{chat.username}</p> */}
@@ -236,8 +240,11 @@ const ChatPage: NextPage = () => {
                     </div>
                   );
                 })
-              : userJobsArray.map((job: Job) => (
-                  <div className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg m-1">
+              : userJobsArray.map((job: Job, id) => (
+                  <div
+                    className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg m-1"
+                    key={id}
+                  >
                     <div id="job-header" className="text-lg">
                       <span>{job.title}</span>
                     </div>
@@ -291,15 +298,9 @@ const ChatPage: NextPage = () => {
           className="space-y-2 p-3 overflow-y-auto flex-1 scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
           style={{}}
         >
-          {messageList.map((message) => {
-            // console.log(
-            //   "userData._id, senderId",
-            //   userData?._id,
-            //   message.senderId
-            // );
-            // console.log("result", userData?._id === message.senderId);
+          {messageList.map((message, id) => {
             return (
-              <div className="chat-message">
+              <div className="chat-message" key={id}>
                 <div
                   className={`${
                     userData?._id === message.senderId

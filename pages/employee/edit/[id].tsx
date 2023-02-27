@@ -2,13 +2,9 @@ import { useRouter } from "next/router";
 import React, { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-import Header from "../../components/Header";
-import { useUser } from "../../contexts/User";
-import {
-  deleteEmployee,
-  editEmployee,
-  getEmployee,
-} from "../../services/EmployeeServices";
+import { useUser } from "../../../contexts/User";
+import { editEmployee, getEmployee } from "../../../services/EmployeeServices";
+import Header from "../../../components/Header";
 
 const EmployeedetailsPage = () => {
   const router = useRouter();
@@ -30,12 +26,12 @@ const EmployeedetailsPage = () => {
     setEmployeeDetail((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleEditEmployee = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     // console.log("handleEditEmployee");
     e.preventDefault();
     if (!id) return;
     await editEmployee(id, employeeDetail, cookies.token);
-    router.push(`/employeedetails/${id}`);
+    router.push(`/employee/details/${id}`);
   };
 
   useEffect(() => {
@@ -55,7 +51,7 @@ const EmployeedetailsPage = () => {
   return (
     <>
       <Header title="Edit Employee" />
-      <form onSubmit={handleEditEmployee}>
+      <form onSubmit={handleSubmit}>
         <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
           <div className="flex justify-center px-5">
             <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">

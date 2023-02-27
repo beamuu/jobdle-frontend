@@ -3,14 +3,13 @@ import { useCookies } from "react-cookie";
 import { getAllEmployees } from "../services/EmployeeServices";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import { editJob, manageJob } from "../services/JobServices";
-import Router, { useRouter } from "next/router";
+import { manageJob } from "../services/JobServices";
+import { useRouter } from "next/router";
 
 interface Props {
   onClose: any;
   show: boolean;
   cancel: any;
-  // confirm: any;
   id: string | string[] | undefined;
   token: string;
 }

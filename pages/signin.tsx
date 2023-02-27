@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import { NextPage } from "next";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
@@ -80,36 +80,32 @@ const SignInPage: SignInPageWithNoLayout = () => {
           <p className="font-bold text-3xl text-center my-5">Sign in</p>
           <form onSubmit={handleSignIn}>
             <div className="mb-3">
-              <label className="block text-gray-700 my-1">
-                Username
-                <input
-                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                  type="text"
-                  value={userAuthData.username}
-                  placeholder="Type your username"
-                  name="username"
-                  onChange={handleChange}
-                  id="username"
-                />
-              </label>
+              <label className="block text-gray-700 my-1">Username</label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="text"
+                value={userAuthData.username}
+                placeholder="Type your username"
+                name="username"
+                onChange={handleChange}
+                id="username"
+              />
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 my-1">
-                Password
-                <input
-                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                  type="password"
-                  value={userAuthData.password}
-                  placeholder="Type your password"
-                  name="password"
-                  onChange={handleChange}
-                />
-              </label>
+              <label className="block text-gray-700 my-1">Password</label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="password"
+                value={userAuthData.password}
+                placeholder="Type your password"
+                name="password"
+                onChange={handleChange}
+              />
             </div>
             <div className="flex justify-end mb-3">
               <p
                 className="text-blue-600 hover:underline hover:cursor-pointer visited:text-purple-600"
-                onClick={() => router.push("/identify")}
+                onClick={() => router.push("/users/password/new")}
               >
                 Forgot Password?
               </p>

@@ -1,8 +1,11 @@
 import { useRouter } from "next/router";
 import React, { FormEvent, useState } from "react";
 import { useCookies } from "react-cookie";
-import Header from "../components/Header";
-import { postEmployee } from "../services/EmployeeServices";
+
+import Header from "../../../components/Header";
+import { postEmployee } from "../../../services/EmployeeServices";
+
+
 
 function FillEmployeeDetailPage() {
   const [cookies, setCookie] = useCookies(["token"]);

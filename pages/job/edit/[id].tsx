@@ -3,10 +3,11 @@ import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-import Header from "../../components/Header";
-import { getAllCategories } from "../../services/CategoryServices";
-import { editJob, getJob } from "../../services/JobServices";
-import { splitTFromISO } from "../../services/UtilsServices";
+import Header from "../../../components/Header";
+import { getAllCategories } from "../../../services/CategoryServices";
+import { editJob, getJob } from "../../../services/JobServices";
+import { splitTFromISO } from "../../../services/UtilsServices";
+
 
 const defaultValue = {
   title: "",
@@ -45,11 +46,11 @@ const EditDescriptionJobPage: NextPage = () => {
     setJobDetailsObject({ ...jobDetailsObject, deadline: date });
   };
 
-  const handleEdit = async (e: FormEvent) => {
+  const handleSumbit = async (e: FormEvent) => {
     e.preventDefault();
     if (!id) return;
     await editJob(id, jobDetailsObject, cookies.token);
-    router.push(`/jobdetails/${id}`);
+    router.push(`/job/details/${id}`);
   };
 
   const fetchAllCategories = async () => {
@@ -84,7 +85,7 @@ const EditDescriptionJobPage: NextPage = () => {
     <>
       <Header title="Edit job details" />
 
-      <form onSubmit={handleEdit}>
+      <form onSubmit={handleSumbit}>
         <div className="bg-white p-4 rounded-md space-y-2">
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Title </p>
@@ -153,7 +154,7 @@ const EditDescriptionJobPage: NextPage = () => {
         <div className="flex justify-between mt-2">
           <button
             className="bg-red-500 rounded-md p-2 text-white"
-            onClick={() => router.push(`/jobdetails/${id}`)}
+            onClick={() => router.push(`/job/details/${id}`)}
           >
             Cancel
           </button>

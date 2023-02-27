@@ -1,10 +1,14 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import ComfirmModal from "../../components/ComfirmModal";
-import Header from "../../components/Header";
-import { useUser } from "../../contexts/User";
-import { deleteEmployee, getEmployee } from "../../services/EmployeeServices";
+
+import { useUser } from "../../../contexts/User";
+import {
+  deleteEmployee,
+  getEmployee,
+} from "../../../services/EmployeeServices";
+import ComfirmModal from "../../../components/ComfirmModal";
+import Header from "../../../components/Header";
 
 const EmployeedetailsPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
@@ -20,8 +24,8 @@ const EmployeedetailsPage = () => {
     router.push("/employee");
   };
 
-  const handleEditEmployee = () => {
-    router.push(`/editemployeedetails/${id}`);
+  const pushEditEmployee = () => {
+    router.push(`/employee/edit/${id}`);
   };
 
   useEffect(() => {
@@ -80,7 +84,7 @@ const EmployeedetailsPage = () => {
         <div className="flex justify-end space-x-2 mt-3">
           <button
             className="p-2 bg-yellow-500 rounded-md text-white"
-            onClick={handleEditEmployee}
+            onClick={pushEditEmployee}
           >
             Edit
           </button>

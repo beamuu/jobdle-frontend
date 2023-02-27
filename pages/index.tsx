@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 
 import Header from "../components/Header";
 import EmployerDashBoard from "./employerdashboard";
-import AdminTable from "../components/AdminHomePage";
+import AdminHomePage from "../components/AdminHomePage";
 import { useUser } from "../contexts/User";
 
 const IndexPage: NextPage = () => {
@@ -13,7 +13,7 @@ const IndexPage: NextPage = () => {
   return (
     <>
       <Header title="Home Page" />
-      {userData.role === "admin" ? <AdminTable /> : <EmployerDashBoard />}
+      {userData.role === "admin" ? <AdminHomePage /> : <EmployerDashBoard />}
     </>
   );
 };

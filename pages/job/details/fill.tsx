@@ -3,10 +3,10 @@ import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-import Header from "../components/Header";
-import { getAllCategories } from "../services/CategoryServices";
-import { postJob } from "../services/JobServices";
-import { splitTFromISO } from "../services/UtilsServices";
+import { getAllCategories } from "../../../services/CategoryServices";
+import { postJob } from "../../../services/JobServices";
+import { splitTFromISO } from "../../../services/UtilsServices";
+import Header from "../../../components/Header";
 
 const defaultValue = {
   title: "",
@@ -51,7 +51,7 @@ const FillDescriptionJobPage: NextPage = () => {
     try {
       console.log(jobDetailsObject);
       const { data } = await postJob(jobDetailsObject, cookies.token);
-      router.push(`jobdetails/${data._id}`);
+      router.push(`${data._id}`);
     } catch (err) {
       console.error(err);
     }

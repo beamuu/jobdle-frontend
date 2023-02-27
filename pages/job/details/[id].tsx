@@ -3,13 +3,13 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
 
-import ComfirmModal from "../../components/ComfirmModal";
-import DeleteJobModal from "../../components/DeleteJobModal";
-import Header from "../../components/Header";
-import ManageEmployeeModal from "../../components/ManageEmployeeModal";
-import { useUser } from "../../contexts/User";
-import { deleteJob, editJob, getJob } from "../../services/JobServices";
-import { dateFormat } from "../../services/UtilsServices";
+import { deleteJob, editJob, getJob } from "../../../services/JobServices";
+import { useUser } from "../../../contexts/User";
+import Header from "../../../components/Header";
+import { dateFormat } from "../../../services/UtilsServices";
+import ManageEmployeeModal from "../../../components/ManageEmployeeModal";
+import DeleteJobModal from "../../../components/DeleteJobModal";
+import ComfirmModal from "../../../components/ComfirmModal";
 
 const JobDetailsPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
@@ -23,7 +23,7 @@ const JobDetailsPage: NextPage = () => {
   const [jobDetailsObject, setJobDetailsObject] = useState<Job>();
 
   const pushEditJobDetails = () => {
-    router.push(`/editjobdetails/${id}`);
+    router.push(`/job/edit/${id}`);
   };
 
   const fetchData = async () => {

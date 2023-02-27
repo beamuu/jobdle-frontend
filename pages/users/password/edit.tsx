@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
+import { resetPassword } from "../../../services/AccountServices";
 
-import { resetPassword } from "../services/AccountServices";
 
 const defaultValue = {
   newPassword: "",

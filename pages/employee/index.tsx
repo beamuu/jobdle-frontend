@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
 
-import Header from "../components/Header";
-import { getAllEmployees } from "../services/EmployeeServices";
+import { getAllEmployees } from "../../services/EmployeeServices";
+import Header from "../../components/Header";
 
 function EmployeePage() {
   const [cookies] = useCookies(["token"]);
@@ -12,7 +12,7 @@ function EmployeePage() {
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState({});
-  const [sortList, setSortList] = useState(["age","status","work"]);
+  const [sortList, setSortList] = useState(["age", "status", "work"]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -36,7 +36,7 @@ function EmployeePage() {
       <div className="flex justify-between my-3">
         <button
           className="p-2 rounded-md bg-green-500 text-white"
-          onClick={() => router.push("/fillemployeedetail")}
+          onClick={() => router.push("employee/details/fill")}
         >
           Add Employee
         </button>
@@ -53,8 +53,10 @@ function EmployeePage() {
               name="filter"
               onChange={(e) => setQuery({ ...query, sort: e.target.value })}
             >
-              {sortList.map((item) => (
-                <option value={item}>{item}</option>
+              {sortList.map((item, id) => (
+                <option value={item} key={id}>
+                  {item}
+                </option>
               ))}
             </select>
           </div>
@@ -75,7 +77,7 @@ function EmployeePage() {
         {allEmployees.map((employee) => (
           <div
             className="bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
-            onClick={() => router.push(`/employeedetails/${employee._id}`)}
+            onClick={() => router.push(`employee/details/${employee._id}`)}
             key={employee._id}
           >
             <div id="image" className="flex justify-center py-2">

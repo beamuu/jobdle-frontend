@@ -119,7 +119,8 @@ const HistoryPage: NextPage = () => {
               {allJobs.map((job) => (
                 <tr
                   className="hover:bg-gray-200 cursor-pointer"
-                  onClick={() => router.push(`/jobdetails/${job._id}`)}
+                  onClick={() => router.push(`/job/details/${job._id}`)}
+                  key={job._id}
                 >
                   {userData.role === "admin" ? (
                     <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
@@ -187,6 +188,7 @@ const HistoryPage: NextPage = () => {
                             : "border-gray-300 bg-white cursor-pointer"
                         } px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20`}
                         onClick={() => setState({ ...state, page: number })}
+                        key={number}
                       >
                         {number}
                       </div>

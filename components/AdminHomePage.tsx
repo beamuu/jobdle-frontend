@@ -70,8 +70,8 @@ const AdminTable = () => {
     router.push("?status=pending");
   };
 
-  const pushGoToEachJob = (id: string) => {
-    router.push(`/jobdetails/${id}`);
+  const pushToEachJob = (id: string) => {
+    router.push(`/job/details/${id}`);
   };
 
   if (!allJobs) return null;
@@ -92,7 +92,6 @@ const AdminTable = () => {
         limit: data.limit,
         totalPages: data.totalPages,
       });
-
     } catch (error) {
       console.error(error);
     }
@@ -102,7 +101,6 @@ const AdminTable = () => {
   useEffect(() => {
     if (!status) return;
     fetchData();
-    console.log("query", query);
   }, [state.page, status, query]);
 
   const HeaderTableStyles = "text-start text-sky-700 py-3";
@@ -135,7 +133,7 @@ const AdminTable = () => {
                 <tr
                   className="hover:bg-gray-200 duration-100 cursor-pointer"
                   key={job._id}
-                  onClick={() => pushGoToEachJob(job._id)}
+                  onClick={() => pushToEachJob(job._id)}
                 >
                   <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
                   <td className="py-3">{job.title}</td>
@@ -237,8 +235,10 @@ const AdminTable = () => {
                 id=""
                 onChange={(e) => setQuery({ ...query, sort: e.target.value })}
               >
-                {sortList.map((item) => (
-                  <option value={item}>{item}</option>
+                {sortList.map((item, id) => (
+                  <option value={item} key={id}>
+                    {item}
+                  </option>
                 ))}
               </select>
             </div>

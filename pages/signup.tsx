@@ -82,89 +82,79 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
           <form onSubmit={handleSignUp}>
             <div className="mb-3 lg:flex">
               <div className="lg:flex-1 lg:mr-3">
-                <label className="block text-gray-700 my-1">
-                  First Name
-                  <input
-                    className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                    type="text"
-                    name="firstname"
-                    placeholder="First Name"
-                    value={userData.firstname}
-                    onChange={handleChange}
-                    required
-                  />
-                </label>
-              </div>
-              <div className="lg:flex-1">
-                <label className="block text-gray-700 my-1">
-                  Surname
-                  <input
-                    className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                    type="text"
-                    name="lastname"
-                    placeholder="Surname"
-                    value={userData.lastname}
-                    onChange={handleChange}
-                    required
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="mb-3">
-              <label className="block text-gray-700 my-1">
-                Email address
-                <input
-                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                  type="email"
-                  name="email"
-                  placeholder="Your email"
-                  value={userData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
-            <div className="mb-3">
-              <label className="block text-gray-700 my-1">
-                Username
+                <label className="block text-gray-700 my-1">First Name</label>
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   type="text"
-                  name="username"
-                  placeholder="Your username"
-                  value={userData.username}
+                  name="firstname"
+                  placeholder="First Name"
+                  value={userData.firstname}
                   onChange={handleChange}
                   required
                 />
-              </label>
-            </div>
-            <div className="mb-3">
-              <label className="block text-gray-700 my-1">
-                Password
+              </div>
+              <div className="lg:flex-1">
+                <label className="block text-gray-700 my-1">Surname</label>
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                  type="password"
-                  placeholder="Password"
-                  name="password"
-                  value={userData.password}
+                  type="text"
+                  name="lastname"
+                  placeholder="Surname"
+                  value={userData.lastname}
                   onChange={handleChange}
                   required
                 />
-              </label>
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className="block text-gray-700 my-1">Email address</label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="email"
+                name="email"
+                placeholder="Your email"
+                value={userData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="block text-gray-700 my-1">Username</label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="text"
+                name="username"
+                placeholder="Your username"
+                value={userData.username}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="block text-gray-700 my-1">Password</label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="password"
+                placeholder="Password"
+                name="password"
+                value={userData.password}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div className="mb-3">
               <label className="block text-gray-700 my-1">
                 Confirm Password
-                <input
-                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                  type="password"
-                  placeholder="Confirm Password"
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setComfirmPassword(e.target.value)
-                  }
-                  value={comfirmPassword}
-                />
               </label>
+              <input
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                type="password"
+                placeholder="Confirm Password"
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setComfirmPassword(e.target.value)
+                }
+                value={comfirmPassword}
+              />
             </div>
             <div className="grid mt-5">
               <button

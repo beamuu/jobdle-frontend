@@ -2,7 +2,6 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useCookies } from "react-cookie";
-import { headersParams } from "../services/UtilsServices";
 
 const IdentifyPage = () => {
   const router = useRouter();
@@ -20,7 +19,7 @@ const IdentifyPage = () => {
         { params: { email: userEmail } }
       );
       alert(response.data.message);
-      router.push("/signin");
+      router.push("/reset_password");
     } catch (error: any) {
       alert(error.response.data.message);
     }
@@ -32,22 +31,20 @@ const IdentifyPage = () => {
     <>
       <div className="bg-sky-400 flex justify-center min-h-screen min-w-screen">
         <div className="bg-white w-8/12 lg:w-4/12 my-20 p-10 rounded-xl border border-transparent">
-          <div>
-            <p className="text-warp">
+          <div className="text-warp">
+            <p>
               Please enter your username or email address. You will recieve an
               email message with link to reset your password.
             </p>
           </div>
           <div className="my-5">
             <form onSubmit={handleSubmit}>
-              <label>
-                Email
-                <input
-                  type="text"
-                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                  onChange={(e) => setUserEmail(e.target.value)}
-                />
-              </label>
+              <label>Email Address</label>
+              <input
+                type="text"
+                className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                onChange={(e) => setUserEmail(e.target.value)}
+              />
               <div className="flex justify-end my-3">
                 <button
                   type="submit"

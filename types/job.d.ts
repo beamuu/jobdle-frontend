@@ -22,13 +22,13 @@ interface Job {
 }
 
 interface JobEditable {
-  title: string;
-  detail: string;
-  category: {
-    name: string;
-    minWage: number;
+  title?: string;
+  detail?: string;
+  category?: {
+    name?: string;
+    minWage?: number;
   };
-  location: string;
-  deadline: string;
-  status: string;
+  location?: string;
+  deadline?: string;
+  status?: string;
 }

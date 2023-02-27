@@ -12,7 +12,7 @@ import {
   ClockIcon,
   ComputerDesktopIcon,
   UserIcon,
-  CalendarDaysIcon
+  CalendarDaysIcon,
 } from "@heroicons/react/24/outline";
 
 type State = {
@@ -179,6 +179,8 @@ const Sidebar: NextPage = () => {
                 if (userData.role !== "admin" && menu.title === "Employee")
                   return null;
                 if (userData.role !== "admin" && menu.title === "Settings")
+                  return null;
+                if (userData.role !== "admin" && menu.title === "Schedule")
                   return null;
                 return (
                   <li title={menu.title} key={menu.title}>

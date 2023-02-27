@@ -8,25 +8,40 @@ import {
   postCategory,
 } from "../services/CategoryServices";
 
+const defaultValue = {
+  name: "",
+  minWage: "",
+  color: "#000000",
+};
+
 const SettingPage = () => {
+  const [cookies] = useCookies(["token"]);
+
+  const [categoryObjectInput, setCategoryObjectInput] = useState(defaultValue);
   const [categories, setCategories] = useState([]);
   const [inputName, setInputName] = useState("");
   const [inputMinWage, setInputMinWage] = useState("");
-  const [cookies] = useCookies(["token"]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const AddCategory = async (e: any) => {
+  const handleOnChange = (event: any) => {
+    setCategoryObjectInput({
+      ...categoryObjectInput,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleSubmitAddCategory = async (e: any) => {
     e.preventDefault();
+    console.log("CategoryObjectInput", categoryObjectInput);
     const trimedInput = inputName.trim(); // Use Regex
     if (trimedInput) {
-      await postCategory(
-        { name: trimedInput, minWage: Number(inputMinWage) },
-        cookies.token
-      );
-      await fetchData();
+      // await postCategory(
+      //   { name: trimedInput, minWage: Number(inputMinWage) },
+      //   cookies.token
+      // );
+      // await fetchData();
 
-      setInputName("");
-      setInputMinWage("");
+      setCategoryObjectInput(defaultValue);
     } else return;
   };
 
@@ -56,9 +71,9 @@ const SettingPage = () => {
     <div>
       <Header title="Settings" />
       <div className="flex flex-col bg-white p-5 rounded-md shadow space-y-2">
-        <div className="grid grid-cols-5">
-          <span className="self-center col-span-1">Your categories: </span>
-          <div className="flex-1 bg-gray-100 p-2 rounded space-y-1 col-span-4">
+        <span className="self-center font-bold">Your categories </span>
+        <div>
+          <div className="flex-1 bg-gray-100 p-2 rounded space-y-1">
             <div className="flex grid grid-cols-2">
               <div className="col-span-1 font-bold">Name</div>
               <div className="col-span-1 font-bold">Min Wage</div>
@@ -85,26 +100,46 @@ const SettingPage = () => {
           </div>
         </div>
 
-        <form onSubmit={AddCategory}>
-          <div className="space-y-1">
-            <div className="grid grid-cols-5">
-              <span className="col-span-2">Type categories: </span>
+        <div>
+          <span className="font-bold">Add Category</span>
+        </div>
+        <form
+          onSubmit={handleSubmitAddCategory}
+          className="border p-2 rounded-md"
+        >
+          <div className="grid md:grid-cols-3 grid-cols-1">
+            <div className="col-span-1">
+              <span>Type categories: </span>
               <input
                 type="text"
-                onChange={(e) => setInputName(e.target.value)}
-                value={inputName}
-                className="border-2 px-2 rounded-md h-full focus:outline-none col-span-3"
+                onChange={handleOnChange}
+                value={categoryObjectInput.name}
+                className="border-2 px-2 w-full rounded-md focus:outline-none"
+                name="name"
                 required
               />
             </div>
-            <div className="grid grid-cols-5">
-              <span className="col-span-2">Type min wage: </span>
+            <div className="col-span-1">
+              <span>Type min wage: </span>
               <input
                 type="number"
                 pattern="[0-9]*"
-                onChange={(e) => setInputMinWage(e.target.value)}
-                value={inputMinWage}
-                className="border-2 px-2 rounded-md h-full focus:outline-none col-span-3"
+                onChange={handleOnChange}
+                value={categoryObjectInput.minWage}
+                className="border-2 px-2 w-full rounded-md focus:outline-none"
+                name="minWage"
+                required
+              />
+            </div>
+            <div className="col-span-1">
+              <span>Select color: </span>
+              <input
+                type="color"
+                pattern="[0-9]*"
+                onChange={handleOnChange}
+                value={categoryObjectInput.color}
+                className="border-2 px-2 w-full rounded-md focus:outline-none"
+                name="color"
                 required
               />
             </div>

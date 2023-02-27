@@ -29,7 +29,7 @@ const EmployerDashBoardPage: NextPage = () => {
   const router = useRouter();
 
   const handleCreateJob = () => {
-    router.push("/filldetailsjob");
+    router.push("job/details/fill");
   };
 
   if (!userJobs) return null;
@@ -71,7 +71,7 @@ const EmployerDashBoardPage: NextPage = () => {
         {userJobs.map((jobDetailsObject) => (
           <div
             className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg"
-            onClick={() => router.push(`jobdetails/${jobDetailsObject?._id}`)}
+            onClick={() => router.push(`job/details/${jobDetailsObject?._id}`)}
           >
             <div id="job-header" className="text-lg">
               <span>{jobDetailsObject.title}</span>
