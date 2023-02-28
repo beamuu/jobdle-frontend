@@ -5,6 +5,7 @@ interface Job {
     _id: string;
     createdAt: string;
     updatedAt: string;
+    color: string;
   };
   createdAt: string;
   deadline: string;

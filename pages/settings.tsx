@@ -19,8 +19,6 @@ const SettingPage = () => {
 
   const [categoryObjectInput, setCategoryObjectInput] = useState(defaultValue);
   const [categories, setCategories] = useState([]);
-  const [inputName, setInputName] = useState("");
-  const [inputMinWage, setInputMinWage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOnChange = (event: any) => {
@@ -38,7 +36,7 @@ const SettingPage = () => {
       await postCategory(
         {
           ...categoryObjectInput,
-          minWage: Number(inputMinWage),
+          minWage: Number(categoryObjectInput.minWage),
           name: trimedNameInput,
         },
         cookies.token
@@ -55,6 +53,7 @@ const SettingPage = () => {
       categories.filter((category: { _id: string }) => category._id !== id)
     );
   };
+  
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -86,11 +85,17 @@ const SettingPage = () => {
               ? "loading..."
               : categories.map(
                   (
-                    category: { name: string; minWage: number; _id: string },
+                    category: {
+                      name: string;
+                      minWage: number;
+                      _id: string;
+                      color: string;
+                    },
                     id
                   ) => (
                     <div
-                      className="flex rounded-full px-2 bg-green-200"
+                      className={`flex rounded-full px-2`}
+                      style={{ backgroundColor: `${category.color}` }}
                       key={id}
                     >
                       <div className="w-1/2">{category.name}</div>

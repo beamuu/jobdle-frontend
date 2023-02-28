@@ -21,7 +21,7 @@ const AdminTable = () => {
   });
   const [sortList, setSortList] = useState([
     "deadline",
-    "employee",
+    "employer's name",
     "title",
     "category",
   ]);
@@ -139,10 +139,13 @@ const AdminTable = () => {
                 >
                   <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
                   <td className="py-3">{job.title}</td>
-                  <td className="py-3">{job.category.name}</td>
-                  <td className="py-3">
-                    {dateFormat(new Date(job.deadline))}
+                  <td
+                    className="py-3"
+                    style={{ color: `${job.category.color}` }}
+                  >
+                    {job.category.name}
                   </td>
+                  <td className="py-3">{dateFormat(new Date(job.deadline))}</td>
                 </tr>
               );
             })}
@@ -232,7 +235,14 @@ const AdminTable = () => {
           <div className="flex space-x-2">
             <div>
               <span>Search: </span>
-              <input className="w-30" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => {if (e.key==="Enter")  setQuery({ ...query, search: search })}}/>
+              <input
+                className="w-30"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") setQuery({ ...query, search: search });
+                }}
+              />
             </div>
             <div>
               <span>Sort: </span>
@@ -255,8 +265,8 @@ const AdminTable = () => {
                 id=""
                 onChange={(e) => setQuery({ ...query, order: e.target.value })}
               >
-                <option value="asc">asc</option>
                 <option value="desc">desc</option>
+                <option value="asc">asc</option>
               </select>
             </div>
           </div>

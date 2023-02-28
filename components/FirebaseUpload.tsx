@@ -16,7 +16,6 @@ function FirebaseUpload({ setUrl }: Props) {
   }
 
   async function handleUpload() {
-
     if (!file) {
       alert("Please choose a file first!");
       return;

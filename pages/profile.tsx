@@ -2,9 +2,10 @@ import { ArrowUpTrayIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import FirebaseUpload from "../components/FirebaseUpload";
+
 import Header from "../components/Header";
 import { useUser } from "../contexts/User";
+import { handleUpload } from "../services/UtilsServices";
 
 const defaultUser = {
   profileImageUrl: "",
@@ -18,7 +19,7 @@ const defaultUser = {
 
 const ProfilePage = () => {
   const { userData } = useUser();
-  const [profileData, setProfileData] = useState(defaultUser);
+  const [profileDataObject, setProfileDataObject] = useState(defaultUser);
   const [cookies] = useCookies(["token"]);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isHover, setIsHover] = useState(false);
@@ -44,38 +45,46 @@ const ProfilePage = () => {
     console.log(response);
   };
 
-  const handleEditUserData = async () => {
-    console.log("profileData", profileData);
-    const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
-      profileData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.token}`,
-        },
-      }
-    );
+  const handleSubmit = async () => {
+    console.log("profileDataObject", profileDataObject);
+    let submitedData = profileDataObject;
+    if (file) {
+      const profileImageUrl = await handleUpload(file);
+      console.log("profileImageUrl", profileImageUrl);
+    }
+    console.log("submitedData", submitedData);
+    // try {
+    //   const response = await axios.patch(
+    //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+    //     submitedData,
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         Authorization: `Bearer ${cookies.token}`,
+    //       },
+    //     }
+    //   );
+    //   console.log(response);
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
   function handleChangeFile(event: any) {
+    console.log(event.target.files[0]);
     setFile(event.target.files[0]);
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setProfileData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setProfileDataObject((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   useEffect(() => {
-    setProfileData(userData || defaultUser);
-    console.log(userData);
-
-    if (avatarUrl) {
-      handlePostAvatar();
-    }
-    console.log("avatarUrl", avatarUrl);
-    console.log(profileData.profileImageUrl);
-  }, [userData, avatarUrl]);
+    setProfileDataObject(userData || defaultUser);
+  }, [userData]);
 
   if (!userData) return null;
 
@@ -85,24 +94,29 @@ const ProfilePage = () => {
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
         <div className="flex flex-col items-center px-5 lg:w-1/3">
           <div
-            className={`h-60 w-60 bg-gray-200 rounded-full bg-no-repeat bg-cover bg-center mb-3 flex justify-center items-center`}
+            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center mb-3 flex justify-center items-center`}
             style={{
               backgroundImage: `url(${
-                file ? URL.createObjectURL(file) : profileData.profileImageUrl
+                file
+                  ? URL.createObjectURL(file)
+                  : profileDataObject.profileImageUrl
               })`,
             }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            {avatarUrl || profileData.profileImageUrl ? null : (
-              <div className="text-6xl">AA</div>
+            {file || profileDataObject.profileImageUrl ? null : (
+              <div className="text-6xl absolute cursor-pointer">
+                {profileDataObject.firstname[0]}
+                {profileDataObject.lastname[0]}
+              </div>
             )}
             {isHover ? (
               <label
-                className="h-60 w-60 bg-[rgb(226,232,240,0.7)] rounded-full cursor-pointer flex justify-center items-center"
+                className="h-60 w-60 bg-[rgb(66,135,245,0.1)] rounded-full cursor-pointer flex justify-center items-center"
                 htmlFor="edit-avatar"
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center z-10">
                   <ArrowUpTrayIcon className="w-20 h-20 text-gray-400" />
                   <span className="text-gray-400">Click to edit</span>
                 </div>
@@ -131,7 +145,7 @@ const ProfilePage = () => {
                     type="text"
                     placeholder=""
                     name="firstname"
-                    value={profileData.firstname}
+                    value={profileDataObject.firstname}
                     onChange={handleChange}
                   />
                 </div>
@@ -144,7 +158,7 @@ const ProfilePage = () => {
                     type="text"
                     placeholder=""
                     name="lastname"
-                    value={profileData.lastname}
+                    value={profileDataObject.lastname}
                     onChange={handleChange}
                   />
                 </div>
@@ -158,7 +172,7 @@ const ProfilePage = () => {
                   type="text"
                   placeholder="Your email"
                   name="email"
-                  value={profileData.email}
+                  value={profileDataObject.email}
                   onChange={handleChange}
                 />
               </div>
@@ -171,7 +185,7 @@ const ProfilePage = () => {
                   type="text"
                   placeholder="Your username"
                   name="username"
-                  value={profileData.username}
+                  value={profileDataObject.username}
                   onChange={handleChange}
                 />
               </div>
@@ -189,8 +203,8 @@ const ProfilePage = () => {
               <div>
                 <button
                   type="submit"
-                  className="rounded-md border border-transparent bg-yellow-500 py-2 px-4 text-sm font-medium text-white hover:bg-yellow-400"
-                  onClick={handleEditUserData}
+                  className="rounded-md border border-transparent bg-sky-500 hover:bg-sky-400 py-2 px-4 text-sm font-medium text-white"
+                  onClick={handleSubmit}
                 >
                   Save Change
                 </button>
