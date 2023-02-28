@@ -27,6 +27,8 @@ const AdminTable = () => {
   ]);
   const [query, setQuery] = useState({});
 
+  const [search, setSearch] = useState("");
+
   const ButtonStyles = (statusNow: string) =>
     `${
       status === statusNow
@@ -139,7 +141,7 @@ const AdminTable = () => {
                   <td className="py-3">{job.title}</td>
                   <td className="py-3">{job.category.name}</td>
                   <td className="py-3">
-                    {dateFormat(new Date(job.updatedAt))}
+                    {dateFormat(new Date(job.deadline))}
                   </td>
                 </tr>
               );
@@ -228,6 +230,10 @@ const AdminTable = () => {
             </button>
           </div>
           <div className="flex space-x-2">
+            <div>
+              <span>Search: </span>
+              <input className="w-30" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => {if (e.key==="Enter")  setQuery({ ...query, search: search })}}/>
+            </div>
             <div>
               <span>Sort: </span>
               <select
