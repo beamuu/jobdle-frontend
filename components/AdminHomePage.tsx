@@ -230,7 +230,6 @@ const AdminTable = () => {
             </button>
           </div>
           <div className="flex space-x-2">
-            <input type="text" className="h-7" />
             <div>
               <span>Search: </span>
               <input className="w-30" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => {if (e.key==="Enter")  setQuery({ ...query, search: search })}}/>
