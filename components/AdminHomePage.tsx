@@ -138,9 +138,7 @@ const AdminTable = () => {
                   <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
                   <td className="py-3">{job.title}</td>
                   <td className="py-3">{job.category.name}</td>
-                  <td className="py-3">
-                    {dateFormat(new Date(job.updatedAt))}
-                  </td>
+                  <td className="py-3">{dateFormat(new Date(job.deadline))}</td>
                 </tr>
               );
             })}
@@ -228,6 +226,7 @@ const AdminTable = () => {
             </button>
           </div>
           <div className="flex space-x-2">
+            <input type="text" className="h-7" />
             <div>
               <span>Sort: </span>
               <select
