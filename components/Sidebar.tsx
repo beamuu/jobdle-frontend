@@ -151,9 +151,14 @@ const Sidebar: NextPage = () => {
               className="flex justify-center hover:cursor-pointer"
               onClick={clickOnHeader}
             >
-              <div className="h-10 w-10 bg-gray-200 rounded-full flex justify-center items-center">
-                <p>pic</p>
-              </div>
+              <div
+                className="h-10 w-10 bg-gray-200 rounded-full flex justify-center items-center bg-no-repeat bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${
+                    userData.profileImageUrl
+                  })`,
+                }}
+              ></div>
             </div>
             <div className="w-full px-2">
               <span

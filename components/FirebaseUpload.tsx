@@ -2,7 +2,11 @@ import { useState } from "react";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import storage from "../firebaseConfig.js";
 
-function FirebaseUpload() {
+interface Props {
+  setUrl: any;
+}
+
+function FirebaseUpload({ setUrl }: Props) {
   const [file, setFile] = useState<File>();
   const [percent, setPercent] = useState(0);
 
@@ -12,6 +16,7 @@ function FirebaseUpload() {
   }
 
   async function handleUpload() {
+
     if (!file) {
       alert("Please choose a file first!");
       return;
@@ -21,6 +26,7 @@ function FirebaseUpload() {
       storageRef,
       await file.arrayBuffer()
     );
+
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -35,6 +41,7 @@ function FirebaseUpload() {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log(url);
+          setUrl(url);
         });
       }
     );
@@ -42,8 +49,20 @@ function FirebaseUpload() {
 
   return (
     <div>
-      <input type="file" onChange={handleChange} accept="" />
-      <button onClick={handleUpload}>Upload to Firebase</button>
+      <input
+        type="file"
+        onChange={handleChange}
+        accept="image/*"
+        className="w-full text-xs"
+      />
+      <div>
+        <button
+          onClick={handleUpload}
+          className="p-2 border bg-sky-500 text-white rounded-full text-xs"
+        >
+          Upload
+        </button>
+      </div>
       <p>
         {percent} {"% done"}
       </p>

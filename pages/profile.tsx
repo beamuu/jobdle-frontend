@@ -1,10 +1,13 @@
+import { ArrowUpTrayIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import FirebaseUpload from "../components/FirebaseUpload";
 import Header from "../components/Header";
 import { useUser } from "../contexts/User";
 
 const defaultUser = {
+  profileImageUrl: "",
   firstname: "",
   lastname: "",
   username: "",
@@ -15,8 +18,31 @@ const defaultUser = {
 
 const ProfilePage = () => {
   const { userData } = useUser();
-  const [profileData, setProfileData] = useState<User>(defaultUser);
-  const [cookies, setCookie] = useCookies(["token"]);
+  const [profileData, setProfileData] = useState(defaultUser);
+  const [cookies] = useCookies(["token"]);
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [isHover, setIsHover] = useState(false);
+  const [file, setFile] = useState<File>();
+
+  const handleMouseEnter = () => {
+    setIsHover(true);
+  };
+  const handleMouseLeave = () => {
+    setIsHover(false);
+  };
+  const handlePostAvatar = async () => {
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+      { profileImageUrl: avatarUrl },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies.token}`,
+        },
+      }
+    );
+    console.log(response);
+  };
 
   const handleEditUserData = async () => {
     console.log("profileData", profileData);
@@ -32,13 +58,24 @@ const ProfilePage = () => {
     );
   };
 
+  function handleChangeFile(event: any) {
+    setFile(event.target.files[0]);
+  }
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setProfileData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   useEffect(() => {
     setProfileData(userData || defaultUser);
-  }, [userData]);
+    console.log(userData);
+
+    if (avatarUrl) {
+      handlePostAvatar();
+    }
+    console.log("avatarUrl", avatarUrl);
+    console.log(profileData.profileImageUrl);
+  }, [userData, avatarUrl]);
 
   if (!userData) return null;
 
@@ -47,12 +84,39 @@ const ProfilePage = () => {
       <Header title="Profile" />
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
         <div className="flex flex-col items-center px-5 lg:w-1/3">
-          <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">
-            Picture
+          <div
+            className={`h-60 w-60 bg-gray-200 rounded-full bg-no-repeat bg-cover bg-center mb-3 flex justify-center items-center`}
+            style={{
+              backgroundImage: `url(${
+                file ? URL.createObjectURL(file) : profileData.profileImageUrl
+              })`,
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {avatarUrl || profileData.profileImageUrl ? null : (
+              <div className="text-6xl">AA</div>
+            )}
+            {isHover ? (
+              <label
+                className="h-60 w-60 bg-[rgb(226,232,240,0.7)] rounded-full cursor-pointer flex justify-center items-center"
+                htmlFor="edit-avatar"
+              >
+                <div className="flex flex-col items-center">
+                  <ArrowUpTrayIcon className="w-20 h-20 text-gray-400" />
+                  <span className="text-gray-400">Click to edit</span>
+                </div>
+                <input
+                  type="file"
+                  id="edit-avatar"
+                  className="hidden"
+                  onChange={handleChangeFile}
+                  accept="image/*"
+                />
+              </label>
+            ) : null}
           </div>
-          <div className="overflow-hidden w-full flex justify-center">
-            <input type="file" accept="image/*" className="text-xs"/>
-          </div>
+          {/* <FirebaseUpload setUrl={setAvatarUrl} /> */}
         </div>
         <div className="px-5 lg:w-2/3">
           <div>
@@ -128,7 +192,7 @@ const ProfilePage = () => {
                   className="rounded-md border border-transparent bg-yellow-500 py-2 px-4 text-sm font-medium text-white hover:bg-yellow-400"
                   onClick={handleEditUserData}
                 >
-                  Edit Profile
+                  Save Change
                 </button>
               </div>
               <div className="mb-3">

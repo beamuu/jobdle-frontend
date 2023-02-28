@@ -33,13 +33,17 @@ const SettingPage = () => {
   const handleSubmitAddCategory = async (e: any) => {
     e.preventDefault();
     console.log("CategoryObjectInput", categoryObjectInput);
-    const trimedInput = inputName.trim(); // Use Regex
-    if (trimedInput) {
-      // await postCategory(
-      //   { name: trimedInput, minWage: Number(inputMinWage) },
-      //   cookies.token
-      // );
-      // await fetchData();
+    const trimedNameInput = categoryObjectInput.name.trim(); // Use Regex
+    if (trimedNameInput) {
+      await postCategory(
+        {
+          ...categoryObjectInput,
+          minWage: Number(inputMinWage),
+          name: trimedNameInput,
+        },
+        cookies.token
+      );
+      await fetchData();
 
       setCategoryObjectInput(defaultValue);
     } else return;
