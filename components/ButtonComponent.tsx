@@ -1,21 +1,28 @@
-interface Props {
-  color: string;
-  w: string;
-  h: string;
-  textColor: string;
-  border: string;
-  text: string;
-  opacity: string;
-}
-
-const Button = ({ color, w, h, textColor, border, text, opacity }: Props) => {
+const ButtonComponent = ({
+  children,
+  className,
+  onClick,
+  disabled,
+  type,
+  isLoading,
+}: any) => {
+  // console.log(props);
   return (
     <button
-      className={`w-[${w}] h-[${h}] bg-[${color}]-[${opacity}] text-[${textColor}]`}
+      className={className}
+      onClick={onClick}
+      disabled={disabled}
+      type={type}
     >
-      {text}
+      {isLoading ? (
+        <div className="flex justify-center">
+          <span className="h-5 w-5 block rounded-full border-4 border-blue-400 border-t-white animate-spin"></span>
+        </div>
+      ) : (
+        children
+      )}
     </button>
   );
 };
 
-export default Button;
+export default ButtonComponent;

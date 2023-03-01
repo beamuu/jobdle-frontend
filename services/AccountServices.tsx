@@ -1,6 +1,20 @@
 import axios from "axios";
 import { headersParams } from "./UtilsServices";
 
+export const getUserData = async (token: string) => {
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  console.log("getUserData", response);
+  return response;
+};
+
 export const postAccountUser = async (data: {
   username: string;
   password: string;
@@ -31,7 +45,7 @@ export const resetPassword = async (
   return response;
 };
 
-export const patchAccountUser = async (data: User, token: string) => {
+export const patchAccountUser = async (data: UserEditable, token: string) => {
   const response = await axios.patch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
     data,

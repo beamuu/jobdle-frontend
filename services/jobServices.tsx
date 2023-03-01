@@ -40,12 +40,17 @@ export const getAllAccomplishedJobs = async (
   return response;
 };
 
-export const getUserJobs = async (token: string) => {
+export const getUserJobs = async (
+  status: string | string[] | undefined,
+  page: number = 0,
+  token: string
+) => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
     {
       params: {
-        status: ["new", "pending"],
+        status: status,
+        page: page,
       },
       headers: headersParams(token),
     }

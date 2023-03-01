@@ -7,24 +7,26 @@ import Header from "../components/Header";
 import { useUser } from "../contexts/User";
 import { patchAccountUser } from "../services/AccountServices";
 import { handleUpload } from "../services/UtilsServices";
+import ButtonComponent from "../components/ButtonComponent";
 
 const defaultUser = {
   profileImageUrl: "",
   firstname: "",
   lastname: "",
   username: "",
-  password: "", // tel
   email: "",
 };
 
 const ProfilePage = () => {
   const { userData } = useUser();
-  const [profileDataObject, setProfileDataObject] = useState<User>();
   const [cookies] = useCookies(["token"]);
 
+  const [profileDataObject, setProfileDataObject] =
+    useState<UserEditable>(defaultUser);
   const [isHover, setIsHover] = useState(false);
   const [file, setFile] = useState<File>();
   const [isLoading, setIsLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
 
   const handleMouseEnter = () => {
     setIsHover(true);
@@ -33,7 +35,7 @@ const ProfilePage = () => {
     setIsHover(false);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmitEditProfile = async () => {
     setIsLoading(true);
     let submitedData = profileDataObject;
     if (!submitedData) return;
@@ -51,11 +53,12 @@ const ProfilePage = () => {
       console.error(error);
     }
     setIsLoading(false);
+    setDisabled(true);
   };
 
   function handleChangeFile(event: any) {
-    console.log(event.target.files[0]);
     setFile(event.target.files[0]);
+    setDisabled(false);
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +66,7 @@ const ProfilePage = () => {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+    setDisabled(false);
   };
 
   useEffect(() => {
@@ -75,9 +79,9 @@ const ProfilePage = () => {
     <>
       <Header title="Profile" />
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
-        <div className="flex flex-col items-center px-5 lg:w-1/3">
+        <div className="flex flex-col items-center lg:w-1/3">
           <div
-            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center mb-3 flex justify-center items-center`}
+            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
             style={{
               backgroundImage: `url(${
                 file
@@ -128,7 +132,7 @@ const ProfilePage = () => {
                     type="text"
                     placeholder=""
                     name="firstname"
-                    value={profileDataObject.firstname}
+                    defaultValue={profileDataObject.firstname}
                     onChange={handleChange}
                   />
                 </div>
@@ -141,7 +145,7 @@ const ProfilePage = () => {
                     type="text"
                     placeholder=""
                     name="lastname"
-                    value={profileDataObject.lastname}
+                    defaultValue={profileDataObject.lastname}
                     onChange={handleChange}
                   />
                 </div>
@@ -155,7 +159,7 @@ const ProfilePage = () => {
                   type="text"
                   placeholder="Your email"
                   name="email"
-                  value={profileDataObject.email}
+                  defaultValue={profileDataObject.email}
                   onChange={handleChange}
                 />
               </div>
@@ -168,49 +172,57 @@ const ProfilePage = () => {
                   type="text"
                   placeholder="Your username"
                   name="username"
-                  value={profileDataObject.username}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block font-medium text-gray-700 my-1">
-                  Contacts Number
-                </label>
-                <input
-                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                  type="text"
-                  placeholder="phone number"
+                  defaultValue={profileDataObject.username}
                   onChange={handleChange}
                 />
               </div>
               <div>
-                <button
+                <ButtonComponent
                   type="submit"
-                  className="rounded-md border border-transparent bg-sky-500 hover:bg-sky-400 py-2 px-4 text-sm font-medium text-white"
-                  onClick={handleSubmit}
+                  className={`${
+                    !disabled
+                      ? "bg-sky-500 hover:bg-sky-400 text-white border border-transparent"
+                      : "bg-white text-sky-500 border border-sky-500"
+                  } transition rounded-md py-2 px-4 text-sm font-medium w-32`}
+                  onClick={handleSubmitEditProfile}
+                  disabled={disabled}
+                  isLoading={isLoading}
                 >
                   Save Change
-                </button>
+                </ButtonComponent>
               </div>
+            </div>
+            <hr className="my-3 border" />
+            <div>
               <div className="mb-3">
                 <label className="block font-medium text-gray-700 my-1">
-                  Password
+                  Old password
                 </label>
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   type="password"
-                  placeholder="Password"
+                  placeholder="Old Password"
+                />
+              </div>
+              <div className="mb-3">
+                <label className="block font-medium text-gray-700 my-1">
+                  New password
+                </label>
+                <input
+                  className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                  type="password"
+                  placeholder="New password"
                   name="password"
                 />
               </div>
               <div className="mb-3">
                 <label className="block font-medium text-gray-700 my-1">
-                  Confirm Password
+                  Confirm new password
                 </label>
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   type="password"
-                  placeholder="Confirm Password"
+                  placeholder="Confirm new password"
                 />
               </div>
               <div>

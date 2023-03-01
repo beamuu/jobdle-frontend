@@ -1,9 +1,10 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
-import { postAccountUser } from "../services/AccountServices";
+import { getUserData, postAccountUser } from "../services/AccountServices";
+import ButtonComponent from "../components/ButtonComponent";
 
 type SignInPageWithNoLayout = NextPage & {
   noLayout: boolean;
@@ -15,7 +16,7 @@ const defaultValue = {
 };
 
 const SignInPage: SignInPageWithNoLayout = () => {
-  const [, setCookie] = useCookies(["token"]);
+  const [cookie, setCookie] = useCookies(["token"]);
   const router = useRouter();
 
   const [userAuthData, setUserAuthData] = useState(defaultValue);
@@ -67,6 +68,17 @@ const SignInPage: SignInPageWithNoLayout = () => {
     }
   };
 
+  useEffect(() => {
+    // if (cookie.token) {
+    //   router.push("/");
+    // }
+    try {
+      getUserData(cookie.token).then(() => router.push("/"));
+    } catch (error) {
+      router.push("/signin");
+    }
+  }, []);
+
   return (
     <>
       <div className="bg-sky-400 min-h-screen min-w-screen grid justify-items-center">
@@ -111,19 +123,14 @@ const SignInPage: SignInPageWithNoLayout = () => {
               </p>
             </div>
             <div className="flex justify-center mb-3 items-center">
-              <button
+              <ButtonComponent
                 type="submit"
                 className="border border-transparent rounded-full bg-blue-600 hover:bg-blue-500 w-full py-2 px-4 text-sm font-medium text-white"
                 disabled={isLoading}
+                isLoading={isLoading}
               >
-                {isLoading ? (
-                  <div className="flex justify-center">
-                    <span className="h-5 w-5 block rounded-full border-4 border-blue-400 border-t-white animate-spin"></span>
-                  </div>
-                ) : (
-                  <span className="justify-center">Log in</span>
-                )}
-              </button>
+                Login
+              </ButtonComponent>
             </div>
           </form>
           <hr />

@@ -12,5 +12,9 @@ interface User {
 }
 
 interface UserEditable {
-  
+  profileImageUrl: string;
+  firstname: string;
+  lastname: string;
+  username: string;
+  email: string;
 }
