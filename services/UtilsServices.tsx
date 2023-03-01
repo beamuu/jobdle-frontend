@@ -1,4 +1,9 @@
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  uploadBytes,
+} from "firebase/storage";
 import storage from "../firebaseConfig.js";
 
 export const headersParams = (token: string | string[] | undefined) => {
@@ -29,23 +34,25 @@ export const handleUpload = async (file: File) => {
   //   return;
   // }
   const storageRef = ref(storage, `/files/${file.name}`);
-  const uploadTask = uploadBytesResumable(storageRef, await file.arrayBuffer());
+  const snapshot = await uploadBytes(storageRef, await file.arrayBuffer());
+  const downloadUrl = await getDownloadURL(snapshot.ref);
 
-  uploadTask.on(
-    "state_changed",
-    (snapshot) => {
-      const percent = Math.round(
-        (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-      );
-      // update progress
-      // setPercent(percent);
-    },
-    (err) => console.log("err", err),
-    async () => {
-      // download url
-      const url = await getDownloadURL(uploadTask.snapshot.ref);
-      console.log("url", url);
-      return url;
-    }
-  );
+  return downloadUrl;
+  // uploadTask.on(
+  //   "state_changed",
+  //   (snapshot) => {
+  //     const percent = Math.round(
+  //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+  //     );
+  //     // update progress
+  //     // setPercent(percent);
+  //   },
+  //   (err) => console.log("err", err),
+  //   async () => {
+  //     // download url
+  //     const url = await getDownloadURL(uploadTask.snapshot.ref);
+  //     console.log("url", url);
+  //     return url;
+  //   }
+  // );
 };

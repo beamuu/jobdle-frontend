@@ -30,3 +30,17 @@ export const resetPassword = async (
   );
   return response;
 };
+
+export const patchAccountUser = async (data: User, token: string) => {
+  const response = await axios.patch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};

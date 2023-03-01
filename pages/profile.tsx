@@ -5,6 +5,7 @@ import { useCookies } from "react-cookie";
 
 import Header from "../components/Header";
 import { useUser } from "../contexts/User";
+import { patchAccountUser } from "../services/AccountServices";
 import { handleUpload } from "../services/UtilsServices";
 
 const defaultUser = {
@@ -12,18 +13,18 @@ const defaultUser = {
   firstname: "",
   lastname: "",
   username: "",
-  password: "",
+  password: "", // tel
   email: "",
-  role: "",
 };
 
 const ProfilePage = () => {
   const { userData } = useUser();
-  const [profileDataObject, setProfileDataObject] = useState(defaultUser);
+  const [profileDataObject, setProfileDataObject] = useState<User>();
   const [cookies] = useCookies(["token"]);
-  const [avatarUrl, setAvatarUrl] = useState("");
+
   const [isHover, setIsHover] = useState(false);
   const [file, setFile] = useState<File>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleMouseEnter = () => {
     setIsHover(true);
@@ -31,43 +32,25 @@ const ProfilePage = () => {
   const handleMouseLeave = () => {
     setIsHover(false);
   };
-  const handlePostAvatar = async () => {
-    const response = await axios.patch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
-      { profileImageUrl: avatarUrl },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.token}`,
-        },
-      }
-    );
-    console.log(response);
-  };
 
   const handleSubmit = async () => {
-    console.log("profileDataObject", profileDataObject);
+    setIsLoading(true);
     let submitedData = profileDataObject;
+    if (!submitedData) return;
     if (file) {
-      const profileImageUrl = await handleUpload(file);
-      console.log("profileImageUrl", profileImageUrl);
+      try {
+        const profileImageUrl = await handleUpload(file);
+        submitedData.profileImageUrl = profileImageUrl;
+      } catch (error) {
+        console.error(error);
+      }
     }
-    console.log("submitedData", submitedData);
-    // try {
-    //   const response = await axios.patch(
-    //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
-    //     submitedData,
-    //     {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         Authorization: `Bearer ${cookies.token}`,
-    //       },
-    //     }
-    //   );
-    //   console.log(response);
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    try {
+      await patchAccountUser(submitedData, cookies.token);
+    } catch (error) {
+      console.error(error);
+    }
+    setIsLoading(false);
   };
 
   function handleChangeFile(event: any) {
@@ -86,7 +69,7 @@ const ProfilePage = () => {
     setProfileDataObject(userData || defaultUser);
   }, [userData]);
 
-  if (!userData) return null;
+  if (!profileDataObject) return null;
 
   return (
     <>
@@ -117,8 +100,8 @@ const ProfilePage = () => {
                 htmlFor="edit-avatar"
               >
                 <div className="flex flex-col items-center z-10">
-                  <ArrowUpTrayIcon className="w-20 h-20 text-gray-400" />
-                  <span className="text-gray-400">Click to edit</span>
+                  <ArrowUpTrayIcon className="w-20 h-20 text-gray-700" />
+                  <span className="text-gray-700">Click to edit</span>
                 </div>
                 <input
                   type="file"
