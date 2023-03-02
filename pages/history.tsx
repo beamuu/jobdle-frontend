@@ -213,9 +213,7 @@ const HistoryPage: NextPage = () => {
   return (
     <>
       <Header title="History" />
-      <div className="my-3">
-        {isLoading ? LoadingComponent : ShowingComponent}
-      </div>
+      <div className="my-3">{ShowingComponent}</div>
     </>
   );
 };
