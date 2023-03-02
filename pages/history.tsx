@@ -9,6 +9,7 @@ import Header from "../components/Header";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { dateFormat } from "../services/UtilsServices";
+import LoadingComponent from "../components/LoadingComponent";
 
 const HistoryPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
@@ -84,12 +85,6 @@ const HistoryPage: NextPage = () => {
 
   const HeaderTableStyles = "text-start text-sky-700 py-3 min-w-[100px]";
 
-  const LoadingComponent = (
-    <div className="flex justify-center items-center w-full bg-white rounded-md">
-      <span className="h-20 w-20 block rounded-full border-4 border-sky-400 border-t-white animate-spin"></span>
-    </div>
-  );
-
   const ShowingComponent =
     allJobs.length === 0 ? (
       <div className="flex justify-center items-center w-full bg-white rounded-md">
@@ -98,53 +93,59 @@ const HistoryPage: NextPage = () => {
     ) : (
       // Header table area
       <div className="bg-white shadow rounded-md overflow-hidden">
-        <div className="overflow-auto">
-          <table className="min-w-max w-full table-auto">
-            <thead>
-              <tr className="border-b-2 border-sky-300">
-                {userData.role === "admin" ? (
-                  <th className="text-start text-sky-700 py-3 pl-2 md:pl-4">
-                    Employer's Name
-                  </th>
-                ) : (
-                  ""
-                )}
-                <th className={isAdminHeaderStyles}>Title</th>
-                <th className={HeaderTableStyles}>Category</th>
-                <th className={HeaderTableStyles}>Date</th>
-                <th className={HeaderTableStyles}>Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {allJobs.map((job) => (
-                <tr
-                  className="hover:bg-gray-200 cursor-pointer"
-                  onClick={() => router.push(`/job/details/${job._id}`)}
-                  key={job._id}
-                >
+        <div className="overflow-auto h-[540px]">
+          {isLoading ? (
+            <LoadingComponent className="h-20 w-20 block rounded-full border-4 border-sky-400 border-t-white animate-spin" />
+          ) : (
+            <table className="min-w-max w-full table-auto">
+              <thead>
+                <tr className="border-b-2 border-sky-300">
                   {userData.role === "admin" ? (
-                    <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
+                    <th className="text-start text-sky-700 py-3 pl-2 md:pl-4">
+                      Employer's Name
+                    </th>
                   ) : (
                     ""
                   )}
-                  <td className={`${isAdminDetailsStyles} py-3`}>
-                    {job.title}
-                  </td>
-                  <td className="py-3">{job.category.name}</td>
-                  <td className="py-3">
-                    {dateFormat(new Date(job.updatedAt))}
-                  </td>
-                  <td className="py-3">
-                    {job.status !== "cancel" ? (
-                      <p className="font-bold text-green-500">Completed</p>
-                    ) : (
-                      <p className="font-bold text-red-500">Fail</p>
-                    )}
-                  </td>
+                  <th className={isAdminHeaderStyles}>Title</th>
+                  <th className={HeaderTableStyles}>Category</th>
+                  <th className={HeaderTableStyles}>Date</th>
+                  <th className={HeaderTableStyles}>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {allJobs.map((job, id) => (
+                  <tr
+                    className={`${
+                      id % 2 == 0 ? "bg-sky-100" : "bg-white border-b"
+                    } hover:bg-sky-200 duration-100 cursor-pointer`}
+                    onClick={() => router.push(`/job/details/${job._id}`)}
+                    key={job._id}
+                  >
+                    {userData.role === "admin" ? (
+                      <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
+                    ) : (
+                      ""
+                    )}
+                    <td className={`${isAdminDetailsStyles} py-3`}>
+                      {job.title}
+                    </td>
+                    <td className="py-3">{job.category.name}</td>
+                    <td className="py-3">
+                      {dateFormat(new Date(job.updatedAt))}
+                    </td>
+                    <td className="py-3">
+                      {job.status !== "cancel" ? (
+                        <p className="font-bold text-green-500">Completed</p>
+                      ) : (
+                        <p className="font-bold text-red-500">Fail</p>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
         <div className="w-full border-sky-300 border-t-2">
           <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">

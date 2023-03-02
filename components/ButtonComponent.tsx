@@ -1,3 +1,5 @@
+import LoadingComponent from "./LoadingComponent";
+
 const ButtonComponent = ({
   children,
   className,
@@ -14,13 +16,7 @@ const ButtonComponent = ({
       disabled={disabled}
       type={type}
     >
-      {isLoading ? (
-        <div className="flex justify-center">
-          <span className="h-5 w-5 block rounded-full border-4 border-blue-400 border-t-white animate-spin"></span>
-        </div>
-      ) : (
-        children
-      )}
+      {isLoading ? <LoadingComponent className="w-5 h-5 border-2"/> : children}
     </button>
   );
 };

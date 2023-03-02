@@ -15,7 +15,7 @@ const defaultValue = {
   wage: "",
   note: "",
   location: "",
-  deadline: 0,
+  deadline: "",
 };
 
 const FillDescriptionJobPage: NextPage = () => {

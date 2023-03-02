@@ -119,11 +119,12 @@ const ChatPage: NextPage = () => {
     }
   };
 
-  useEffect(() => { // for getUserJobs
+  useEffect(() => {
+    // for getUserJobs
     fetchData();
   }, []);
 
-  useEffect(() => { 
+  useEffect(() => {
     init();
   }, [roomId]);
 
@@ -226,7 +227,7 @@ const ChatPage: NextPage = () => {
                     <div
                       className={`${
                         data.index === id ? "bg-white" : "bg-gray-100"
-                      } p-5 hover:bg-white cursor-pointer border-b border-white`}
+                      } p-5 hover:bg-white cursor-pointer border-b border-gray-200`}
                       onClick={() => {
                         setData({ ...data, index: id });
                         setRoomId(room._id);

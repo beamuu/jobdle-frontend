@@ -9,6 +9,8 @@ import {
 } from "../../../services/EmployeeServices";
 import ComfirmModal from "../../../components/ComfirmModal";
 import Header from "../../../components/Header";
+import { dateFormat } from "../../../services/UtilsServices";
+import { PhotoIcon } from "@heroicons/react/24/outline";
 
 const EmployeedetailsPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
@@ -16,7 +18,8 @@ const EmployeedetailsPage = () => {
   const { id } = router.query;
   const { userData } = useUser();
 
-  const [employeeDetail, setEmployeeDetail] = useState<Employee>();
+  const [employeeDetailsObject, setEmployeeDetailsObject] =
+    useState<Employee>();
   const [showDeleteEmployeeModal, setShowDeleteEmployeeModal] = useState(false);
 
   const handleDeleteEmployee = async () => {
@@ -32,13 +35,25 @@ const EmployeedetailsPage = () => {
     if (id) {
       getEmployee(id, cookies.token)
         .then((res) => {
-          setEmployeeDetail(res.data);
+          setEmployeeDetailsObject(res.data);
         })
         .catch((err) => console.error(err));
     }
   }, [router]);
 
-  if (employeeDetail === undefined) return null;
+  const calculateAge = () => {
+    if (!employeeDetailsObject?.birthday) return;
+    var today = new Date();
+    var birthDate = new Date(employeeDetailsObject?.birthday);
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  if (employeeDetailsObject === undefined) return null;
 
   if (userData === undefined) return null;
 
@@ -47,36 +62,59 @@ const EmployeedetailsPage = () => {
       <Header title="Employee details" />
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md">
         <div className="flex justify-center px-5 pb-5" id="picture">
-          <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">
-            Picture
+          <div
+            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
+            style={{
+              backgroundImage: `url(${employeeDetailsObject.profileImageUrl})`,
+            }}
+          >
+            {employeeDetailsObject.profileImageUrl ? null : (
+              <div>
+                <PhotoIcon className="w-auto" />
+                <p>No Image</p>
+              </div>
+            )}
           </div>
         </div>
         <div className="px-5 lg:w-2/3 divide-y">
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">ชื่อ - นามสกุล </p>
             <p className="w-full sm:col-span-3">
-              {employeeDetail.firstname} {employeeDetail.lastname}
+              {employeeDetailsObject.firstname} {employeeDetailsObject.lastname}
             </p>
           </div>
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">Email </p>
-            <p className="w-full sm:col-span-3">{employeeDetail.email}</p>
+            <p className="w-full sm:col-span-3">
+              {employeeDetailsObject.email}
+            </p>
           </div>
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">Gender </p>
-            <p className="w-full sm:col-span-3">{employeeDetail.gender}</p>
+            <p className="w-full sm:col-span-3">
+              {employeeDetailsObject.gender}
+            </p>
           </div>
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">Tel. </p>
-            <p className="w-full sm:col-span-3">{employeeDetail.tel}</p>
+            <p className="w-full sm:col-span-3">{employeeDetailsObject.tel}</p>
           </div>
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">Age </p>
-            <p className="w-full sm:col-span-3">{employeeDetail.age}</p>
+            <p className="w-full sm:col-span-3">
+              {calculateAge()}{" "}
+              <span className="text-gray-400">
+                (Birthday:{" "}
+                {dateFormat(new Date(employeeDetailsObject.birthday))})
+              </span>
+            </p>
           </div>
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">Works </p>
-            <p className="w-full sm:col-span-3">{employeeDetail.works}</p>
+            <div className="border rounded-md w-full sm:col-span-3"></div>
+            <p className="w-full sm:col-span-3">
+              {employeeDetailsObject.works}
+            </p>
           </div>
         </div>
       </div>

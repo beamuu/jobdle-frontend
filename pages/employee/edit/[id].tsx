@@ -5,22 +5,26 @@ import { useCookies } from "react-cookie";
 import { useUser } from "../../../contexts/User";
 import { editEmployee, getEmployee } from "../../../services/EmployeeServices";
 import Header from "../../../components/Header";
+import { splitTFromISO } from "../../../services/UtilsServices";
+
+const defaultValue = {
+  firstname: "",
+  lastname: "",
+  email: "",
+  tel: "",
+  birthday: "",
+  gender: "",
+  detail: "",
+};
 
 const EmployeedetailsPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const { userData } = useUser();
 
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
-  const [employeeDetail, setEmployeeDetail] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-    tel: "",
-    age: -1,
-    // detail: string;
-    gender: "",
-  });
+  const [cookies] = useCookies(["token"]);
+  const [employeeDetail, setEmployeeDetail] =
+    useState<EmployeeEditable>(defaultValue);
 
   const handleChange = (e: any) => {
     setEmployeeDetail((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -43,6 +47,10 @@ const EmployeedetailsPage = () => {
         .catch((err) => console.error(err));
     }
   }, [router]);
+
+  const handleDateChage = (date: any) => {
+    setEmployeeDetail({ ...employeeDetail, birthday: date });
+  };
 
   if (employeeDetail === undefined) return null;
 
@@ -122,16 +130,15 @@ const EmployeedetailsPage = () => {
                 <div className="mb-3 lg:flex">
                   <div className="lg:flex-1 lg:mr-3">
                     <label className="block font-medium text-gray-700 my-1">
-                      Age
+                      Birthday
                     </label>
                     <input
+                      type="date"
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                      type="number"
-                      placeholder=""
-                      name="age"
-                      onChange={handleChange}
-                      value={employeeDetail.age}
-                      required
+                      value={splitTFromISO(employeeDetail.birthday)}
+                      name="birthday"
+                      onChange={(e) => handleDateChage(e.target.value)}
+                      //   required
                     />
                   </div>
                   <div className="lg:flex-1">

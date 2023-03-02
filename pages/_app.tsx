@@ -26,7 +26,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <UserProvider>
         <div className="flex flex-col md:flex md:flex-row bg-gray-100 min-h-screen min-w-screen">
           <Sidebar />
-          <div className="flex-1 p-5">
+          <div className="flex-1 p-5 min-h-screen min-w-screen">
             <Component {...pageProps} />
           </div>
         </div>

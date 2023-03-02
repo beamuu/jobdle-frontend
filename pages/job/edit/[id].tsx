@@ -8,7 +8,6 @@ import { getAllCategories } from "../../../services/CategoryServices";
 import { editJob, getJob } from "../../../services/JobServices";
 import { splitTFromISO } from "../../../services/UtilsServices";
 
-
 const defaultValue = {
   title: "",
   detail: "",
@@ -19,6 +18,7 @@ const defaultValue = {
   note: "",
   location: "",
   deadline: "",
+  status: "",
 };
 
 const EditDescriptionJobPage: NextPage = () => {

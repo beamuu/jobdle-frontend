@@ -5,6 +5,7 @@ import { useCookies } from "react-cookie";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { dateFormat } from "../services/UtilsServices";
 import { getAllJobs } from "../services/JobServices";
+import LoadingComponent from "./LoadingComponent";
 
 const AdminTable = () => {
   const [cookies] = useCookies(["token"]);
@@ -107,50 +108,55 @@ const AdminTable = () => {
 
   const HeaderTableStyles = "text-start text-sky-700 py-3";
 
-  const LoadingComponent = (
-    <div className="flex justify-center items-center w-full h-40 bg-white rounded-md">
-      <span className="h-20 w-20 block rounded-full border-4 border-sky-400 border-t-white animate-spin"></span>
-    </div>
-  );
-
   const ShowingComponent = (
     // Header table area
     <div className="bg-white rounded-md overflow-hidden">
-      <div className="overflow-auto">
-        <table className="table-auto w-full">
-          <thead>
-            <tr className="border-b-2 border-sky-300">
-              <th className={`${HeaderTableStyles} pl-2 md:pl-4`}>
-                Employer's Name
-              </th>
-              <th className={HeaderTableStyles}>Title</th>
-              <th className={HeaderTableStyles}>Category</th>
-              <th className={HeaderTableStyles}>Dead line</th>
-            </tr>
-          </thead>
-          {/* Showing jobs area */}
-          <tbody className="divide-y">
-            {allJobs.map((job) => {
-              return (
-                <tr
-                  className="hover:bg-gray-200 duration-100 cursor-pointer"
-                  key={job._id}
-                  onClick={() => pushToEachJob(job._id)}
-                >
-                  <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
-                  <td className="py-3">{job.title}</td>
-                  <td
-                    className="py-3"
-                    style={{ color: `${job.category.color}` }}
-                  >
-                    {job.category.name}
-                  </td>
-                  <td className="py-3">{dateFormat(new Date(job.deadline))}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="overflow-auto h-[540px]">
+        {isLoading ? (
+          <LoadingComponent className="h-20 w-20 block rounded-full border-4 border-sky-400 border-t-white animate-spin" />
+        ) : (
+          <table className="table-auto w-full">
+            <thead>
+              <tr className="border-b-2 border-sky-300">
+                <th className={`${HeaderTableStyles} pl-2 md:pl-4`}>
+                  Employer's Name
+                </th>
+                <th className={HeaderTableStyles}>Title</th>
+                <th className={HeaderTableStyles}>Category</th>
+                <th className={HeaderTableStyles}>Dead line</th>
+              </tr>
+            </thead>
+            {/* Showing jobs area */}
+            <tbody className="">
+              {isLoading
+                ? null
+                : allJobs.map((job, id) => {
+                    console.log(id);
+                    return (
+                      <tr
+                        className={`${
+                          id % 2 == 0 ? "bg-sky-100" : "bg-white"
+                        } hover:bg-sky-200 duration-100 cursor-pointer border-b`}
+                        key={job._id}
+                        onClick={() => pushToEachJob(job._id)}
+                      >
+                        <td className="py-3 pl-2 md:pl-4">{job.fullname}</td>
+                        <td className="py-3">{job.title}</td>
+                        <td
+                          className="py-3"
+                          style={{ color: `${job.category.color}` }}
+                        >
+                          <div className="font-bold">{job.category.name}</div>
+                        </td>
+                        <td className="py-3">
+                          {dateFormat(new Date(job.deadline))}
+                        </td>
+                      </tr>
+                    );
+                  })}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Footer area */}
@@ -271,7 +277,7 @@ const AdminTable = () => {
             </div>
           </div>
         </div>
-        {isLoading ? LoadingComponent : ShowingComponent}
+        {ShowingComponent}
       </div>
     </>
   );

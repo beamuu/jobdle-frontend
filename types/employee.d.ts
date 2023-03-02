@@ -1,5 +1,6 @@
 interface Employee {
-  age: number;
+  profileImageUrl: string;
+  birthday: string;
   email: string;
   firstname: string;
   gender: string;
@@ -10,4 +11,15 @@ interface Employee {
   works: array;
   __v: number;
   _id: string;
+}
+
+interface EmployeeEditable {
+  profileImageUrl: string;
+  firstname: string;
+  lastname: stirng;
+  email: stirng;
+  tel: stirng;
+  birthday: stirng;
+  gender: stirng;
+  detail: stirng;
 }

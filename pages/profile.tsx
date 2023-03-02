@@ -71,6 +71,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     setProfileDataObject(userData || defaultUser);
+    console.log(userData);
   }, [userData]);
 
   if (!profileDataObject) return null;
@@ -117,7 +118,15 @@ const ProfilePage = () => {
               </label>
             ) : null}
           </div>
-          {/* <FirebaseUpload setUrl={setAvatarUrl} /> */}
+          <div className="px-5 my-3">
+            <input
+              type="file"
+              id="edit-avatar"
+              onChange={handleChangeFile}
+              accept="image/*"
+              className="w-full bg-gray-100"
+            />
+          </div>
         </div>
         <div className="px-5 lg:w-2/3">
           <div>
