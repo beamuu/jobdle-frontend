@@ -15,6 +15,7 @@ import { getUserJobs } from "../services/JobServices";
 import { dateFormat } from "../services/UtilsServices";
 
 const ChatPage: NextPage = () => {
+  const [search, setSearch] = useState("");
   const [messageList, setMessageList] = useState<any[]>([]);
   const [roomId, setRoomId] = useState(undefined);
   const [cookies] = useCookies(["token"]);
@@ -33,8 +34,12 @@ const ChatPage: NextPage = () => {
 
   const getRoom = async (token: string) => {
     try {
+      let searchUrl = "";
+      if (!!search) {
+        searchUrl = "?search=" + search;
+      }
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/chatroom`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/chatroom` + searchUrl,
         {
           headers: {
             "Content-Type": "application/json",
@@ -218,68 +223,80 @@ const ChatPage: NextPage = () => {
             {userData.role === "admin" ? "Chat" : "Your jobs"}
           </p>
         </div>
-
+        {userData.role === "admin" ?
+          (
+            <div>
+              <span>Search: </span>
+              <input
+                className="w-30"
+                value={search}
+                onChange={(e) => setSearch(e.target.value.trim())}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") setSearch(search);
+                }}
+              />
+            </div>
+          )
+          : null}
         <div className="flex-1 relative">
           <div className="overflow-auto absolute top-0 bottom-0 left-0 right-0">
             {userData.role === "admin"
               ? chatRooms.map((room, id) => {
-                  return (
-                    <div
-                      className={`${
-                        data.index === id ? "bg-white" : "bg-gray-100"
-                      } p-5 hover:bg-white cursor-pointer border-b border-gray-200`}
-                      onClick={() => {
-                        setData({ ...data, index: id });
-                        setRoomId(room._id);
-                        setRoomName(room.nameOfUser);
-                      }}
-                      key={id}
-                    >
-                      <p className="font-bold">{room.nameOfUser}</p>
-                      {/* <p className="text-gray-500 font-light">{chat.username}</p> */}
-                      {/* <p>{room.messages[0].content}</p> */}
-                    </div>
-                  );
-                })
-              : userJobsArray.map((job: Job, id) => (
+                return (
                   <div
-                    className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg m-1"
+                    className={`${data.index === id ? "bg-white" : "bg-gray-100"
+                      } p-5 hover:bg-white cursor-pointer border-b border-gray-200`}
+                    onClick={() => {
+                      setData({ ...data, index: id });
+                      setRoomId(room._id);
+                      setRoomName(room.nameOfUser);
+                    }}
                     key={id}
                   >
-                    <div id="job-header" className="text-lg">
-                      <span>{job.title}</span>
+                    <p className="font-bold">{room.nameOfUser}</p>
+                    {/* <p className="text-gray-500 font-light">{chat.username}</p> */}
+                    {/* <p>{room.messages[0].content}</p> */}
+                  </div>
+                );
+              })
+              : userJobsArray.map((job: Job, id) => (
+                <div
+                  className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg m-1"
+                  key={id}
+                >
+                  <div id="job-header" className="text-lg">
+                    <span>{job.title}</span>
+                  </div>
+                  <hr />
+                  <div id="p-5" className="px-5 py-3">
+                    <div>
+                      <span className="text-gray-400">Category: </span>
+                      <span>{job.category.name}</span>
                     </div>
-                    <hr />
-                    <div id="p-5" className="px-5 py-3">
-                      <div>
-                        <span className="text-gray-400">Category: </span>
-                        <span>{job.category.name}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-400">min-Wage: </span>
-                        <span>{job.category.minWage}</span>
-                      </div>
-                    </div>
-                    <div
-                      id="job-footer"
-                      className="flex justify-between items-center pt-2"
-                    >
-                      <div className="text-sm">
-                        <span className="text-gray-400">Deadline: </span>
-                        <span>{dateFormat(new Date(job.deadline))}</span>
-                      </div>
-                      <span
-                        className={`${
-                          job.status === "new"
-                            ? "bg-green-500"
-                            : "bg-yellow-500"
-                        } px-5 rounded-full text-white`}
-                      >
-                        <span className="uppercase">{job.status}</span>
-                      </span>
+                    <div>
+                      <span className="text-gray-400">min-Wage: </span>
+                      <span>{job.category.minWage}</span>
                     </div>
                   </div>
-                ))}
+                  <div
+                    id="job-footer"
+                    className="flex justify-between items-center pt-2"
+                  >
+                    <div className="text-sm">
+                      <span className="text-gray-400">Deadline: </span>
+                      <span>{dateFormat(new Date(job.deadline))}</span>
+                    </div>
+                    <span
+                      className={`${job.status === "new"
+                        ? "bg-green-500"
+                        : "bg-yellow-500"
+                        } px-5 rounded-full text-white`}
+                    >
+                      <span className="uppercase">{job.status}</span>
+                    </span>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       </div>
@@ -303,25 +320,22 @@ const ChatPage: NextPage = () => {
             return (
               <div className="chat-message" key={id}>
                 <div
-                  className={`${
-                    userData?._id === message.senderId
-                      ? "items-end justify-end"
-                      : ""
-                  } flex`}
+                  className={`${userData?._id === message.senderId
+                    ? "items-end justify-end"
+                    : ""
+                    } flex`}
                 >
                   <div
-                    className={`${
-                      userData?._id === message.senderId
-                        ? "items-end order-1"
-                        : "items-start order-2"
-                    } flex flex-col rounded-lg space-y-2 mx-2 overflow-x-hidden max-w-xs`}
+                    className={`${userData?._id === message.senderId
+                      ? "items-end order-1"
+                      : "items-start order-2"
+                      } flex flex-col rounded-lg space-y-2 mx-2 overflow-x-hidden max-w-xs`}
                   >
                     <span
-                      className={`${
-                        userData?._id === message.senderId
-                          ? "bg-sky-500 text-white"
-                          : "bg-gray-300 text-gray-600"
-                      } px-4 py-2 rounded-lg inline-block`}
+                      className={`${userData?._id === message.senderId
+                        ? "bg-sky-500 text-white"
+                        : "bg-gray-300 text-gray-600"
+                        } px-4 py-2 rounded-lg inline-block`}
                     >
                       {message.content}
                     </span>

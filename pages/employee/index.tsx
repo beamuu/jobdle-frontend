@@ -12,10 +12,11 @@ function EmployeePage() {
   const [cookies] = useCookies(["token"]);
   const router = useRouter();
 
+  const [search, setSearch] = useState("");
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState({});
-  const [sortList, setSortList] = useState(["age", "status", "work"]);
+  const [sortList, setSortList] = useState(["age", "status", "work", "gender"]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -49,6 +50,17 @@ function EmployeePage() {
               Add Employee
             </ButtonComponent>
             <div className="flex space-x-2">
+            <div>
+              <span>Search: </span>
+              <input
+                className="w-30"
+                value={search}
+                onChange={(e) => setSearch(e.target.value.trim())}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") setQuery({ ...query, search: search });
+                }}
+              />
+            </div>
               <div>
                 <span>Status: </span>
                 <select name="filter" id="">
@@ -77,8 +89,8 @@ function EmployeePage() {
                     setQuery({ ...query, order: e.target.value })
                   }
                 >
-                  <option value="asc">asc</option>
                   <option value="desc">desc</option>
+                  <option value="asc">asc</option>
                 </select>
               </div>
             </div>
