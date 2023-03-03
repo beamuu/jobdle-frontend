@@ -146,6 +146,7 @@ function FillEmployeeDetailPage() {
                     name="tel"
                     onChange={handleChange}
                     value={employeeDetailsObject.tel}
+                    pattern="\d{9,10}"
                     required
                   />
                 </div>
@@ -199,6 +200,7 @@ function FillEmployeeDetailPage() {
             type="submit"
             className="p-2 bg-sky-500 rounded-md text-white"
             isLoading={isLoading}
+            disabled={isLoading}
           >
             Add
           </ButtonComponent>

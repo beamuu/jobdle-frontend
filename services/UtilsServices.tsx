@@ -22,9 +22,7 @@ export const dateFormat = (today: Date) => {
 };
 
 export const splitTFromISO = (dateString: string) => {
-  console.log("dateString", dateString);
   const dateSplitT = dateString.split("T")[0];
-  console.log("dateSplitT", dateSplitT);
   return dateSplitT;
 };
 
