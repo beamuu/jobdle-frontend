@@ -1,21 +1,24 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
+import { useForm } from "react-hook-form";
 
 import { getAllCategories } from "../../../services/CategoryServices";
 import { postJob } from "../../../services/JobServices";
 import { handleUpload, splitTFromISO } from "../../../services/UtilsServices";
 import Header from "../../../components/Header";
 import { PhotoIcon } from "@heroicons/react/24/outline";
+import ButtonComponent from "../../../components/ButtonComponent";
 
 const defaultValue = {
   pictureUrl: [""],
   title: "",
   detail: "",
-  category: {},
-  wage: "",
-  note: "",
+  category: {
+    name: "",
+    minWage: 0,
+  },
   location: "",
   deadline: "",
 };
@@ -23,10 +26,16 @@ const defaultValue = {
 const FillDescriptionJobPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<JobEditable>({ defaultValues: defaultValue });
+  const [isLoading, setIsLoading] = useState(false);
 
   const [categoryObjects, setCategoryObjects] = useState([]);
-  const [jobDetailsObject, setJobDetailsObject] = useState(defaultValue);
   const [files, setFiles] = useState<File[]>([]);
+  const filesCountRef = useRef<number>(0);
 
   const fetchAllCategories = async () => {
     const { data } = await getAllCategories(cookies.token);
@@ -34,61 +43,53 @@ const FillDescriptionJobPage: NextPage = () => {
   };
 
   useEffect(() => {
-    if (files.length > 5) {
-      files.length = 5;
-    }
     fetchAllCategories();
+    console.log(files);
   }, []);
 
-  const handleChange = (e: any) => {
-    setJobDetailsObject((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  function handleChangeFile(event: any) {
-    if (files.length > 5) {
+  const handleChangeFile = (event: any) => {
+    const filesArray: File[] = Array.from(event.target.files);
+    filesCountRef.current += filesArray.length;
+    if (filesCountRef.current > 5) {
+      filesCountRef.current -= filesArray.length;
       alert("Maximum is 5 pictures.");
+      event.target.value = [];
       return;
     }
-    const filesArray: File[] = Array.from(event.target.files);
     setFiles([...files, ...filesArray]);
     console.log(filesArray);
-  }
-
-  const handleSelectChange = (myStringifyObject: string) => {
-    const prasedObject = JSON.parse(myStringifyObject);
-    setJobDetailsObject({ ...jobDetailsObject, category: prasedObject });
   };
 
-  const handleDateChage = (date: any) => {
-    setJobDetailsObject({ ...jobDetailsObject, deadline: date });
-  };
-
-  const handlePost = async (e: FormEvent) => {
-    e.preventDefault();
-    let submitedData = jobDetailsObject;
+  const onPostJob = handleSubmit(async (data) => {
+    setIsLoading(true);
+    let submitedData: JobEditable = data;
     if (!submitedData) return;
     if (files) {
       try {
-        const uploadedPictureArray: string[] = [];
-        files.forEach(async (file) => {
-          uploadedPictureArray.push(await handleUpload(file));
-        });
-        submitedData.pictureUrl = uploadedPictureArray;
+        const allPromises = files.map((file) => handleUpload(file));
+
+        await Promise.all(allPromises).then(
+          (result) => (submitedData.pictureUrl = result)
+        );
       } catch (error) {
         console.error(error);
       }
     }
+    submitedData.category = JSON.parse(submitedData.category);
     console.log("submitedData", submitedData);
     try {
-      console.log(jobDetailsObject);
-      const { data } = await postJob(jobDetailsObject, cookies.token);
-      router.push(`${data._id}`);
+      const res = await postJob(submitedData, cookies.token);
+      console.log(res);
+      router.push(`${res.data._id}`);
     } catch (err) {
       console.error(err);
     }
+  });
+
+  const deletePicture = (name: string) => {
+    console.log("h", name);
+    setFiles(files.filter((file) => file.name !== name));
+    filesCountRef.current -= 1;
   };
 
   const BlockFieldStyles = "sm:grid sm:grid-cols-5 items-center";
@@ -102,101 +103,92 @@ const FillDescriptionJobPage: NextPage = () => {
     <div>
       <Header title="Fill job details" />
 
-      <form onSubmit={handlePost}>
+      <form onSubmit={onPostJob}>
         <div className="bg-white p-4 rounded-md space-y-2">
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Title </p>
             <input
               type="text"
               className={InputFieldStyles}
-              value={jobDetailsObject.title}
-              name="title"
-              onChange={handleChange}
-              required
+              {...register("title", { required: "This is required." })}
             />
+            <p></p>
+            <p className="text-red-500">{errors.title?.message}</p>
           </div>
+
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Detail </p>
             <textarea
               className={InputFieldStyles}
               rows={10}
-              value={jobDetailsObject.detail}
-              name="detail"
-              onChange={handleChange}
-              // required
+              {...register("detail", { required: "This is required." })}
             />
+            <p></p>
+            <p className="text-red-500">{errors.detail?.message}</p>
           </div>
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Category </p>
             <select
               className={`${InputFieldStyles} cursor-pointer`}
-              name="category"
-              onChange={(e) => handleSelectChange(e.target.value)}
-              // required
+              {...register("category", { required: "This is required." })}
             >
               <option value="">โปรดเลือก</option>
-              {categoryObjects.map((category: any) => {
+              {categoryObjects.map((category: any, id) => {
                 return (
-                  <option value={JSON.stringify(category)}>
+                  <option value={JSON.stringify(category)} key={id}>
                     {category.name} | minWage: {category.minWage}
                   </option>
                 );
               })}
             </select>
-          </div>
-          <div className={BlockFieldStyles}>
-            <p className={LabelStyles}>Note </p>
-            <input
-              type="text"
-              className={InputFieldStyles}
-              value={jobDetailsObject.note}
-              name="note"
-              onChange={handleChange}
-            />
+            <p></p>
+            <p className="text-red-500">{errors.category?.message}</p>
           </div>
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Location </p>
             <input
               type="text"
               className={InputFieldStyles}
-              value={jobDetailsObject.location}
-              name="location"
-              onChange={handleChange}
-              // required
+              {...register("location", { required: "This is required." })}
             />
+            <p></p>
+            <p className="text-red-500">{errors.location?.message}</p>
           </div>
           <div className={BlockFieldStyles}>
             <p className={LabelStyles}>Deadline </p>
             <input
               type="date"
               className={InputFieldStyles}
-              name="deadline"
-              onChange={(e) => handleDateChage(e.target.value)}
               min={splitTFromISO(new Date().toISOString())}
-              // required
+              {...register("deadline", { required: "This is required." })}
             />
+            <p></p>
+            <p className="text-red-500">{errors.deadline?.message}</p>
           </div>
           <div className="py-2">
-            <div className="flex flex-col items-center">
-              <div>
-                <p className="font-bold">Pictures (at most 5 photos )</p>
+            <div className="flex flex-col">
+              <div className="">
+                <p className="font-bold">
+                  Pictures (at most 5 photos ){filesCountRef.current}
+                </p>
               </div>
               <div className="w-full flex bg-gray-100 rounded-md flex-wrap">
-                {files.map((file) => (
+                {files.map((file, id) => (
                   <div
-                    className={`h-40 w-40 m-2 bg-gray-100 rounded-md bg-no-repeat bg-cover bg-center flex justify-center items-center`}
+                    className={`h-40 w-40 m-2 rounded-md bg-no-repeat bg-cover bg-center flex justify-center items-center relative`}
                     style={{
                       backgroundImage: `url(${
                         file ? URL.createObjectURL(file) : null
                       })`,
                     }}
+                    key={id}
                   >
-                    {file || jobDetailsObject.pictureUrl ? null : (
-                      <div>
-                        <PhotoIcon className="w-auto" />
-                        <p>No Image</p>
-                      </div>
-                    )}
+                    <div
+                      className="absolute -right-1 -top-2 rounded-full p-0 m-0 cursor-pointer font-bold flex justify-center items-center text-red-500"
+                      onClick={() => deletePicture(file.name)}
+                    >
+                      X
+                    </div>
                   </div>
                 ))}
               </div>
@@ -214,12 +206,14 @@ const FillDescriptionJobPage: NextPage = () => {
           </div>
         </div>
         <div className="flex justify-end mt-2">
-          <button
+          <ButtonComponent
             className="bg-sky-600 hover:bg-sky-400 rounded-md p-2 text-white"
             type="submit"
+            isLoading={isLoading}
+            disable={isLoading}
           >
             Create
-          </button>
+          </ButtonComponent>
         </div>
       </form>
     </div>

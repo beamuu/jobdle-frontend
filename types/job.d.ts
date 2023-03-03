@@ -20,9 +20,11 @@ interface Job {
   userId: string;
   __v: 0;
   _id: string;
+  pictureUrl: string[];
 }
 
 interface JobEditable {
+  pictureUrl: string[];
   title: string;
   detail: string;
   category: {
@@ -31,5 +33,4 @@ interface JobEditable {
   };
   location: string;
   deadline: string;
-  status: string;
 }

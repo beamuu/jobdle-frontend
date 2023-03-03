@@ -96,7 +96,12 @@ const JobDetailsPage: NextPage = () => {
         </div>
         <div className={BlockFieldStyles}>
           <p className={LabelStyles}>Category </p>
-          <p className={DetailStyles}>{jobDetailsObject.category.name}</p>
+          <p
+            className={DetailStyles}
+            style={{ color: `${jobDetailsObject.category.color}`,fontWeight: "bold" }}
+          >
+            {jobDetailsObject.category.name}
+          </p>
         </div>
         <div className={BlockFieldStyles}>
           <p className={LabelStyles}>Min wage </p>
@@ -133,7 +138,6 @@ const JobDetailsPage: NextPage = () => {
                       <span>
                         {employee.firstname} {employee.lastname}
                       </span>
-                      <span className="text-gray-400">Front Developer</span>
                     </div>
                   </div>
                 ))}
@@ -141,6 +145,19 @@ const JobDetailsPage: NextPage = () => {
             </div>
           </div>
         ) : null}
+        <div className="w-full">
+          <p className={LabelStyles}>Pictures </p>
+          <div className="flex flex-wrap">
+            {jobDetailsObject.pictureUrl.map((url) => (
+              <div
+                className={`h-40 w-40 m-2 rounded-md bg-no-repeat bg-cover bg-center flex justify-center items-center relative`}
+                style={{
+                  backgroundImage: `url(${url})`,
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div

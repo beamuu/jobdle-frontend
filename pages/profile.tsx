@@ -55,7 +55,7 @@ const ProfilePage = () => {
   const handleSubmitEditProfile = async () => {
     setIsLoading(true);
     let submitedData = profileDataObject;
-    if (!submitedData) return;
+    if (!submitedData) return; 
     if (file) {
       try {
         const profileImageUrl = await handleUpload(file);

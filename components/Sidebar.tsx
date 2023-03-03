@@ -14,6 +14,7 @@ import {
   UserIcon,
   CalendarDaysIcon,
 } from "@heroicons/react/24/outline";
+import Navbar from "./navbar";
 
 type State = {
   firstname: string;
@@ -89,10 +90,15 @@ const Sidebar: NextPage = () => {
     router.push("/profile");
   };
 
+  const handleNavBar = (menu: any) => {
+    handleSelectedMenu(menu);
+    setOpen({ ...open, Navbar: !Navbar });
+  };
+
   return (
     <>
       {/* <!-- mobile menu bar --> */}
-      <div className="relative inset-x-0 bg-gradient-to-r from-cyan-500 to-blue-500 flex justify-between md:hidden text-white z-10">
+      <div className="relative inset-x-0 bg-gradient-to-r from-cyan-500 to-blue-500 flex justify-between md:hidden text-white z-20">
         {/* <!-- logo --> */}
         <a href="#" className="p-4 font-bold">
           {userData.firstname} {userData.lastname}
@@ -109,17 +115,27 @@ const Sidebar: NextPage = () => {
       <div
         className={`absolute bg-white shadow-lg min-w-screen ${
           !open.Navbar && "-translate-y-full"
-        } duration-200 md:hidden inset-x-0 top-14`}
+        } duration-200 md:hidden inset-x-0 top-14 z-10`}
       >
-        {menuLists.map((menu) => (
-          <a
-            href={menu.link}
-            className="block px-4 py-2 flex justify-center"
-            key={menu.title}
-          >
-            <span className="flex">{menu.title}</span>
-          </a>
-        ))}
+        {menuLists.map((menu, id) => {
+          if (userData.role !== "admin" && menu.title === "Employee")
+            return null;
+          if (userData.role !== "admin" && menu.title === "Settings")
+            return null;
+          if (userData.role !== "admin" && menu.title === "Schedule")
+            return null;
+          return (
+            <div key={id}>
+              <div
+                onClick={() => handleNavBar(menu)}
+                className="flex justify-center p-2 hover:bg-gray-200"
+              >
+                {menu.icon}
+                <span className="pl-3">{menu.title}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Sidebar */}
@@ -154,9 +170,7 @@ const Sidebar: NextPage = () => {
               <div
                 className="h-10 w-10 bg-gray-200 rounded-full flex justify-center items-center bg-no-repeat bg-cover bg-center"
                 style={{
-                  backgroundImage: `url(${
-                    userData.profileImageUrl
-                  })`,
+                  backgroundImage: `url(${userData.profileImageUrl})`,
                 }}
               ></div>
             </div>
@@ -233,7 +247,7 @@ const Sidebar: NextPage = () => {
         onClose={setShowSignOutMoDal}
         show={showSignOutMoDal}
         cancel={() => setShowSignOutMoDal(false)}
-        confirm={() => router.push("/signout")}
+        confirm={() => router.push("signout")}
       />
     </>
   );

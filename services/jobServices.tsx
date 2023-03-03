@@ -49,7 +49,7 @@ export const getUserJobs = async (
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
     {
       params: {
-        status: status,
+        status: [status],
         page: page,
       },
       headers: headersParams(token),
@@ -72,7 +72,7 @@ export const getJob = async (id: any, token: string) => {
 
 export const editJob = async (
   id: string | string[] | undefined,
-  data: JobEditable,
+  data: { status: string },
   token: string
 ) => {
   const response = await axios.patch(
@@ -101,6 +101,7 @@ export const deleteJob = async (
 };
 
 export const postJob = async (data: {}, token: string) => {
+  console.log("data in postJob", data);
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
     data,

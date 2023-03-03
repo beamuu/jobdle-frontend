@@ -16,7 +16,7 @@ const defaultValue = {
 };
 
 const SignInPage: SignInPageWithNoLayout = () => {
-  const [cookie, setCookie] = useCookies(["token"]);
+  const [cookies, setCookie] = useCookies(["token"]);
   const router = useRouter();
 
   const [userAuthData, setUserAuthData] = useState(defaultValue);
@@ -70,7 +70,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
 
   useEffect(() => {
     try {
-      getUserData(cookie.token).then(() => router.push("/"));
+      getUserData(cookies.token).then(() => router.push("/"));
     } catch (error) {
       router.push("/signin");
     }

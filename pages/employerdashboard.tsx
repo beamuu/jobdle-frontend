@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import ButtonComponent from "../components/ButtonComponent";
+import LoadingComponent from "../components/LoadingComponent";
+import { getUserData } from "../services/AccountServices";
 
 import { getUserJobs } from "../services/JobServices";
 import { dateFormat } from "../services/UtilsServices";
@@ -19,8 +21,8 @@ const EmployerDashBoardPage: NextPage = () => {
     limit: 0,
     totalPages: 0,
   });
-  const [status, setStatus] = useState(["new", "pending"]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState("new"); //
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -40,6 +42,11 @@ const EmployerDashBoardPage: NextPage = () => {
   };
 
   useEffect(() => {
+    try {
+      getUserData(cookies.token)
+    } catch (error) {
+      router.push("/signin");
+    }
     fetchData();
     console.log("status", status);
   }, [state.page, status]);
@@ -66,67 +73,71 @@ const EmployerDashBoardPage: NextPage = () => {
     setState({ ...state, page: page + 1 });
   };
 
+  const ButtonStyles = (statusNow: string) =>
+    `${
+      status === statusNow
+        ? "bg-sky-500 text-white"
+        : "bg-white text-sky-700 hover:bg-sky-100"
+    } duration-200 font-semibold p-2 rounded-md`;
+
+  const handleChangeStatus = (status: string) => {
+    setStatus(status);
+  };
+
   if (!userJobs) return null;
 
-  const showingJobs = (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-      {userJobs.map((jobDetailsObject) => (
-        <div
-          className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg"
-          onClick={() => router.push(`job/details/${jobDetailsObject?._id}`)}
-        >
-          <div id="job-header" className="text-lg">
-            <span>{jobDetailsObject.title}</span>
-          </div>
-          <hr />
-          <div id="p-5" className="px-5 py-3">
-            <div>
-              <span className="text-gray-400">Category: </span>
-              <span>{jobDetailsObject.category.name}</span>
-            </div>
-            <div>
-              <span className="text-gray-400">min-Wage: </span>
-              <span>{jobDetailsObject?.category.minWage}</span>
-            </div>
-          </div>
-          <div
-            id="job-footer"
-            className="flex justify-between items-center pt-2"
-          >
-            <div className="text-sm">
-              <span className="text-gray-400">Deadline: </span>
-              <span>{dateFormat(new Date(jobDetailsObject.deadline))}</span>
-            </div>
-            <span
-              className={`${
-                jobDetailsObject.status === "new"
-                  ? "bg-green-500"
-                  : "bg-yellow-500"
-              } px-5 rounded-full text-white`}
-            >
-              <span className="uppercase">{jobDetailsObject.status}</span>
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  return userJobs.length === 0 ? (
-    <>
-      <div className="w-full h-full flex justify-center">
-        <div>
-          <span>You do not have any employment </span>
-          <ButtonComponent
-            className="bg-green-500 p-2 rounded-md text-white"
-            onClick={handleCreateJob}
-          >
-            Create One !
-          </ButtonComponent>
-        </div>
+  const showingJobs =
+    userJobs.length === 0 ? (
+      <div className="w-full flex justify-center items-center">
+        {" "}
+        You don't have Job in "{status}" status
       </div>
-    </>
-  ) : (
+    ) : (
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {userJobs.map((jobDetailsObject, id) => (
+          <div
+            className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg"
+            onClick={() => router.push(`job/details/${jobDetailsObject?._id}`)}
+            key={id}
+          >
+            <div id="job-header" className="text-lg">
+              <span>{jobDetailsObject.title}</span>
+            </div>
+            <hr />
+            <div id="p-5" className="px-5 py-3">
+              <div>
+                <span className="text-gray-400">Category: </span>
+                <span>{jobDetailsObject.category.name}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">min-Wage: </span>
+                <span>{jobDetailsObject?.category.minWage}</span>
+              </div>
+            </div>
+            <div
+              id="job-footer"
+              className="flex justify-between items-center pt-2"
+            >
+              <div className="text-sm">
+                <span className="text-gray-400">Deadline: </span>
+                <span>{dateFormat(new Date(jobDetailsObject.deadline))}</span>
+              </div>
+              <span
+                className={`${
+                  jobDetailsObject.status === "new"
+                    ? "bg-green-500"
+                    : "bg-yellow-500"
+                } px-5 rounded-full text-white`}
+              >
+                <span className="uppercase">{jobDetailsObject.status}</span>
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
+  return (
     <>
       <div className="block h-10 mb-3 flex justify-between">
         <ButtonComponent
@@ -136,20 +147,28 @@ const EmployerDashBoardPage: NextPage = () => {
           Create Job
         </ButtonComponent>
         <div>
-          status:
-          <select
-            name=""
-            id=""
-            onChange={(event) => setStatus([event.target.value])}
+          <button
+            className={ButtonStyles("new")}
+            onClick={() => handleChangeStatus("new")}
           >
-            <option value={status}>All</option>
-            <option value={status[0]}>New</option>
-            <option value={status[1]}>Pending</option>
-          </select>
+            New
+          </button>
+          <button
+            className={ButtonStyles("pending")}
+            onClick={() => handleChangeStatus("pending")}
+          >
+            Pending
+          </button>
         </div>
       </div>
 
-      {isLoading ? <div></div> : showingJobs}
+      {isLoading ? (
+        <div className="">
+          <LoadingComponent className="h-20 w-20 block rounded-full border-4 border-sky-400 border-t-white animate-spin" />
+        </div>
+      ) : (
+        <div className="h-2/3">{showingJobs}</div>
+      )}
 
       <div className="flex justify-end mt-3">
         <div
@@ -160,7 +179,7 @@ const EmployerDashBoardPage: NextPage = () => {
           <ChevronLeftIcon className="h-5 w-5" />
         </div>
 
-        {createPagination().map((number) => {
+        {createPagination().map((number, id) => {
           return (
             <div
               aria-current="page"
@@ -170,7 +189,7 @@ const EmployerDashBoardPage: NextPage = () => {
                   : "border-gray-300 bg-white cursor-pointer"
               } px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20`}
               onClick={() => setState({ ...state, page: number })}
-              key={number}
+              key={id}
             >
               {number}
             </div>

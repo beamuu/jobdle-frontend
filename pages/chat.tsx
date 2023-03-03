@@ -1,5 +1,6 @@
 import axios from "axios";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import React, {
   ChangeEvent,
   FormEvent,
@@ -9,6 +10,7 @@ import React, {
 } from "react";
 import { useCookies } from "react-cookie";
 import io, { Socket } from "socket.io-client";
+import LoadingComponent from "../components/LoadingComponent";
 
 import { useUser } from "../contexts/User";
 import { getUserJobs } from "../services/JobServices";
@@ -20,9 +22,10 @@ const ChatPage: NextPage = () => {
   const [roomId, setRoomId] = useState(undefined);
   const [cookies] = useCookies(["token"]);
   const refMessages = useRef<any[]>([]);
-  const { userData } = useUser();
+  const router = useRouter();
+  // const { userData } = useUser();
 
-  const [chatRooms, setChatRooms] = useState<any[]>([]);
+  const [chatRoomsObjectsArray, setChatRoomsObjectsArray] = useState<any[]>([]);
   const [senderId, setSenderId] = useState();
   const [roomName, setRoomName] = useState();
   const [data, setData] = useState({
@@ -31,6 +34,9 @@ const ChatPage: NextPage = () => {
   const [message, setMessage] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
   const [userJobsArray, setUserJobsArray] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState<User>();
+  const [isReRenderSidebar, setIsReRenderSidebar] = useState(false);
 
   const getRoom = async (token: string) => {
     try {
@@ -73,29 +79,38 @@ const ChatPage: NextPage = () => {
     }
   };
 
-  const init = async () => {
-    var chatRoomsObjectsArray = await getRoom(cookies.token);
-    var userData = await getUserData();
-    setSenderId(userData._id);
+  const reRenderSideBar = async () => {
+    if (isReRenderSidebar && userData?.role === "admin") {
+      let chatRoomsObjectsArray = await getRoom(cookies.token);
+      setChatRoomsObjectsArray(chatRoomsObjectsArray);
+      setIsReRenderSidebar(false);
+    }
+  };
 
-    console.log(userData.role);
+  const init = async () => {
+    setIsLoading(true);
+    let chatRoomsObjectsArray = await getRoom(cookies.token);
+    let userData = await getUserData();
+    if (userData) {
+      setUserData(userData);
+    } else {
+      console.clear();
+      router.push("/app/signin");
+    }
+
+    setSenderId(userData._id);
 
     if (chatRoomsObjectsArray.length == 0) return;
 
     if (userData !== undefined && chatRoomsObjectsArray !== undefined) {
       if (userData.role === "user") {
         // USER CHAT
-        console.log("ROLE:User");
-        console.log("chatRoomsObjectsArray", chatRoomsObjectsArray);
         setMessageList(chatRoomsObjectsArray.messages);
         setRoomId(chatRoomsObjectsArray._id);
         refMessages.current = messageList;
       } else if (userData.role === "admin") {
         // ADMIN CHAT
-        console.log("ROLE:Admin");
-        console.log("chatRoomsObjectsArray", chatRoomsObjectsArray);
-        setChatRooms(chatRoomsObjectsArray);
-        console.log("FIRST ROOM ID", roomId);
+        setChatRoomsObjectsArray(chatRoomsObjectsArray);
         if (roomId === undefined) {
           console.log("NOT HAVE ROOM ID");
           setRoomId(chatRoomsObjectsArray[0]._id);
@@ -112,11 +127,12 @@ const ChatPage: NextPage = () => {
         }
       }
     }
+    setIsLoading(false);
   };
 
   const fetchData = async () => {
     try {
-      const { data } = await getUserJobs(cookies.token);
+      const { data } = await getUserJobs(["new", "pending"], 1, cookies.token);
       setUserJobsArray(data.docs);
       console.log("data", data.docs);
     } catch (error) {
@@ -125,10 +141,15 @@ const ChatPage: NextPage = () => {
   };
 
   useEffect(() => {
-    // for getUserJobs
+    reRenderSideBar();
+  }, [chatRoomsObjectsArray]);
+
+  // for getUserJobs
+  useEffect(() => {
     fetchData();
   }, []);
 
+  // for getChatRooms
   useEffect(() => {
     init();
   }, [roomId]);
@@ -139,6 +160,7 @@ const ChatPage: NextPage = () => {
     // setChkMessage(true)
   }, [messageList]);
 
+  // for connent to socket
   useEffect(() => {
     // getRoom(cookies.token);
     if (socket === null) {
@@ -157,6 +179,7 @@ const ChatPage: NextPage = () => {
         console.log("socket.on - message", data);
         let newMessageLists = [...refMessages.current, data.content];
         setMessageList(newMessageLists);
+        setIsReRenderSidebar(true);
         // let currentMessageList = [...messageList];
         // currentMessageList.push(data.content);
         // setMessageList([...refMessages.current, data.content]);
@@ -168,6 +191,7 @@ const ChatPage: NextPage = () => {
     }
   }, [socket]);
 
+  // for change chat room
   useEffect(() => {
     console.log("ROOMID:", roomId);
     if (roomId && socket !== null) {
@@ -223,80 +247,80 @@ const ChatPage: NextPage = () => {
             {userData.role === "admin" ? "Chat" : "Your jobs"}
           </p>
         </div>
-        {userData.role === "admin" ?
-          (
-            <div>
-              <span>Search: </span>
-              <input
-                className="w-30"
-                value={search}
-                onChange={(e) => setSearch(e.target.value.trim())}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") setSearch(search);
-                }}
-              />
-            </div>
-          )
-          : null}
+        {userData.role === "admin" ? (
+          <div>
+            <span>Search: </span>
+            <input
+              className="w-30"
+              value={search}
+              onChange={(e) => setSearch(e.target.value.trim())}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") setSearch(search);
+              }}
+            />
+          </div>
+        ) : null}
         <div className="flex-1 relative">
           <div className="overflow-auto absolute top-0 bottom-0 left-0 right-0">
             {userData.role === "admin"
-              ? chatRooms.map((room, id) => {
-                return (
-                  <div
-                    className={`${data.index === id ? "bg-white" : "bg-gray-100"
+              ? chatRoomsObjectsArray.map((room, id) => {
+                  return (
+                    <div
+                      className={`${
+                        data.index === id ? "bg-white" : "bg-gray-100"
                       } p-5 hover:bg-white cursor-pointer border-b border-gray-200`}
-                    onClick={() => {
-                      setData({ ...data, index: id });
-                      setRoomId(room._id);
-                      setRoomName(room.nameOfUser);
-                    }}
+                      onClick={() => {
+                        setData({ ...data, index: id });
+                        setRoomId(room._id);
+                        setRoomName(room.nameOfUser);
+                      }}
+                      key={id}
+                    >
+                      <p className="font-bold">{room.nameOfUser}</p>
+                      {/* <p className="text-gray-500 font-light">{chat.username}</p> */}
+                      {/* <p>{room.messages[0].content}</p> */}
+                    </div>
+                  );
+                })
+              : userJobsArray.map((job: Job, id) => (
+                  <div
+                    className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg m-1"
                     key={id}
                   >
-                    <p className="font-bold">{room.nameOfUser}</p>
-                    {/* <p className="text-gray-500 font-light">{chat.username}</p> */}
-                    {/* <p>{room.messages[0].content}</p> */}
-                  </div>
-                );
-              })
-              : userJobsArray.map((job: Job, id) => (
-                <div
-                  className="bg-white rounded-md px-3 py-2 cursor-pointer hover:shadow-lg m-1"
-                  key={id}
-                >
-                  <div id="job-header" className="text-lg">
-                    <span>{job.title}</span>
-                  </div>
-                  <hr />
-                  <div id="p-5" className="px-5 py-3">
-                    <div>
-                      <span className="text-gray-400">Category: </span>
-                      <span>{job.category.name}</span>
+                    <div id="job-header" className="text-lg">
+                      <span>{job.title}</span>
                     </div>
-                    <div>
-                      <span className="text-gray-400">min-Wage: </span>
-                      <span>{job.category.minWage}</span>
+                    <hr />
+                    <div id="p-5" className="px-5 py-3">
+                      <div>
+                        <span className="text-gray-400">Category: </span>
+                        <span>{job.category.name}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">min-Wage: </span>
+                        <span>{job.category.minWage}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div
-                    id="job-footer"
-                    className="flex justify-between items-center pt-2"
-                  >
-                    <div className="text-sm">
-                      <span className="text-gray-400">Deadline: </span>
-                      <span>{dateFormat(new Date(job.deadline))}</span>
-                    </div>
-                    <span
-                      className={`${job.status === "new"
-                        ? "bg-green-500"
-                        : "bg-yellow-500"
-                        } px-5 rounded-full text-white`}
+                    <div
+                      id="job-footer"
+                      className="flex justify-between items-center pt-2"
                     >
-                      <span className="uppercase">{job.status}</span>
-                    </span>
+                      <div className="text-sm">
+                        <span className="text-gray-400">Deadline: </span>
+                        <span>{dateFormat(new Date(job.deadline))}</span>
+                      </div>
+                      <span
+                        className={`${
+                          job.status === "new"
+                            ? "bg-green-500"
+                            : "bg-yellow-500"
+                        } px-5 rounded-full text-white`}
+                      >
+                        <span className="uppercase">{job.status}</span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
           </div>
         </div>
       </div>
@@ -311,40 +335,47 @@ const ChatPage: NextPage = () => {
         </div>
 
         {/* Chat content */}
-        <div
-          id="messages"
-          className="space-y-2 p-3 overflow-y-auto flex-1 scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
-          style={{}}
-        >
-          {messageList.map((message, id) => {
-            return (
-              <div className="chat-message" key={id}>
-                <div
-                  className={`${userData?._id === message.senderId
-                    ? "items-end justify-end"
-                    : ""
-                    } flex`}
-                >
+        {isLoading ? (
+          <LoadingComponent className="w-28 h-28 border-4 border-gray-100 border-t-sky-500" />
+        ) : (
+          <div
+            id="messages"
+            className="space-y-2 p-3 overflow-y-auto flex-1 scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+            style={{}}
+          >
+            {messageList.map((message, id) => {
+              return (
+                <div className="chat-message" key={id}>
                   <div
-                    className={`${userData?._id === message.senderId
-                      ? "items-end order-1"
-                      : "items-start order-2"
-                      } flex flex-col rounded-lg space-y-2 mx-2 overflow-x-hidden max-w-xs`}
+                    className={`${
+                      userData?._id === message.senderId
+                        ? "items-end justify-end"
+                        : ""
+                    } flex`}
                   >
-                    <span
-                      className={`${userData?._id === message.senderId
-                        ? "bg-sky-500 text-white"
-                        : "bg-gray-300 text-gray-600"
-                        } px-4 py-2 rounded-lg inline-block`}
+                    <div
+                      className={`${
+                        userData?._id === message.senderId
+                          ? "items-end order-1"
+                          : "items-start order-2"
+                      } flex flex-col rounded-lg space-y-2 mx-2 overflow-x-hidden max-w-xs`}
                     >
-                      {message.content}
-                    </span>
+                      <span
+                        className={`${
+                          userData?._id === message.senderId
+                            ? "bg-sky-500 text-white"
+                            : "bg-gray-300 text-gray-600"
+                        } px-4 py-2 rounded-lg inline-block`}
+                      >
+                        {message.content}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
         {/* Chat input message */}
         <div className="flex border-t">
           <form onSubmit={sendMessage} className="flex w-full">

@@ -130,7 +130,6 @@ const AdminTable = () => {
               {isLoading
                 ? null
                 : allJobs.map((job, id) => {
-                    console.log(id);
                     return (
                       <tr
                         className={`${
