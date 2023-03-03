@@ -16,7 +16,11 @@ const ButtonComponent = ({
       disabled={disabled}
       type={type}
     >
-      {isLoading ? <LoadingComponent className="w-5 h-5 border-2"/> : children}
+      {isLoading ? (
+        <LoadingComponent className="w-5 h-5 border-2 border-white border-t-blue-500" />
+      ) : (
+        children
+      )}
     </button>
   );
 };

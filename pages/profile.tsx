@@ -1,5 +1,4 @@
 import { ArrowUpTrayIcon, PhotoIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
@@ -28,11 +27,29 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
+  useEffect(() => {
+    setProfileDataObject(userData || defaultUser);
+    console.log(userData);
+  }, [userData]);
+
   const handleMouseEnter = () => {
     setIsHover(true);
   };
   const handleMouseLeave = () => {
     setIsHover(false);
+  };
+
+  const handleChangeFile = (event: any) => {
+    setFile(event.target.files[0]);
+    setDisabled(false);
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setProfileDataObject((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+    setDisabled(false);
   };
 
   const handleSubmitEditProfile = async () => {
@@ -56,24 +73,6 @@ const ProfilePage = () => {
     setDisabled(true);
   };
 
-  function handleChangeFile(event: any) {
-    setFile(event.target.files[0]);
-    setDisabled(false);
-  }
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setProfileDataObject((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-    setDisabled(false);
-  };
-
-  useEffect(() => {
-    setProfileDataObject(userData || defaultUser);
-    console.log(userData);
-  }, [userData]);
-
   if (!profileDataObject) return null;
 
   return (
@@ -82,7 +81,7 @@ const ProfilePage = () => {
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
         <div className="flex flex-col items-center lg:w-1/3">
           <div
-            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
+            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center border-4 border-sky-500`}
             style={{
               backgroundImage: `url(${
                 file

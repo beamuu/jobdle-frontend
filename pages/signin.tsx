@@ -69,9 +69,6 @@ const SignInPage: SignInPageWithNoLayout = () => {
   };
 
   useEffect(() => {
-    // if (cookie.token) {
-    //   router.push("/");
-    // }
     try {
       getUserData(cookie.token).then(() => router.push("/"));
     } catch (error) {

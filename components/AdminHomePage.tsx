@@ -27,8 +27,29 @@ const AdminTable = () => {
     "category",
   ]);
   const [query, setQuery] = useState({});
-
   const [search, setSearch] = useState("");
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await getAllJobs(
+        status,
+        state.page,
+        cookies.token,
+        query
+      );
+      setAllJobs(data.docs);
+      setState({
+        ...state,
+        totalDocs: data.totalDocs,
+        limit: data.limit,
+        totalPages: data.totalPages,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    setIsLoading(false);
+  };
 
   const ButtonStyles = (statusNow: string) =>
     `${
@@ -78,28 +99,6 @@ const AdminTable = () => {
   };
 
   if (!allJobs) return null;
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await getAllJobs(
-        status,
-        state.page,
-        cookies.token,
-        query
-      );
-      setAllJobs(data.docs);
-      setState({
-        ...state,
-        totalDocs: data.totalDocs,
-        limit: data.limit,
-        totalPages: data.totalPages,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-    setIsLoading(false);
-  };
 
   useEffect(() => {
     if (!status) return;
@@ -244,7 +243,7 @@ const AdminTable = () => {
               <input
                 className="w-30"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value.trim())}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") setQuery({ ...query, search: search });
                 }}

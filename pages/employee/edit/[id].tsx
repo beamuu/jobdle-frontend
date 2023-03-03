@@ -2,12 +2,14 @@ import { useRouter } from "next/router";
 import React, { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-import { useUser } from "../../../contexts/User";
 import { editEmployee, getEmployee } from "../../../services/EmployeeServices";
 import Header from "../../../components/Header";
-import { splitTFromISO } from "../../../services/UtilsServices";
+import { handleUpload, splitTFromISO } from "../../../services/UtilsServices";
+import { PhotoIcon } from "@heroicons/react/24/outline";
+import ButtonComponent from "../../../components/ButtonComponent";
 
 const defaultValue = {
+  profileImageUrl: "",
   firstname: "",
   lastname: "",
   email: "",
@@ -20,50 +22,94 @@ const defaultValue = {
 const EmployeedetailsPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { userData } = useUser();
-
   const [cookies] = useCookies(["token"]);
-  const [employeeDetail, setEmployeeDetail] =
+
+  const [employeeDetailsObject, setEmployeeDetailsObject] =
     useState<EmployeeEditable>(defaultValue);
+  const [file, setFile] = useState<File>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: any) => {
-    setEmployeeDetail((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    // console.log("handleEditEmployee");
-    e.preventDefault();
-    if (!id) return;
-    await editEmployee(id, employeeDetail, cookies.token);
-    router.push(`/employee/details/${id}`);
+  const fetchData = async () => {
+    try {
+      if (id) {
+        const { data } = await getEmployee(id, cookies.token);
+        setEmployeeDetailsObject(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
-    if (id) {
-      getEmployee(id, cookies.token)
-        .then((res) => {
-          setEmployeeDetail(res.data);
-        })
-        .catch((err) => console.error(err));
-    }
+    fetchData();
   }, [router]);
 
   const handleDateChage = (date: any) => {
-    setEmployeeDetail({ ...employeeDetail, birthday: date });
+    setEmployeeDetailsObject({ ...employeeDetailsObject, birthday: date });
   };
 
-  if (employeeDetail === undefined) return null;
+  const handleChange = (e: any) => {
+    setEmployeeDetailsObject((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-  if (userData === undefined) return null;
+  function handleChangeFile(event: any) {
+    setFile(event.target.files[0]);
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
+    setIsLoading(true);
+    e.preventDefault();
+    let submitedData = employeeDetailsObject;
+    if (!submitedData) return;
+    if (file) {
+      try {
+        const profileImageUrl = await handleUpload(file);
+        submitedData.profileImageUrl = profileImageUrl;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    console.log("submitedData", submitedData);
+    await editEmployee(id, submitedData, cookies.token);
+    router.push(`/employee/details/${id}`);
+  };
+
+  if (employeeDetailsObject === undefined) return null;
 
   return (
     <>
       <Header title="Edit Employee" />
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
-          <div className="flex justify-center px-5">
-            <div className="h-60 w-60 bg-gray-200 rounded-full flex justify-center items-center">
-              Picture
+          <div className="flex flex-col items-center lg:w-1/">
+            <div
+              className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
+              style={{
+                backgroundImage: `url(${
+                  file
+                    ? URL.createObjectURL(file)
+                    : employeeDetailsObject.profileImageUrl
+                })`,
+              }}
+            >
+              {file || employeeDetailsObject.profileImageUrl ? null : (
+                <div>
+                  <PhotoIcon className="w-auto" />
+                  <p>No Image</p>
+                </div>
+              )}
+            </div>
+            <div className="px-5 my-3">
+              <input
+                type="file"
+                id="edit-avatar"
+                onChange={handleChangeFile}
+                accept="image/*"
+                className="w-full m-auto bg-gray-100"
+              />
             </div>
           </div>
           <div className="px-5 lg:w-2/3">
@@ -80,7 +126,7 @@ const EmployeedetailsPage = () => {
                       placeholder=""
                       name="firstname"
                       onChange={handleChange}
-                      value={employeeDetail.firstname}
+                      value={employeeDetailsObject.firstname}
                       required
                     />
                   </div>
@@ -94,7 +140,7 @@ const EmployeedetailsPage = () => {
                       placeholder=""
                       name="lastname"
                       onChange={handleChange}
-                      value={employeeDetail.lastname}
+                      value={employeeDetailsObject.lastname}
                       required
                     />
                   </div>
@@ -109,7 +155,7 @@ const EmployeedetailsPage = () => {
                     placeholder="Your email"
                     name="email"
                     onChange={handleChange}
-                    value={employeeDetail.email}
+                    value={employeeDetailsObject.email}
                     required
                   />
                 </div>
@@ -119,11 +165,12 @@ const EmployeedetailsPage = () => {
                   </label>
                   <input
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                    type="text"
+                    type="tel"
                     placeholder=""
                     name="tel"
                     onChange={handleChange}
-                    value={employeeDetail.tel}
+                    value={employeeDetailsObject.tel}
+                    pattern="\d{9,10}"
                     required
                   />
                 </div>
@@ -135,7 +182,7 @@ const EmployeedetailsPage = () => {
                     <input
                       type="date"
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                      value={splitTFromISO(employeeDetail.birthday)}
+                      value={splitTFromISO(employeeDetailsObject.birthday)}
                       name="birthday"
                       onChange={(e) => handleDateChage(e.target.value)}
                       //   required
@@ -150,7 +197,7 @@ const EmployeedetailsPage = () => {
                       required
                       name="gender"
                       onChange={handleChange}
-                      value={employeeDetail.gender}
+                      value={employeeDetailsObject.gender}
                     >
                       <option value="">โปรดเลือก</option>
                       <option value="male">Male</option>
@@ -172,12 +219,14 @@ const EmployeedetailsPage = () => {
           </div>
         </div>
         <div className="flex justify-end pt-2">
-          <button
+          <ButtonComponent
             type="submit"
             className="p-2 bg-yellow-500 rounded-md text-white"
+            disabled={isLoading}
+            isLoading={isLoading}
           >
             Edit
-          </button>
+          </ButtonComponent>
         </div>
       </form>
     </>

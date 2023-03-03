@@ -92,7 +92,7 @@ function EmployeePage() {
               >
                 <div id="image" className="flex justify-center py-2">
                   <div
-                    className={`h-32 w-32 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
+                    className={`h-32 w-32 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center border-2 border-sky-500`}
                     style={{
                       backgroundImage: `url(${employee.profileImageUrl})`,
                     }}

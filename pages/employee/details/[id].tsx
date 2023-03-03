@@ -13,7 +13,7 @@ import { dateFormat } from "../../../services/UtilsServices";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
 const EmployeedetailsPage = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [cookies] = useCookies(["token"]);
   const router = useRouter();
   const { id } = router.query;
   const { userData } = useUser();
@@ -21,6 +21,21 @@ const EmployeedetailsPage = () => {
   const [employeeDetailsObject, setEmployeeDetailsObject] =
     useState<Employee>();
   const [showDeleteEmployeeModal, setShowDeleteEmployeeModal] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      if (id) {
+        const { data } = await getEmployee(id, cookies.token);
+        setEmployeeDetailsObject(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [router]);
 
   const handleDeleteEmployee = async () => {
     await deleteEmployee(id, cookies.token);
@@ -30,16 +45,6 @@ const EmployeedetailsPage = () => {
   const pushEditEmployee = () => {
     router.push(`/employee/edit/${id}`);
   };
-
-  useEffect(() => {
-    if (id) {
-      getEmployee(id, cookies.token)
-        .then((res) => {
-          setEmployeeDetailsObject(res.data);
-        })
-        .catch((err) => console.error(err));
-    }
-  }, [router]);
 
   const calculateAge = () => {
     if (!employeeDetailsObject?.birthday) return;
@@ -63,7 +68,7 @@ const EmployeedetailsPage = () => {
       <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md">
         <div className="flex justify-center px-5 pb-5" id="picture">
           <div
-            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
+            className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center border-4 border-sky-500`}
             style={{
               backgroundImage: `url(${employeeDetailsObject.profileImageUrl})`,
             }}
