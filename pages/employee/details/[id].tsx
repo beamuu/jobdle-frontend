@@ -116,9 +116,10 @@ const EmployeedetailsPage = () => {
           </div>
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">Works </p>
-            <div className="border rounded-md w-full sm:col-span-3"></div>
             <p className="w-full sm:col-span-3">
-              {employeeDetailsObject.works}
+              {employeeDetailsObject.works.map((work) => (
+                <div className="border rounded-md w-full sm:col-span-3"></div>
+              ))}
             </p>
           </div>
         </div>

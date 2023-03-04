@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 
 const VerifyIndexPage = () => {
   const router = useRouter();
-  const { token } = router.query;
+  const { verify_email_token } = router.query;
 
   const handleVerify = async () => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/verify`,
-        { token },
+        { verify_email_token },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${verify_email_token}`,
           },
         }
       );
@@ -28,13 +28,13 @@ const VerifyIndexPage = () => {
   };
 
   useEffect(() => {
-    if (token === undefined) {
+    if (verify_email_token === undefined) {
       router.push("/signin");
       return;
     }
     handleVerify();
-    console.log(token);
-  }, [token]);
+    console.log(verify_email_token);
+  }, [verify_email_token]);
 };
 
 VerifyIndexPage.noLayout = true;
