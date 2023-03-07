@@ -15,8 +15,8 @@ export const getUserData = async (token: string) => {
   return response;
 };
 
-export const postAccountUser = async (data: {
-  username: string;
+export const signInAccount = async (data: {
+  email: string;
   password: string;
 }) => {
   const response = await axios.post(
