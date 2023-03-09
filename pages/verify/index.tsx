@@ -35,6 +35,8 @@ const VerifyIndexPage = () => {
     handleVerify();
     console.log(verify_email_token);
   }, [verify_email_token]);
+
+  return <></>;
 };
 
 VerifyIndexPage.noLayout = true;

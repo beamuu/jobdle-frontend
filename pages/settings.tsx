@@ -33,17 +33,21 @@ const SettingPage = () => {
     console.log("CategoryObjectInput", categoryObjectInput);
     const trimedNameInput = categoryObjectInput.name.trim(); // Use Regex
     if (trimedNameInput) {
-      await postCategory(
+      postCategory(
         {
           ...categoryObjectInput,
           minWage: Number(categoryObjectInput.minWage),
           name: trimedNameInput,
         },
         cookies.token
-      );
-      await fetchData();
-
-      setCategoryObjectInput(defaultValue);
+      )
+        .then(async () => {
+          await fetchData();
+          setCategoryObjectInput(defaultValue);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     } else return;
   };
 
@@ -53,13 +57,12 @@ const SettingPage = () => {
       categories.filter((category: { _id: string }) => category._id !== id)
     );
   };
-  
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const { data } = await getAllCategories(cookies.token);
-      setCategories(data);
+      const response = await getAllCategories(cookies.token);
+      setCategories(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -67,8 +70,10 @@ const SettingPage = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (categories.length === 0) {
+      fetchData();
+    }
+  }, [categories]);
 
   return (
     <div>

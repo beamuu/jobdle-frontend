@@ -29,7 +29,7 @@ const EmployerDashBoardPage: NextPage = () => {
     totalPages: 0,
   });
   const [status, setStatus] = useState(statusOptions[0].value);
-  const [order, setOrder] = useState("desc")
+  const [order, setOrder] = useState("desc");
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
@@ -95,8 +95,6 @@ const EmployerDashBoardPage: NextPage = () => {
       setStatus([status]);
     }
   };
-
-
 
   if (!userJobs) return null;
 
@@ -166,7 +164,7 @@ const EmployerDashBoardPage: NextPage = () => {
             <Select
               options={statusOptions}
               defaultValue={statusOptions[0]}
-              onChange={(value) => setStatus(value?.value)}
+              onChange={(option) => setStatus(option?.value)}
             />
           </div>
         </div>

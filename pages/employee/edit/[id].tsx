@@ -272,17 +272,6 @@ const EmployeedetailsPage = () => {
                     <ErrorMessage>{errors.gender?.message}</ErrorMessage>
                   </div>
                 </div>
-                <div className="mb-3">
-                  <label className="block font-medium text-gray-700 my-1">
-                    Details
-                  </label>
-                  <textarea
-                    className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                    rows={10}
-                    {...register("detail")}
-                  />
-                  <ErrorMessage>{errors.detail?.message}</ErrorMessage>
-                </div>
               </div>
             </div>
           </div>
