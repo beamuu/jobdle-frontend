@@ -7,6 +7,9 @@ import Header from "../../../components/Header";
 import { handleUpload, splitTFromISO } from "../../../services/UtilsServices";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import ButtonComponent from "../../../components/ButtonComponent";
+import { Controller, useForm } from "react-hook-form";
+import ReactSelect from "react-select";
+import ErrorMessage from "../../../components/ErrorMessage";
 
 const defaultValue = {
   profileImageUrl: "",
@@ -19,21 +22,34 @@ const defaultValue = {
   detail: "",
 };
 
+const genderListOptions = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+];
+
 const EmployeedetailsPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [cookies] = useCookies(["token"]);
 
   const [employeeDetailsObject, setEmployeeDetailsObject] =
-    useState<EmployeeEditable>(defaultValue);
+    useState<EmployeeEditable>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm({ defaultValues: employeeDetailsObject });
+
   const [file, setFile] = useState<File>();
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
       if (id) {
-        const { data } = await getEmployee(id, cookies.token);
-        setEmployeeDetailsObject(data);
+        const response = await getEmployee(id, cookies.token);
+        setEmployeeDetailsObject(response.data);
       }
     } catch (error) {
       console.error(error);
@@ -44,25 +60,52 @@ const EmployeedetailsPage = () => {
     fetchData();
   }, [router]);
 
-  const handleDateChage = (date: any) => {
-    setEmployeeDetailsObject({ ...employeeDetailsObject, birthday: date });
-  };
+  useEffect(() => {
+    if (employeeDetailsObject) {
+      reset({
+        ...employeeDetailsObject,
+        birthday: splitTFromISO(employeeDetailsObject.birthday),
+      });
+    }
+  }, [employeeDetailsObject]);
 
-  const handleChange = (e: any) => {
-    setEmployeeDetailsObject((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  // const handleDateChage = (date: any) => {
+  //   setEmployeeDetailsObject({ ...employeeDetailsObject, birthday: date });
+  // };
+
+  // const handleChange = (e: any) => {
+  //   setEmployeeDetailsObject((prev) => ({
+  //     ...prev,
+  //     [e.target.name]: e.target.value,
+  //   }));
+  // };
 
   function handleChangeFile(event: any) {
     setFile(event.target.files[0]);
   }
 
-  const handleSubmit = async (e: FormEvent) => {
+  // const handleSubmit = async (e: FormEvent) => {
+  //   setIsLoading(true);
+  //   e.preventDefault();
+  //   let submitedData = employeeDetailsObject;
+  //   if (!submitedData) return;
+  //   if (file) {
+  //     try {
+  //       const profileImageUrl = await handleUpload(file);
+  //       submitedData.profileImageUrl = profileImageUrl;
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   console.log("submitedData", submitedData);
+  //   await editEmployee(id, submitedData, cookies.token);
+  //   router.push(`/employee/details/${id}`);
+  // };
+
+  const onSubmit = handleSubmit(async (data) => {
+    console.log(data);
     setIsLoading(true);
-    e.preventDefault();
-    let submitedData = employeeDetailsObject;
+    let submitedData = data;
     if (!submitedData) return;
     if (file) {
       try {
@@ -73,8 +116,21 @@ const EmployeedetailsPage = () => {
       }
     }
     console.log("submitedData", submitedData);
-    await editEmployee(id, submitedData, cookies.token);
-    router.push(`/employee/details/${id}`);
+    try {
+      const response = await editEmployee(id, submitedData, cookies.token);
+      console.log(response);
+      router.push(`/employee/details/${id}`);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  const defaultValueGender = (gender: string) => {
+    if (gender === "male") {
+      return 0;
+    } else {
+      return 1;
+    }
   };
 
   if (employeeDetailsObject === undefined) return null;
@@ -82,9 +138,9 @@ const EmployeedetailsPage = () => {
   return (
     <>
       <Header title="Edit Employee" />
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={onSubmit}>
         <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
-          <div className="flex flex-col items-center lg:w-1/">
+          <div className="flex flex-col items-center lg:w-1/2">
             <div
               className={`h-60 w-60 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
               style={{
@@ -124,11 +180,11 @@ const EmployeedetailsPage = () => {
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                       type="text"
                       placeholder=""
-                      name="firstname"
-                      onChange={handleChange}
-                      value={employeeDetailsObject.firstname}
-                      required
+                      {...register("firstname", {
+                        required: "This is required.",
+                      })}
                     />
+                    <ErrorMessage>{errors.firstname?.message}</ErrorMessage>
                   </div>
                   <div className="lg:flex-1">
                     <label className="block font-medium text-gray-700 my-1">
@@ -138,11 +194,11 @@ const EmployeedetailsPage = () => {
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                       type="text"
                       placeholder=""
-                      name="lastname"
-                      onChange={handleChange}
-                      value={employeeDetailsObject.lastname}
-                      required
+                      {...register("lastname", {
+                        required: "This is required.",
+                      })}
                     />
+                    <ErrorMessage>{errors.lastname?.message}</ErrorMessage>
                   </div>
                 </div>
                 <div className="mb-3">
@@ -151,13 +207,11 @@ const EmployeedetailsPage = () => {
                   </label>
                   <input
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                    type="text"
+                    type="email"
                     placeholder="Your email"
-                    name="email"
-                    onChange={handleChange}
-                    value={employeeDetailsObject.email}
-                    required
+                    {...register("email", { required: "This is required." })}
                   />
+                  <ErrorMessage>{errors.email?.message}</ErrorMessage>
                 </div>
                 <div className="mb-3">
                   <label className="block font-medium text-gray-700 my-1">
@@ -167,12 +221,16 @@ const EmployeedetailsPage = () => {
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     type="tel"
                     placeholder=""
-                    name="tel"
-                    onChange={handleChange}
-                    value={employeeDetailsObject.tel}
-                    pattern="\d{9,10}"
-                    required
+                    {...register("tel", {
+                      required: "This is required.",
+                      pattern: {
+                        value:
+                          /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+                        message: "Please type phone number correctly.",
+                      },
+                    })}
                   />
+                  <ErrorMessage>{errors.tel?.message}</ErrorMessage>
                 </div>
                 <div className="mb-3 lg:flex">
                   <div className="lg:flex-1 lg:mr-3">
@@ -182,27 +240,36 @@ const EmployeedetailsPage = () => {
                     <input
                       type="date"
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
-                      value={splitTFromISO(employeeDetailsObject.birthday)}
-                      name="birthday"
-                      onChange={(e) => handleDateChage(e.target.value)}
-                      //   required
+                      {...register("birthday", {
+                        required: "This is required.",
+                      })}
                     />
+                    <ErrorMessage>{errors.birthday?.message}</ErrorMessage>
                   </div>
                   <div className="lg:flex-1">
                     <label className="block font-medium text-gray-700 my-1">
                       Gender
                     </label>
-                    <select
-                      className="border-2 border-gray-200 w-full h-10 rounded-md px-3 cursor-pointer cursor-pointer focus:outline-none focus:border-blue-500"
-                      required
+                    <Controller
                       name="gender"
-                      onChange={handleChange}
-                      value={employeeDetailsObject.gender}
-                    >
-                      <option value="">โปรดเลือก</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                    </select>
+                      control={control}
+                      rules={{ required: "This is required." }}
+                      render={({ field: { onChange } }) => (
+                        <ReactSelect
+                          onChange={(option: any) => {
+                            console.log(option);
+                            onChange(option.value);
+                          }}
+                          options={genderListOptions}
+                          defaultValue={
+                            genderListOptions[
+                              defaultValueGender(employeeDetailsObject.gender)
+                            ]
+                          }
+                        />
+                      )}
+                    />
+                    <ErrorMessage>{errors.gender?.message}</ErrorMessage>
                   </div>
                 </div>
                 <div className="mb-3">
@@ -212,7 +279,9 @@ const EmployeedetailsPage = () => {
                   <textarea
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     rows={10}
+                    {...register("detail")}
                   />
+                  <ErrorMessage>{errors.detail?.message}</ErrorMessage>
                 </div>
               </div>
             </div>

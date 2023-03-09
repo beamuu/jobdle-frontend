@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 
@@ -8,16 +8,29 @@ import { getAllCategories } from "../../../services/CategoryServices";
 import { postJob } from "../../../services/JobServices";
 import { handleUpload, splitTFromISO } from "../../../services/UtilsServices";
 import Header from "../../../components/Header";
-import { PhotoIcon } from "@heroicons/react/24/outline";
 import ButtonComponent from "../../../components/ButtonComponent";
 
-const defaultValue = {
+interface IdefaultValue {
+  pictureUrl: string[];
+  title: string;
+  detail: string;
+  category: {
+    name: string;
+    minWage: number;
+    color: string;
+  };
+  location: string;
+  deadline: string;
+}
+
+const defaultValue: IdefaultValue = {
   pictureUrl: [""],
   title: "",
   detail: "",
   category: {
     name: "",
     minWage: 0,
+    color: "",
   },
   location: "",
   deadline: "",
@@ -30,7 +43,7 @@ const FillDescriptionJobPage: NextPage = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<JobEditable>({ defaultValues: defaultValue });
+  } = useForm({ defaultValues: defaultValue });
   const [isLoading, setIsLoading] = useState(false);
 
   const [categoryObjects, setCategoryObjects] = useState([]);
@@ -62,28 +75,30 @@ const FillDescriptionJobPage: NextPage = () => {
 
   const onPostJob = handleSubmit(async (data) => {
     setIsLoading(true);
-    let submitedData: JobEditable = data;
-    if (!submitedData) return;
-    if (files) {
-      try {
-        const allPromises = files.map((file) => handleUpload(file));
-
-        await Promise.all(allPromises).then(
-          (result) => (submitedData.pictureUrl = result)
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    if (!data) return;
+    let submitedData = data;
+    console.log(
+      "submitedData.category",
+      typeof submitedData.category,
+      submitedData.category
+    );
     submitedData.category = JSON.parse(submitedData.category);
-    console.log("submitedData", submitedData);
-    try {
-      const res = await postJob(submitedData, cookies.token);
-      console.log(res);
-      router.push(`${res.data._id}`);
-    } catch (err) {
-      console.error(err);
+
+    if (files) {
+      const allPromises = files.map((file) => handleUpload(file));
+
+      await Promise.all(allPromises).then(async (result) => {
+        try {
+          submitedData.pictureUrl = result;
+          const response = await postJob(submitedData, cookies.token);
+          console.log(response);
+          router.push(`${response.data._id}`);
+        } catch (error) {
+          console.error(error);
+        }
+      });
     }
+    console.log("submitedData", submitedData);
   });
 
   const deletePicture = (name: string) => {
@@ -168,9 +183,7 @@ const FillDescriptionJobPage: NextPage = () => {
           <div className="py-2">
             <div className="flex flex-col">
               <div className="">
-                <p className="font-bold">
-                  Pictures (at most 5 photos ){filesCountRef.current}
-                </p>
+                <p className="font-bold">Pictures (at most 5 photos )</p>
               </div>
               <div className="w-full flex bg-gray-100 rounded-md flex-wrap">
                 {files.map((file, id) => (

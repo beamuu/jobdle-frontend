@@ -26,6 +26,7 @@ function UserProvider({ children }: UserProviderProps) {
   const [userData, setUserData] = useState<User>();
 
   const getUserData = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
@@ -40,6 +41,7 @@ function UserProvider({ children }: UserProviderProps) {
     } catch (err) {
       router.push("/signin");
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {

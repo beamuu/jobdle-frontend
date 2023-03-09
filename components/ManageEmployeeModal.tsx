@@ -5,6 +5,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { manageJob } from "../services/JobServices";
 import { useRouter } from "next/router";
+import { PhotoIcon } from "@heroicons/react/24/outline";
+import ButtonComponent from "./ButtonComponent";
 
 interface Props {
   onClose: any;
@@ -21,12 +23,14 @@ export default function ManageEmployeeModal({
   id,
   token,
 }: Props) {
-  const [cookies, setCookie] = useCookies(["token"]);
+  const [cookies] = useCookies(["token"]);
+  const router = useRouter();
+
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
   const [selectedEmployeeArray, setSelectedEmployeeArray] = useState<number[]>(
     []
   );
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!show) return;
@@ -34,23 +38,29 @@ export default function ManageEmployeeModal({
   }, [show]);
 
   const fetchData = async () => {
-    const allEmployees = await getAllEmployees(cookies.token); // error must have query
+    const allEmployees = await getAllEmployees(cookies.token, undefined); // error must have query
     setAllEmployees(allEmployees.data);
   };
 
   const handleManageEmployees = async () => {
+    setIsLoading(true);
     selectedEmployeeArray.sort();
     const selectedEmployees: Employee[] = selectedEmployeeArray.map(
       (index) => allEmployees[index]
     );
     console.log("SelectedEmployees", selectedEmployees);
     console.log("id", id);
-    await manageJob(
-      id,
-      { employee: selectedEmployees, status: "pending" },
-      token
-    );
-    router.push("/");
+    try {
+      const response = await manageJob(
+        id,
+        { employee: selectedEmployees, status: "pending" },
+        token
+      );
+      console.log(response);
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -116,8 +126,18 @@ export default function ManageEmployeeModal({
                             }
                           }}
                         >
-                          <div id="image" className="flex justify-center py-2">
-                            <div className="bg-sky-500 rounded-full w-32 h-32"></div>
+                          <div
+                            className={`h-32 w-32 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center border-sky-500 border-2`}
+                            style={{
+                              backgroundImage: `url(${employee.profileImageUrl})`,
+                            }}
+                          >
+                            {employee.profileImageUrl ? null : (
+                              <div>
+                                <PhotoIcon className="w-auto" />
+                                <p>No Image</p>
+                              </div>
+                            )}
                           </div>
                           <div
                             id="details"
@@ -143,13 +163,15 @@ export default function ManageEmployeeModal({
                     >
                       Cancel
                     </button>
-                    <button
+                    <ButtonComponent
                       type="button"
                       className="inline-flex justify-center rounded border border-transparent bg-sky-100 px-4 py-2 text-sm font-medium text-sky-900 hover:bg-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       onClick={handleManageEmployees}
+                      isLoading={isLoading}
+                      disabled={isLoading}
                     >
                       Manage
-                    </button>
+                    </ButtonComponent>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

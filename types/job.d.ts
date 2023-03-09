@@ -28,8 +28,10 @@ interface JobEditable {
   title: string;
   detail: string;
   category: {
-    name: string;
+    color: string;
     minWage: number;
+    name: string;
+
   };
   location: string;
   deadline: string;

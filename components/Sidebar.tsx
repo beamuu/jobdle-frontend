@@ -19,17 +19,17 @@ import Navbar from "./navbar";
 type State = {
   firstname: string;
   lastname: string;
-  menuState: string;
 };
 
 const Sidebar: NextPage = () => {
   const router = useRouter();
   const { userData } = useUser();
+  // const [sidebar, setSidebar] = useSidebar();
+  // console.log("sidebarData", sidebar);
 
   const [state, setState] = useState<State>({
     firstname: "",
     lastname: "",
-    menuState: "",
   });
   const [open, setOpen] = useState({
     Sidebar: true,
@@ -73,7 +73,7 @@ const Sidebar: NextPage = () => {
   ];
 
   const handleSelectedMenu = (menu: { title: string; link: string }) => {
-    setState({ ...state, menuState: menu.title });
+    localStorage.setItem("sidebarState", menu.link);
     router.push(menu.link);
   };
 
@@ -83,7 +83,6 @@ const Sidebar: NextPage = () => {
 
   const clickOnLogo = () => {
     router.push("/");
-    setState({ ...state, menuState: "" });
   };
 
   const clickOnHeader = () => {
@@ -211,7 +210,7 @@ const Sidebar: NextPage = () => {
                           ? "flex items-center space-x-3"
                           : "flex justify-center"
                       } ${
-                        state.menuState === menu.title
+                        localStorage.getItem("sidebarState") === menu.link
                           ? "bg-gray-100 text-sky-600"
                           : ""
                       } p-2 ml-2 rounded-md rounded-r-none font-medium hover:bg-gray-100 hover:text-sky-600 focus:shadow-outline cursor-pointer duration-100`}

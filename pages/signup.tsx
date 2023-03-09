@@ -2,57 +2,56 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { NextPage } from "next";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import ErrorMessage from "../components/ErrorMessage";
 
 type SignUpPageWithNoLayout = NextPage & {
   noLayout: boolean;
 };
 
-const defaultValue = {
+interface IdefaultValue {
+  firstname: string;
+  lastname: string;
+  email: string;
+  tel: string;
+  password: string;
+  confirmPassword: string | undefined;
+}
+
+const defaultValue: IdefaultValue = {
   firstname: "",
   lastname: "",
   email: "",
-  username: "",
+  tel: "",
   password: "",
+  confirmPassword: "",
 };
 
 const SignUpPage: SignUpPageWithNoLayout = () => {
   const router = useRouter();
+  const {
+    register,
+    unregister,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({ defaultValues: defaultValue });
 
-  const [userData, setUserData] = useState(defaultValue);
+  // const [userData, setUserData] = useState(defaultValue);
   const [isLoading, setIsLoading] = useState(false);
   const [comfirmPassword, setComfirmPassword] = useState("");
 
-  const handleChange = (e: any) => {
-    setUserData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  // const handleChange = (e: any) => {
+  //   setUserData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  // };
 
-  const handleSignUp = async (event: FormEvent) => {
-    event.preventDefault();
+  const onSubmit = handleSubmit(async (data) => {
     setIsLoading(true);
-
-    let errorArray = [];
-    let inputs = Object.entries(userData);
-
-    for (let i = 0; i < Object.keys(userData).length; i++) {
-      if (inputs[i][1].trim() === "") {
-        errorArray.push(inputs[i][0]);
-      }
-    }
-    if (errorArray.length > 0) {
-      setIsLoading(false);
-      alert(`Please enter ${errorArray}`);
-      return;
-    }
-
-    if (comfirmPassword !== userData.password) {
-      alert("Those passwords didn’t match. Try again");
-      return;
-    }
+    delete data.confirmPassword;
     try {
-      event.preventDefault();
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signup`,
-        userData,
+        data,
         {
           headers: {
             "Content-Type": "application/json",
@@ -63,10 +62,10 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
       router.push("/signin");
     } catch (error: any) {
       console.error(error);
-      alert(error.response.data.message);
+      alert(error?.response.data.message);
     }
     setIsLoading(false);
-  };
+  });
 
   return (
     <>
@@ -79,31 +78,27 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
         </div>
         <div className="bg-white w-9/12 h-5/6 p-10 rounded-xl border border-transparent">
           <p className="font-bold text-3xl text-center my-5">Sign Up</p>
-          <form onSubmit={handleSignUp}>
+          <form onSubmit={onSubmit}>
             <div className="mb-3 lg:flex">
               <div className="lg:flex-1 lg:mr-3">
                 <label className="block text-gray-700 my-1">First Name</label>
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   type="text"
-                  name="firstname"
                   placeholder="First Name"
-                  value={userData.firstname}
-                  onChange={handleChange}
-                  required
+                  {...register("firstname", { required: "This is required." })}
                 />
+                <ErrorMessage>{errors.firstname?.message}</ErrorMessage>
               </div>
               <div className="lg:flex-1">
                 <label className="block text-gray-700 my-1">Surname</label>
                 <input
                   className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   type="text"
-                  name="lastname"
                   placeholder="Surname"
-                  value={userData.lastname}
-                  onChange={handleChange}
-                  required
+                  {...register("lastname", { required: "This is required." })}
                 />
+                <ErrorMessage>{errors.lastname?.message}</ErrorMessage>
               </div>
             </div>
             <div className="mb-3">
@@ -111,36 +106,39 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
               <input
                 className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                 type="email"
-                name="email"
                 placeholder="Your email"
-                value={userData.email}
-                onChange={handleChange}
-                required
+                {...register("email", { required: "This is required." })}
               />
+              <ErrorMessage>{errors.email?.message}</ErrorMessage>
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 my-1">Username</label>
+              <label className="block text-gray-700 my-1">Phone number</label>
               <input
                 className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                 type="text"
-                name="username"
-                placeholder="Your username"
-                value={userData.username}
-                onChange={handleChange}
-                required
+                placeholder="Your Phone number"
+                {...register("tel", {
+                  required: "This is required.",
+                  pattern: { value: /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, message: "Please type phone number correctly." },
+                })}
               />
+              <ErrorMessage>{errors.tel?.message}</ErrorMessage>
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 my-1">Password</label>
+              <label className="block text-gray-700 my-1">Password <span className="text-gray-400">(At least 8 characters)</span></label>
               <input
                 className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                 type="password"
                 placeholder="Password"
-                name="password"
-                value={userData.password}
-                onChange={handleChange}
-                required
+                {...register("password", {
+                  required: "This is required.",
+                  minLength: {
+                    value: 8,
+                    message: "Password must have at least 8 characters.",
+                  },
+                })}
               />
+              <ErrorMessage>{errors.password?.message}</ErrorMessage>
             </div>
             <div className="mb-3">
               <label className="block text-gray-700 my-1">
@@ -150,11 +148,16 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
                 className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                 type="password"
                 placeholder="Confirm Password"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setComfirmPassword(e.target.value)
-                }
-                value={comfirmPassword}
+                {...register("confirmPassword", {
+                  required: "This is required.",
+                  validate: (value) => {
+                    if (watch("password") != value) {
+                      return "Your passwords do no match";
+                    }
+                  },
+                })}
               />
+              <ErrorMessage>{errors.confirmPassword?.message}</ErrorMessage>
             </div>
             <div className="grid mt-5">
               <button

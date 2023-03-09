@@ -7,7 +7,7 @@ import {
   deleteEmployee,
   getEmployee,
 } from "../../../services/EmployeeServices";
-import ComfirmModal from "../../../components/ComfirmModal";
+import ComfirmModal from "../../../components/SuccessJobModal";
 import Header from "../../../components/Header";
 import { dateFormat } from "../../../services/UtilsServices";
 import { PhotoIcon } from "@heroicons/react/24/outline";
@@ -116,11 +116,11 @@ const EmployeedetailsPage = () => {
           </div>
           <div className="sm:grid sm:grid-cols-4 py-1">
             <p className="font-bold col-span-1">Works </p>
-            <p className="w-full sm:col-span-3">
-              {employeeDetailsObject.works.map((work) => (
-                <div className="border rounded-md w-full sm:col-span-3"></div>
+            <div className="w-full sm:col-span-3">
+              {employeeDetailsObject.works.map((work: any) => (
+                <div className="border rounded-md w-full sm:col-span-3">{work.title}</div>
               ))}
-            </p>
+            </div>
           </div>
         </div>
       </div>

@@ -6,6 +6,19 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { dateFormat } from "../services/UtilsServices";
 import { getAllJobs } from "../services/JobServices";
 import LoadingComponent from "./LoadingComponent";
+import Select from "react-select";
+
+const sortListOptions = [
+  { value: "deadline", label: "Deadline" },
+  { value: "fullname", label: "Employer's name" },
+  { value: "title", label: "Title" },
+  { value: "category", label: "Category" },
+];
+
+const OrderListOptions = [
+  { value: "desc", label: "Desc" },
+  { value: "asc", label: "Asc" },
+];
 
 const AdminTable = () => {
   const [cookies] = useCookies(["token"]);
@@ -225,7 +238,7 @@ const AdminTable = () => {
     <>
       <div className="my-3">
         <div className="flex mb-3 justify-between">
-          <div className="space-x-2">
+          <div>
             <button className={ButtonStyles("new")} onClick={pushStatusNew}>
               New
             </button>
@@ -237,7 +250,7 @@ const AdminTable = () => {
             </button>
           </div>
           <div className="flex space-x-2">
-            <div>
+            <div className="flex items-center">
               <span>Search: </span>
               <input
                 className="w-30"
@@ -248,30 +261,25 @@ const AdminTable = () => {
                 }}
               />
             </div>
-            <div>
+            <div className="flex items-center">
               <span>Sort: </span>
-              <select
-                name=""
-                id=""
-                onChange={(e) => setQuery({ ...query, sort: e.target.value })}
-              >
-                {sortList.map((item, id) => (
-                  <option value={item} key={id}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+              <Select
+                options={sortListOptions}
+                defaultValue={sortListOptions[0]}
+                onChange={(option) =>
+                  setQuery({ ...query, sort: option.value })
+                }
+              />
             </div>
-            <div>
+            <div className="flex items-center">
               <span>Order</span>
-              <select
-                name=""
-                id=""
-                onChange={(e) => setQuery({ ...query, order: e.target.value })}
-              >
-                <option value="desc">desc</option>
-                <option value="asc">asc</option>
-              </select>
+              <Select
+                options={OrderListOptions}
+                defaultValue={OrderListOptions[0]}
+                onChange={(option) =>
+                  setQuery({ ...query, order: option.value })
+                }
+              />
             </div>
           </div>
         </div>

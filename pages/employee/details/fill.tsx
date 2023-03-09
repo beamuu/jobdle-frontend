@@ -2,13 +2,27 @@ import { ArrowUpTrayIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import React, { FormEvent, useState } from "react";
 import { useCookies } from "react-cookie";
+import { Controller, useForm } from "react-hook-form";
+import Select from "react-select";
 import ButtonComponent from "../../../components/ButtonComponent";
+import ErrorMessage from "../../../components/ErrorMessage";
 
 import Header from "../../../components/Header";
 import { postEmployee } from "../../../services/EmployeeServices";
 import { handleUpload } from "../../../services/UtilsServices";
 
-const defaultValue = {
+interface IdefaultValue {
+  profileImageUrl: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  tel: string;
+  birthday: string;
+  gender: string;
+  detail: string;
+}
+
+const defaultValue: IdefaultValue = {
   profileImageUrl: "",
   firstname: "",
   lastname: "",
@@ -19,30 +33,34 @@ const defaultValue = {
   detail: "",
 };
 
+const genderListOptions = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+];
+
 function FillEmployeeDetailPage() {
   const [cookies] = useCookies(["token"]);
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({ defaultValues: defaultValue });
 
-  const [employeeDetailsObject, setEmployeeDetailsObject] =
-    useState<EmployeeEditable>(defaultValue);
+  // const [employeeDetailsObject, setEmployeeDetailsObject] =
+  //   useState<EmployeeEditable>(defaultValue);
   const [file, setFile] = useState<File>();
   const [isLoading, setLoading] = useState(false);
-
-  const handleChange = (e: any) => {
-    setEmployeeDetailsObject((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
   function handleChangeFile(event: any) {
     setFile(event.target.files[0]);
   }
 
-  const handleSubmitAddEmployee = async (e: FormEvent) => {
+  const onSubmit = handleSubmit(async (data) => {
+    console.log(data);
     setLoading(true);
-    e.preventDefault();
-    let submitedData = employeeDetailsObject;
+    let submitedData = data;
     if (!submitedData) return;
     if (file) {
       try {
@@ -53,14 +71,19 @@ function FillEmployeeDetailPage() {
       }
     }
     console.log("submitedData", submitedData);
-    await postEmployee(submitedData, cookies.token);
-    router.push("/employee");
-  };
+    try {
+      const response = await postEmployee(submitedData, cookies.token);
+      console.log(response);
+      router.push("/employee");
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   return (
     <>
       <Header title="Fill Employee Details" />
-      <form onSubmit={handleSubmitAddEmployee}>
+      <form onSubmit={onSubmit}>
         <div className="flex flex-col lg:flex lg:flex-row bg-white py-5 rounded-md shadow">
           <div className="flex flex-col items-center lg:w-1/3">
             <div
@@ -71,7 +94,7 @@ function FillEmployeeDetailPage() {
                 })`,
               }}
             >
-              {file || employeeDetailsObject.profileImageUrl ? null : (
+              {file ? null : (
                 <div>
                   <PhotoIcon className="w-auto" />
                   <p>No Image</p>
@@ -100,11 +123,11 @@ function FillEmployeeDetailPage() {
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                       type="text"
                       placeholder=""
-                      name="firstname"
-                      onChange={handleChange}
-                      value={employeeDetailsObject.firstname}
-                      required
+                      {...register("firstname", {
+                        required: "This is required.",
+                      })}
                     />
+                    <ErrorMessage>{errors.firstname?.message}</ErrorMessage>
                   </div>
                   <div className="lg:flex-1">
                     <label className="block font-medium text-gray-700 my-1">
@@ -114,11 +137,11 @@ function FillEmployeeDetailPage() {
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                       type="text"
                       placeholder=""
-                      name="lastname"
-                      onChange={handleChange}
-                      value={employeeDetailsObject.lastname}
-                      required
+                      {...register("lastname", {
+                        required: "This is required.",
+                      })}
                     />
+                    <ErrorMessage>{errors.lastname?.message}</ErrorMessage>
                   </div>
                 </div>
                 <div className="mb-3">
@@ -129,11 +152,9 @@ function FillEmployeeDetailPage() {
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     type="email"
                     placeholder="Your email"
-                    name="email"
-                    onChange={handleChange}
-                    value={employeeDetailsObject.email}
-                    required
+                    {...register("email", { required: "This is required." })}
                   />
+                  <ErrorMessage>{errors.email?.message}</ErrorMessage>
                 </div>
                 <div className="mb-3">
                   <label className="block font-medium text-gray-700 my-1">
@@ -143,12 +164,16 @@ function FillEmployeeDetailPage() {
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     type="text"
                     placeholder=""
-                    name="tel"
-                    onChange={handleChange}
-                    value={employeeDetailsObject.tel}
-                    pattern="\d{9,10}"
-                    required
+                    {...register("tel", {
+                      required: "This is required.",
+                      pattern: {
+                        value:
+                          /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+                        message: "Please type phone number correctly.",
+                      },
+                    })}
                   />
+                  <ErrorMessage>{errors.tel?.message}</ErrorMessage>
                 </div>
                 <div className="mb-3 lg:flex">
                   <div className="lg:flex-1 lg:mr-3">
@@ -159,27 +184,28 @@ function FillEmployeeDetailPage() {
                       className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                       type="date"
                       placeholder=""
-                      name="birthday"
-                      onChange={handleChange}
-                      value={employeeDetailsObject.birthday}
-                      required
+                      {...register("birthday", {
+                        required: "This is required.",
+                      })}
                     />
+                    <ErrorMessage>{errors.birthday?.message}</ErrorMessage>
                   </div>
                   <div className="lg:flex-1">
                     <label className="block font-medium text-gray-700 my-1">
                       Gender
                     </label>
-                    <select
-                      className="border-2 border-gray-200 w-full h-10 rounded-md px-3 cursor-pointer cursor-pointer focus:outline-none focus:border-blue-500"
-                      required
+                    <Controller
                       name="gender"
-                      onChange={handleChange}
-                      value={employeeDetailsObject.gender}
-                    >
-                      <option value="">โปรดเลือก</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                    </select>
+                      control={control}
+                      rules={{ required: "This is required." }}
+                      render={({ field: { onChange } }) => (
+                        <Select
+                          onChange={(option: any) => onChange(option.value)}
+                          options={genderListOptions}
+                        />
+                      )}
+                    />
+                    <ErrorMessage>{errors.gender?.message}</ErrorMessage>
                   </div>
                 </div>
                 <div className="mb-3">
@@ -189,6 +215,7 @@ function FillEmployeeDetailPage() {
                   <textarea
                     className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     rows={10}
+                    {...register("detail")}
                   />
                 </div>
               </div>
@@ -202,7 +229,7 @@ function FillEmployeeDetailPage() {
             isLoading={isLoading}
             disabled={isLoading}
           >
-            Add
+            Create
           </ButtonComponent>
         </div>
       </form>

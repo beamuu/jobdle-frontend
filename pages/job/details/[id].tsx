@@ -9,7 +9,8 @@ import Header from "../../../components/Header";
 import { dateFormat } from "../../../services/UtilsServices";
 import ManageEmployeeModal from "../../../components/ManageEmployeeModal";
 import DeleteJobModal from "../../../components/DeleteJobModal";
-import ComfirmModal from "../../../components/ComfirmModal";
+import ComfirmModal from "../../../components/SuccessJobModal";
+import { PhotoIcon } from "@heroicons/react/24/outline";
 
 const JobDetailsPage: NextPage = () => {
   const [cookies] = useCookies(["token"]);
@@ -98,7 +99,10 @@ const JobDetailsPage: NextPage = () => {
           <p className={LabelStyles}>Category </p>
           <p
             className={DetailStyles}
-            style={{ color: `${jobDetailsObject.category.color}`,fontWeight: "bold" }}
+            style={{
+              color: `${jobDetailsObject.category.color}`,
+              fontWeight: "bold",
+            }}
           >
             {jobDetailsObject.category.name}
           </p>
@@ -131,8 +135,18 @@ const JobDetailsPage: NextPage = () => {
                     className="border bg-white flex flex-col items-center rounded-md hover:shadow-lg cursor-pointer p-2"
                     key={employee._id}
                   >
-                    <div id="image" className="flex justify-center py-2">
-                      <div className="bg-sky-500 rounded-full w-32 h-32"></div>
+                    <div
+                      className={`h-32 w-32 bg-gray-100 rounded-full bg-no-repeat bg-cover bg-center flex justify-center items-center`}
+                      style={{
+                        backgroundImage: `url(${employee.profileImageUrl})`,
+                      }}
+                    >
+                      {employee.profileImageUrl ? null : (
+                        <div>
+                          <PhotoIcon className="w-auto" />
+                          <p>No Image</p>
+                        </div>
+                      )}
                     </div>
                     <div id="details" className="flex flex-col items-center">
                       <span>

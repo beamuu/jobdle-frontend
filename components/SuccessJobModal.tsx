@@ -17,10 +17,6 @@ export default function ComfirmModal({
   show,
   cancel,
   confirm,
-  title,
-  cancelButtonValue,
-  confirmButtonValue,
-  confirmButtonColor,
 }: Props) {
   return (
     <>
@@ -58,7 +54,7 @@ export default function ComfirmModal({
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    {title}
+                    Are you sure you success this job ?
                   </Dialog.Title>
 
                   <div className="mt-4 flex justify-end space-x-4">
@@ -67,14 +63,14 @@ export default function ComfirmModal({
                       className="inline-flex justify-center rounded border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       onClick={cancel}
                     >
-                      {cancelButtonValue}
+                      cancel
                     </button>
                     <button
                       type="button"
-                      className={`inline-flex justify-center rounded border border-transparent bg-${confirmButtonColor}-100 px-4 py-2 text-sm font-medium text-${confirmButtonColor}-900 hover:bg-${confirmButtonColor}-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
+                      className={`bg-green-100 text-green-900 hover:bg-green-200 inline-flex justify-center rounded border border-transparent px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
                       onClick={confirm}
                     >
-                      {confirmButtonValue}
+                      Confirm
                     </button>
                   </div>
                 </Dialog.Panel>

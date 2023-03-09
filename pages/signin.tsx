@@ -11,7 +11,12 @@ type SignInPageWithNoLayout = NextPage & {
   noLayout: boolean;
 };
 
-const defaultValue = {
+interface IdefaultValue {
+  email: string;
+  password: string;
+}
+
+const defaultValue: IdefaultValue = {
   email: "",
   password: "",
 };
@@ -33,7 +38,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
     console.log(data);
     setIsLoading(true);
     try {
-      console.log("signInAccount")
+      console.log("signInAccount");
       const response = await signInAccount(data);
       console.log("response", response);
 

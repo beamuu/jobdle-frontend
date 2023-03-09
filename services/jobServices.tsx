@@ -41,7 +41,7 @@ export const getAllAccomplishedJobs = async (
 };
 
 export const getUserJobs = async (
-  status: string | string[] | undefined,
+  status:  string[] | undefined,
   page: number = 0,
   token: string
 ) => {
@@ -49,7 +49,7 @@ export const getUserJobs = async (
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,
     {
       params: {
-        status: [status],
+        status: status,
         page: page,
       },
       headers: headersParams(token),
@@ -100,7 +100,7 @@ export const deleteJob = async (
   return response;
 };
 
-export const postJob = async (data: {}, token: string) => {
+export const postJob = async (data: JobEditable, token: string) => {
   console.log("data in postJob", data);
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/work`,

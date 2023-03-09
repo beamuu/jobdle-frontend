@@ -50,17 +50,18 @@ function EmployeePage() {
               Add Employee
             </ButtonComponent>
             <div className="flex space-x-2">
-            <div>
-              <span>Search: </span>
-              <input
-                className="w-30"
-                value={search}
-                onChange={(e) => setSearch(e.target.value.trim())}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") setQuery({ ...query, search: search });
-                }}
-              />
-            </div>
+              <div>
+                <span>Search: </span>
+                <input
+                  className="w-30"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value.trim())}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter")
+                      setQuery({ ...query, search: search });
+                  }}
+                />
+              </div>
               <div>
                 <span>Status: </span>
                 <select name="filter" id="">
@@ -112,7 +113,7 @@ function EmployeePage() {
                     {employee.profileImageUrl ? null : (
                       <div>
                         <PhotoIcon className="w-auto" />
-                        <p>No Image</p>
+                        <span>No Image</span>
                       </div>
                     )}
                   </div>
