@@ -6,6 +6,15 @@ import { useRouter } from "next/router";
 import { getUserData, signInAccount } from "../services/AccountServices";
 import ButtonComponent from "../components/ButtonComponent";
 import { useForm } from "react-hook-form";
+import Link from "next/link";
+
+const scope =
+  "openid%20email%20profile_pic%20student%20educations%20fullname%20account_type";
+const clientId = "d1c641c30dd8d85add98cb275ab9cacc";
+const redirectUri = "http://localhost:3000/auth/kraikub";
+const signinWithKasetsart = {
+  baseUrl: `https://dev.kraikub.com/signin?client_id=${clientId}&scope=${scope}&redirect_uri=${redirectUri}&response_type=implicit`,
+};
 
 type SignInPageWithNoLayout = NextPage & {
   noLayout: boolean;
@@ -111,7 +120,7 @@ const SignInPage: SignInPageWithNoLayout = () => {
                 Forgot Password?
               </a>
             </div>
-            <div className="flex justify-center mb-3 items-center">
+            <div className="flex gap-y-4 flex-col justify-center mb-3 items-center">
               <ButtonComponent
                 className="border border-transparent rounded-full bg-blue-600 hover:bg-blue-500 w-full py-2 px-4 text-sm font-medium text-white"
                 type="submit"
@@ -120,17 +129,26 @@ const SignInPage: SignInPageWithNoLayout = () => {
               >
                 Login
               </ButtonComponent>
+              <a href={signinWithKasetsart.baseUrl} className="w-full">
+                <ButtonComponent
+                  className="border border-transparent rounded-full bg-green-600 hover:bg-green-500 w-full py-2 px-4 text-sm font-medium text-white"
+                  type="button"
+                  disabled={isLoading}
+                  isLoading={isLoading}
+                >
+                  Sign up with Kasetsart
+                </ButtonComponent>
+              </a>
             </div>
           </form>
           <div className="flex justify-center my-5">
             <p>
               Need An Account?{" "}
-              <a
-                href="/signup"
-                className="text-blue-600 visited:text-purple-600 hover:underline hover:cursor-pointer"
-              >
-                Create Now!
-              </a>
+              <Link href="/signup">
+                <a className="text-blue-600 visited:text-purple-600 hover:underline hover:cursor-pointer">
+                  Create Now!
+                </a>
+              </Link>
             </p>
           </div>
         </div>

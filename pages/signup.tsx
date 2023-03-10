@@ -4,6 +4,7 @@ import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import ErrorMessage from "../components/ErrorMessage";
+import Link from "next/link";
 
 type SignUpPageWithNoLayout = NextPage & {
   noLayout: boolean;
@@ -35,7 +36,14 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm({ defaultValues: defaultValue });
+  } = useForm({
+    defaultValues: {
+      ...defaultValue,
+      firstname: router.query.firstname,
+      lastname: router.query.lastname,
+      email: router.query.email,
+    },
+  });
 
   // const [userData, setUserData] = useState(defaultValue);
   const [isLoading, setIsLoading] = useState(false);
@@ -119,13 +127,20 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
                 placeholder="Your Phone number"
                 {...register("tel", {
                   required: "This is required.",
-                  pattern: { value: /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, message: "Please type phone number correctly." },
+                  pattern: {
+                    value:
+                      /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+                    message: "Please type phone number correctly.",
+                  },
                 })}
               />
               <ErrorMessage>{errors.tel?.message}</ErrorMessage>
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 my-1">Password <span className="text-gray-400">(At least 8 characters)</span></label>
+              <label className="block text-gray-700 my-1">
+                Password{" "}
+                <span className="text-gray-400">(At least 8 characters)</span>
+              </label>
               <input
                 className="border-2 border-gray-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                 type="password"
@@ -178,9 +193,9 @@ const SignUpPage: SignUpPageWithNoLayout = () => {
 
           <div className="flex justify-center my-5">
             <p className="mr-2">You have an account ? </p>
-            <a href="/signin" className="text-blue-600 visited:text-purple-600">
-              Sign In
-            </a>
+            <Link href="/signin">
+              <a className="text-blue-600 visited:text-purple-600">Sign In</a>
+            </Link>
           </div>
         </div>
       </div>
